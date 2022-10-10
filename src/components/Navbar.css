@@ -1,0 +1,19 @@
+.navbar-top {
+	display: flex;
+    justify-content: space-around;
+}
+
+.navbar {
+	diplay: flex !important;
+	justify-content: space-around;
+	align-items: center;
+}
+
+.icon {
+	font-size: 2rem;
+	color: #6900ff;
+}
+
+.purple {
+	color:  #6900ff;
+}
