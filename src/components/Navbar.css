@@ -1,11 +1,6 @@
-.navbar-top {
-	display: flex;
-    justify-content: space-around;
-}
-
 .navbar {
-	diplay: flex !important;
-	justify-content: space-around;
+	display: flex !important;
+	justify-content: center;
 	align-items: center;
 }
 

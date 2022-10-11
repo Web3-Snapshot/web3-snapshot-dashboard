@@ -8,16 +8,20 @@
 
 body {
   margin: 0;
-  font-family: 'Rubik',
-    sans-serif;
+  font-family: 'Rubik', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #26272b;
   color: #f4f4f4;
 }
 
-h1 {
+a {
   color: #f4f4f4;
+  text-decoration: none;
+}
+
+h1 {
+  text-align: center;
   margin:  1rem;
 }
 
