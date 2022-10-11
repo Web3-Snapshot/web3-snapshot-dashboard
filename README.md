@@ -1,6 +1,12 @@
-# From this tutorial
+### From this tutorial
 
 https://www.youtube.com/watch?v=gxXw-M5lDOw
+
+tutorial finished!
+
+### Next Step
+
+Customization + add custom content
 
 # Getting Started with Create React App
 
