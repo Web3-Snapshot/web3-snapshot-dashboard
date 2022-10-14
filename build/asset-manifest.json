@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/web3dash2/static/css/main.91404ed1.css",
+    "main.js": "/web3dash2/static/js/main.be3e7409.js",
+    "index.html": "/web3dash2/index.html",
+    "main.91404ed1.css.map": "/web3dash2/static/css/main.91404ed1.css.map",
+    "main.be3e7409.js.map": "/web3dash2/static/js/main.be3e7409.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.91404ed1.css",
+    "static/js/main.be3e7409.js"
+  ]
+}
