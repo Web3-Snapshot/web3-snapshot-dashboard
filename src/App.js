@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Routes, Route } from 'react-router-dom'
-import Coins from './components/Coins-2';
+import Coins from './components/Coins';
 import Coin from './routes/Coin';
 import Navbar from './components/Navbar';
 

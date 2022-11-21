@@ -9,6 +9,7 @@ const Navbar = () => {
 			<div className='navbar'>
 				<FaCoins className='icon' />
 				<h1> Web3 <span className='purple'>Smart</span> Dashboard</h1>
+				<button>hello</button>
 			</div>
 		</Link>
 	)
