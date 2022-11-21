@@ -21,3 +21,9 @@ This version is live at:
 https://www.lostconversation.com/web3dash2/6/
 
 you should click on the logo... which WEIRDLY loads the app onto my main domain lostconversation.com !!! SO WEIRD... let's fix this!
+
+///////////////////////////
+
+This is the original tutorial btw:
+
+https://www.youtube.com/watch?v=gxXw-M5lDOw
