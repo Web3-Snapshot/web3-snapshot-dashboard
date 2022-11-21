@@ -8,7 +8,9 @@ I have implemented two buttons, but can't get them to do what I want. I can't ev
 
 Also I have created two pages, Coins-1 and Coins-2 which are supposed to fetch different data.
 Right now the issue is at App.js where:
-`const url1` is alright
+
+`const url1` is alright 
+
 `const url2` should be a loop that goes through all `totCryptos` and stores data of that item.
 
 I look forward to interact ith Mr. Loxosceles on this one!
