@@ -1,3 +1,5 @@
+
+
 .navbar {
 	display: flex !important;
 	justify-content: center;
@@ -11,4 +13,19 @@
 
 .purple {
 	color:  #0afa96;
+}
+
+.mainMenu {
+	margin: auto;
+    display: table;
+}
+
+button {
+	padding: 5px;
+	width: 150px;	
+	margin: 5px;
+}
+
+.btnPressed {
+	opacity: .2;
 }
