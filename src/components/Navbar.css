@@ -1,31 +1,29 @@
-
-
 .navbar {
-	display: flex !important;
-	justify-content: center;
-	align-items: center;
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
 }
 
 .icon {
-	font-size: 2rem;
-	color: #0afa96;
+  font-size: 2rem;
+  color: #0afa96;
 }
 
 .purple {
-	color:  #0afa96;
+  color: #0afa96;
 }
 
 .mainMenu {
-	margin: auto;
-    display: table;
+  margin: auto;
+  display: table;
 }
 
 button {
-	padding: 5px;
-	width: 150px;	
-	margin: 5px;
+  padding: 5px;
+  width: 150px;
+  margin: 5px;
 }
 
-.btnPressed {
-	opacity: .2;
+.active {
+  opacity: 0.2;
 }
