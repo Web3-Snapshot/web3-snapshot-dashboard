@@ -19,11 +19,19 @@
 }
 
 button {
+  border-radius: 3px;
   padding: 5px;
   width: 150px;
   margin: 5px;
 }
 
+button:hover {
+  cursor: pointer;
+  opacity: .7;
+}
+
 .active {
-  opacity: 0.2;
+  pointer-events: none;
+  background-color: #0afa96;
+  /* opacity: 0.2; */
 }

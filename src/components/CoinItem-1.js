@@ -20,7 +20,7 @@ const CoinItem = (props) => {
       <p>-</p> {/* 30d */}
       <p>-</p> {/* 6m */}
       <p>-</p> {/* 1y */}
-      <p className="hide-mobile">-</p> {/* 3y */}
+      <p className="hide-mobile">-</p> {props.url3}
     </div>
   );
 };

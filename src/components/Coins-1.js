@@ -13,12 +13,12 @@ const Coins1 = (props) => {
           <p>#</p>
           <p className="coin-name coin-col-2">Coin</p>
           <p className="coin-col-3">Price</p>
-          <p className="coin-col-4">24h</p>
+          <p className="coin-col-4">1d</p>
           <p>1w</p>
           <p>1m</p>
           <p>6m</p>
           <p>1y</p>
-          <p className="hide-mobile">3y</p>
+          <p className="hide-mobile">1/1/'20</p>
         </div>
 
         {props.coins.map((coins) => {
