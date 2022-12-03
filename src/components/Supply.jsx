@@ -1,65 +1,58 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import CoinItem from "./CoinItem-1";
+import CoinItem from "./CoinItem-2";
 import Coin from "../routes/Coin";
 import { Link } from "react-router-dom";
-import { PAGES } from "../constants";
 
 import "./Coins.css";
 
-async function fetchCoins() {
-  const marketsUrl = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${PAGES}&page=1&sparkline=false&price_change_percentage=1h%2C%2024h%2C%207d%2C%2030d%2C%20200d%2C%201y%2C%203y`;
+async function fetchCoins(id) {
+  const coinUrl = `https://api.coingecko.com/api/v3/coins/${id}`;
   return axios({
     method: "GET",
-    url: marketsUrl,
+    url: coinUrl,
   })
     .then((res) => {
-      return res.data;
+      return res;
     })
     .catch((err) => {
       throw new Error(err);
     });
 }
 
-function Prices() {
+function Supply(props) {
   const [coins, setCoins] = useState([]);
 
   useEffect(() => {
     fetchCoins().then((res) => setCoins(res));
   }, []);
 
-  const headCells = [
-    { id: "number", label: "#", classes: "" },
-    { id: "coin", label: "Coin", classes: "coin-name coin-col-2" },
-    { id: "price", label: "Price", classes: "coin-col-3" },
-    { id: "1d", label: "1D", classes: "coin-col-4" },
-    { id: "1w", label: "1W" },
-    { id: "1m", label: "1M" },
-    { id: "6m", label: "6M" },
-    { id: "6m", label: "6M" },
-    { id: "1y", label: "1Y" },
-    { id: "refDate", label: "01/01/20", classes: "hide-mobile" },
-  ];
-
   return (
     <div className='container'>
       {coins && (
-        <div className='heading'>
-          {headCells.map((cell) => (
-            <p className={cell.classes}>{cell.label}</p>
-          ))}
+        <div>
+          <div className='heading'>
+            <p className='coin-col-1'>#</p>
+            <p className='coin-col-2 coin-name'>Coin</p>
+            <p className='coin-col-3'>Mkt Cap</p>
+            <p className='hide-mobile'>FD Mkt Cap</p>
+            <p>Supply</p>
+            <p className='hide-mobile'>Supply Total</p>
+            <p className='hide-mobile'>Supply Max</p>
+            <p className='hide-mobile'>Volume</p>
+          </div>
+
+          {coins.map((coins) => {
+            return (
+              <Link to={`/coin/${coins.id}`} element={<Coin />} key={coins.id}>
+                <CoinItem coins={coins} />
+              </Link>
+            );
+          })}
         </div>
       )}
-
-      {coins.map((coin) => {
-        return (
-          <Link to={`/coin/${coin.id}`} element={<Coin />} key={coin.id}>
-            <CoinItem coins={coin} />
-          </Link>
-        );
-      })}
     </div>
   );
 }
 
-export default Prices;
+export default Supply;

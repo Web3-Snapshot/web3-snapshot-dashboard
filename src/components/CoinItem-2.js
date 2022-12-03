@@ -13,7 +13,7 @@ const CoinItem = (props) => {
       let shortValue = "";
       for (let precision = 2; precision >= 1; precision--) {
         shortValue = parseFloat(
-          (suffixNum != 0
+          (suffixNum !== 0
             ? value / Math.pow(1000, suffixNum)
             : value
           ).toPrecision(precision)
@@ -37,13 +37,13 @@ const CoinItem = (props) => {
   // console.log(newValue);
 
   return (
-    <div className="coin-row" alt="asd">
-      <p className="coin-col-1">{props.coins.market_cap_rank}</p>
-      <div className="img-symbol coin-col-2">
-        <img src={props.coins.image} />
+    <div className='coin-row' alt='asd'>
+      <p className='coin-col-1'>{props.coins.market_cap_rank}</p>
+      <div className='img-symbol coin-col-2'>
+        <img src={props.coins.image} alt='coin' />
         <p>{props.coins.symbol.toUpperCase()}</p>
       </div>
-      <p className="coin-col-3 hide-mobile">
+      <p className='coin-col-3 hide-mobile'>
         {/* here we should have "newValue" instead of the line below */}$
         {props.coins.market_cap.toLocaleString()}
       </p>{" "}
@@ -52,7 +52,7 @@ const CoinItem = (props) => {
       <p>-</p> {/* supply */}
       <p>-</p> {/* supply total */}
       <p>-</p> {/* supply max */}
-      <p className="hide-mobile">
+      <p className='hide-mobile'>
         ${props.coins.total_volume.toLocaleString()}
       </p>
     </div>
