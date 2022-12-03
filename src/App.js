@@ -45,10 +45,10 @@ const App = () => {
         <>
           <div>
             {coin.symbol}: 1day: {coin.price_change_percentage_24h.toFixed(2)}%
-            // 1week: {coin.price_change_percentage_7d}% // 1month:
-            {coin.price_change_percentage_30d} // 7months:{" "}
+            {/* 1week: {coin.price_change_percentage_7d}%  1month: */}
+            {coin.price_change_percentage_30d} {/* 7months:{" "} */}
             {coin.price_change_percentage_200d}
-            // 1year:
+            {/* 1year: */}
             {coin.price_change_percentage_1y}
           </div>
         </>
@@ -60,12 +60,12 @@ const App = () => {
     <>
       <Navbar />
       <div>{coinData()}</div>
-      <div className="grid"></div>
+      <div className='grid'></div>
       <Routes>
-        <Route path="/" element={<Coins1 coins={coins} />} />
-        <Route path="/supply" element={<Coins2 coins={coins} />} />
-        <Route path="/coin" element={<Coin />}>
-          <Route path=":coinId" element={<Coin />} />
+        <Route path='/' element={<Coins1 coins={coins} />} />
+        <Route path='/supply' element={<Coins2 coins={coins} />} />
+        <Route path='/coin' element={<Coin />}>
+          <Route path=':coinId' element={<Coin />} />
         </Route>
       </Routes>
     </>
