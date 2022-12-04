@@ -13,7 +13,7 @@ async function fetchCoins(id) {
     url: coinUrl,
   })
     .then((res) => {
-      return res;
+      return res.data;
     })
     .catch((err) => {
       throw new Error(err);

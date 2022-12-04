@@ -47,7 +47,7 @@ function App() {
       {/* <div>{coinData()}</div> */}
       <div className='grid'></div>
       <Routes>
-        <Route path='/' element={<Prices />} />
+        <Route path='/prices' element={<Prices />} />
         <Route path='/supply' element={<Supply />} />
         <Route path='/coin' element={<Coin />}>
           <Route path=':coinId' element={<Coin />} />
