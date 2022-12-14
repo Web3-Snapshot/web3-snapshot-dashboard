@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Prices from "./components/Prices";
 import Supply from "./components/Supply";
 import Coin from "./routes/Coin";
 import Navbar from "./components/Navbar";
 import { PAGES } from "./constants";
+import Dashboard from "./pages/Dashboard";
+import { fetchCoins } from "./pages/Dashboard";
+
+export async function loader() {
+  const coins = await fetchCoins();
+  return { coins };
+}
 
 // url3 is supposed to fetch data for all coins at the 1 Jan 2020 date, and display the difference in %
 // const URL3 = `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=1-1-2020`;
@@ -44,13 +51,13 @@ function App() {
   return (
     <>
       <Navbar />
-      {/* <div>{coinData()}</div> */}
       <div className='grid'></div>
       <Routes>
-        <Route path='/prices' element={<Prices />} />
-        <Route path='/supply' element={<Supply />} />
-        <Route path='/coin' element={<Coin />}>
-          <Route path=':coinId' element={<Coin />} />
+        <Route path='/' element={<Dashboard />}>
+          <Route index element={<Prices />} />
+          <Route path='/prices' element={<Prices />} />
+          <Route path='/supply' element={<Supply />} />
+          <Route path='*' element={<></>} />
         </Route>
       </Routes>
     </>

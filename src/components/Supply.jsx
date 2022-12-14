@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CoinItem from "./CoinItem-2";
 import Coin from "../routes/Coin";
-import { Link } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 
 import "./Coins.css";
 
@@ -20,16 +20,18 @@ async function fetchCoins(id) {
     });
 }
 
-function Supply(props) {
-  const [coins, setCoins] = useState([]);
+function Supply() {
+  const context = useOutletContext();
+  // const [coins, setCoins] = useState([]);
+  console.log("Rendering Supply");
 
-  useEffect(() => {
-    fetchCoins().then((res) => setCoins(res));
-  }, []);
+  // useEffect(() => {
+  //   fetchCoins().then((res) => setCoins(res));
+  // }, []);
 
   return (
     <div className='container'>
-      {coins && (
+      {context.coins && (
         <div>
           <div className='heading'>
             <p className='coin-col-1'>#</p>
@@ -42,7 +44,7 @@ function Supply(props) {
             <p className='hide-mobile'>Volume</p>
           </div>
 
-          {coins.map((coins) => {
+          {context.coins.map((coins) => {
             return (
               <Link to={`/coin/${coins.id}`} element={<Coin />} key={coins.id}>
                 <CoinItem coins={coins} />

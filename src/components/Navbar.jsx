@@ -12,14 +12,14 @@ function Navbar() {
           <h1> Web3 Dashboard</h1>
         </div>
       </Link>
-      <div className='mainMenu'>
+      {/* <div className='mainMenu'>
         <NavLink activeClassName='active' to='/prices'>
           <button>PRICES</button>
         </NavLink>
         <NavLink activeClassName='active' to='/supply'>
           <button>SUPPLY</button>
         </NavLink>
-      </div>
+      </div> */}
     </div>
   );
 }
