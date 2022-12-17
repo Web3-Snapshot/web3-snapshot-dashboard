@@ -54,11 +54,11 @@ function App() {
       <div className='grid'></div>
       <Routes>
         <Route path='/' element={<Dashboard />}>
-          <Route index element={<Prices />} />
-          <Route path='/prices' element={<Prices />} />
-          <Route path='/supply' element={<Supply />} />
-          <Route path='*' element={<></>} />
+          <Route index element={<Navigate to='prices' />} />
+          <Route path='prices' element={<Prices />} />
+          <Route path='supply' element={<Supply />} />
         </Route>
+        <Route path='*' element={<></>} />
       </Routes>
     </>
   );
