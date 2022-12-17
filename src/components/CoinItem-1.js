@@ -1,6 +1,6 @@
 import React from "react";
 
-const CoinItem1 = ({ coin, additionalInfo }) => {
+const CoinItem1 = ({ additionalInfo }) => {
   return (
     <div className='coin-row' alt='coinRow'>
       {additionalInfo && (

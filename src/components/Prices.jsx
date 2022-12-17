@@ -33,7 +33,7 @@ function Prices() {
       {coins.map((coin) => {
         return (
           <Link to={`/coin/${coin.id}`} element={<Coin />} key={coin.id}>
-            <CoinItem1 coin={coin} additionalInfo={coinProperties[coin.id]} />
+            <CoinItem1 additionalInfo={coinProperties[coin.id]} />
           </Link>
         );
       })}

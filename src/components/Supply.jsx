@@ -30,10 +30,7 @@ function Supply() {
                 element={<Coin />}
                 key={`${coins.id}-${idx}`}
               >
-                <CoinItem2
-                  coin={coin}
-                  additionalInfo={coinProperties[coin.id]}
-                />
+                <CoinItem2 additionalInfo={coinProperties[coin.id]} />
               </Link>
             );
           })}

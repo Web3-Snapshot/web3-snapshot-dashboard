@@ -75,28 +75,22 @@ function Dashboard() {
 
   return (
     <div>
+      <nav>
+        <NavLink to='/prices'>
+          {({ isActive }) => (
+            <button className={isActive ? "active" : undefined}>PRICES</button>
+          )}
+        </NavLink>
+        <NavLink to='/supply'>
+          {({ isActive }) => (
+            <button className={isActive ? "active" : undefined}>SUPPLY</button>
+          )}
+        </NavLink>
+      </nav>
       {coins.length > 0 && (
-        <>
-          <nav>
-            <NavLink to='/prices'>
-              {({ isActive }) => (
-                <button className={isActive ? "active" : undefined}>
-                  PRICES
-                </button>
-              )}
-            </NavLink>
-            <NavLink to='/supply'>
-              {({ isActive }) => (
-                <button className={isActive ? "active" : undefined}>
-                  SUPPLY
-                </button>
-              )}
-            </NavLink>
-          </nav>
-          <main>
-            <Outlet context={{ coins, coinProperties }} />
-          </main>
-        </>
+        <main>
+          <Outlet context={{ coins, coinProperties }} />
+        </main>
       )}
     </div>
   );
