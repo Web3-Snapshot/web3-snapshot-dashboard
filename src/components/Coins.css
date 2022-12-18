@@ -66,6 +66,11 @@ img {
 }
 .coin-col-4 {
 }
+
+.table {
+  width: 100vw;
+}
+
 @media screen and (max-width: 720) {
   .hide-mobile {
     display: none;

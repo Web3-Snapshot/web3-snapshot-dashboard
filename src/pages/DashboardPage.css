@@ -1,0 +1,9 @@
+.container {
+  max-width: 1140px;
+  margin: auto;
+}
+
+.navigation {
+  display: flex;
+  justify-content: center;
+}

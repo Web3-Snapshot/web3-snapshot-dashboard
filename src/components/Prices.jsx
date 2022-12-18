@@ -30,13 +30,13 @@ function Prices() {
         </div>
       )}
 
-      {coins.map((coin) => {
-        return (
+      <div className='table'>
+        {coins.map((coin) => (
           <Link to={`/coin/${coin.id}`} element={<Coin />} key={coin.id}>
             <CoinItem1 additionalInfo={coinProperties[coin.id]} />
           </Link>
-        );
-      })}
+        ))}
+      </div>
     </div>
   );
 }
