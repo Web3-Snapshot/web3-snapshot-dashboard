@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { isEmpty } from "lodash";
 import { NavLink, Outlet } from "react-router-dom";
 import axios from "axios";
 import { PAGES } from "../constants";
@@ -71,7 +72,9 @@ function Dashboard() {
           });
         });
     };
-    fetchData();
+    if (coins.length < 1 && isEmpty(coinProperties)) {
+      fetchData();
+    }
   }, [coins, coinProperties]);
 
   return (
@@ -88,7 +91,7 @@ function Dashboard() {
           )}
         </NavLink>
       </nav>
-      {coins.length > 0 && (
+      {coins.length > 0 && !isEmpty(coinProperties) && (
         <main>
           <Outlet context={{ coins, coinProperties }} />
         </main>

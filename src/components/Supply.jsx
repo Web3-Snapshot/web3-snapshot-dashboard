@@ -1,37 +1,77 @@
 import React from "react";
-import CoinItem2 from "./CoinItem-2";
-import Coin from "../routes/Coin";
-import { Link, useOutletContext } from "react-router-dom";
+import Row from "./Row";
+import { useOutletContext } from "react-router-dom";
 
 import "./Coins.css";
 
+function IconAndCurrencyId({ additionalInfo }) {
+  return (
+    <div className='img-symbol coin-col-2'>
+      <img src={additionalInfo.image.thumb} alt='coin' />
+      <p>{additionalInfo.symbol.toUpperCase()}</p>
+    </div>
+  );
+}
+
 function Supply() {
   const { coins, coinProperties } = useOutletContext();
+
+  const cellHeaders = [
+    "#",
+    "Coin",
+    "Market Cap",
+    "FD Market Cap",
+    "Total Supply",
+    "Max Supply",
+    "Total Volume",
+  ];
+
+  function getCellData(additionalInfo) {
+    return [
+      {
+        id: "marketCapRank",
+        value: additionalInfo.market_data.market_cap_rank,
+      },
+      {
+        id: "icon",
+        value: <IconAndCurrencyId additionalInfo={additionalInfo} />,
+      },
+      {
+        id: "marketCapUSD",
+        value: `$${additionalInfo.market_data.market_cap.usd.toLocaleString()}`,
+      },
+      {
+        id: "FDMarketCap",
+        value: `$${additionalInfo.market_data.market_cap.usd.toLocaleString()}`,
+      },
+      {
+        id: "totalSupply",
+        value: additionalInfo.market_data.total_supply,
+      },
+      {
+        id: "maxSupply",
+        value: additionalInfo.market_data.max_supply,
+      },
+      {
+        id: "totalVolumeUSD",
+        value: additionalInfo.market_data.total_volume.usd.toLocaleString(),
+      },
+    ];
+  }
 
   return (
     <div className='container'>
       {coins && (
         <div>
           <div className='heading'>
-            <p className='coin-col-1'>#</p>
-            <p className='coin-col-2 coin-name'>Coin</p>
-            <p className='coin-col-3'>Mkt Cap</p>
-            <p className='hide-mobile'>FD Mkt Cap</p>
-            <p>Supply</p>
-            <p className='hide-mobile'>Supply Total</p>
-            <p className='hide-mobile'>Supply Max</p>
-            <p className='hide-mobile'>Volume</p>
+            {cellHeaders.map((header, idx) => (
+              <div className={`column-${idx + 1}`}>{header}</div>
+            ))}
           </div>
 
           {coins.map((coin, idx) => {
             return (
-              <Link
-                to={`/coin/${coins.id}`}
-                element={<Coin />}
-                key={`${coins.id}-${idx}`}
-              >
-                <CoinItem2 additionalInfo={coinProperties[coin.id]} />
-              </Link>
+              <Row key={coin.id} row={getCellData(coinProperties[coin.id])} />
             );
           })}
         </div>
