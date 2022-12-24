@@ -5,7 +5,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: 0.2fr 0.7fr repeat(5, 1fr);
   min-height: 4rem;
   align-items: center;
   min-width: fit-content;
