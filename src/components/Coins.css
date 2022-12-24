@@ -1,36 +1,29 @@
 .container {
-  max-width: 1140px;
-  margin: auto;
+  width: 85%;
+  margin: 4rem auto;
 }
 
-.heading {
-  display: flex;
-  justify-content: space-between;
+.row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  min-height: 4rem;
   align-items: center;
+  min-width: fit-content;
+}
+
+.header {
   background-color: #26272b;
   box-shadow: 0px 0px 12px #18191b;
   border-radius: 8px;
-  margin: 2rem 1rem;
-  padding: 0.7rem 1rem;
   font-weight: 600;
 }
 
-/* .coin-name {
-  margin-left: -4rem;
-} */
-
-.coin-row {
-  display: flex;
-  /* justify-content: space-between; */
-  align-items: center;
-  background-color: #26272b;
+.data {
+  margin: 2rem 0;
   box-shadow: 0px 0px 12px #18191b;
-  border-radius: 8px;
-  margin: 1rem 1rem;
-  padding: 2rem 1rem;
 }
 
-.coin-row:hover {
+.data:hover {
   transform: scale(1.04);
   transition: 0.3s ease-in-out;
   cursor: pointer;
@@ -38,8 +31,7 @@
 
 img {
   height: 30px;
-  margin-right: 8px;
-  /* width: auto; */
+  margin-right: 10px;
 }
 
 .img-symbol {
@@ -47,43 +39,23 @@ img {
   align-items: center;
 }
 
-/* .cell {
-  width: 380px;
-} */
-
-.column-0 {
-  width: 10rem;
+.cell {
+  display: flex;
+  padding-left: 2.8rem;
+  min-width: 4rem;
 }
 
-.column-1 {
-  width: 15rem;
+/* TODO: Adapt this and other media queries once cell content is more clear */
+@media screen and (max-width: 1550px) {
+  .row {
+    display: grid;
+    grid-template-columns: 0.6fr 0.8fr repeat(5, 1fr);
+    min-height: 4rem;
+    align-items: center;
+  }
 }
 
-.column-2 {
-  width: 40rem;
-}
-
-.column-3 {
-  width: 40rem;
-}
-
-.column-4 {
-  width: 40rem;
-}
-
-.column-5 {
-  width: 40rem;
-}
-
-.column-6 {
-  width: 40rem;
-}
-
-.table {
-  width: 100vw;
-}
-
-@media screen and (max-width: 720) {
+@media screen and (max-width: 720px) {
   .hide-mobile {
     display: none;
   }

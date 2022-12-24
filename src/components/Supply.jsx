@@ -63,15 +63,17 @@ function Supply() {
     <div className='container'>
       {coins && (
         <div>
-          <div className='heading'>
-            {cellHeaders.map((header, idx) => (
-              <div className={`column-${idx + 1}`}>{header}</div>
+          <div className='row header'>
+            {cellHeaders.map((header) => (
+              <span className='cell'>{header}</span>
             ))}
           </div>
 
           {coins.map((coin, idx) => {
             return (
-              <Row key={coin.id} row={getCellData(coinProperties[coin.id])} />
+              <div className='row data'>
+                <Row key={coin.id} row={getCellData(coinProperties[coin.id])} />
+              </div>
             );
           })}
         </div>
