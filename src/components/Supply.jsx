@@ -27,7 +27,13 @@ function Supply() {
     {
       id: "FDMarketCap",
       label: "FD Market Cap",
-      render: (obj) => `$${obj.market_data.market_cap.usd.toLocaleString()}`,
+      render: (obj) =>
+        `$${obj.market_data.fully_diluted_valuation.usd.toLocaleString()}`,
+    },
+    {
+      id: "circulatingSupply",
+      label: "Circ. Supply",
+      render: (obj) => obj.market_data.circulating_supply,
     },
     {
       id: "totalSupply",
@@ -39,25 +45,16 @@ function Supply() {
       label: "Max Supply",
       render: (obj) => obj.market_data.max_supply,
     },
-    {
-      id: "totalVolumeUSD",
-      label: "Total Volume",
-      render: (obj) => obj.market_data.total_volume.usd.toLocaleString(),
-    },
   ];
 
   return (
     <div className={styles.container}>
       <div className={`${styles.row} ${styles.header}`}>
-        {tableData.map((item) => (
-          <span key={item.id} className={styles.cell}>
-            {item.label}
-          </span>
-        ))}
+        <Row header tableData={tableData} />
       </div>
       {Object.entries(coinProperties).map(([id, coin]) => (
-        <div className={`${styles.row} ${styles.data}`}>
-          <Row key={id} tableData={tableData} row={coin} />
+        <div key={id} className={`${styles.row} ${styles.data}`}>
+          <Row tableData={tableData} row={coin} />
         </div>
       ))}
     </div>

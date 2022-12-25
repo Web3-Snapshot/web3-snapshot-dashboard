@@ -5,22 +5,17 @@ import Row from "./Row";
 import styles from "./Prices.module.css";
 import IconAndCurrencyIdCell from "./IconAndCurrencyIdCell";
 
-// url3 is supposed to fetch data for all coins at the 1 Jan 2020 date, and display the difference in %
-// const URL3 = `https://api.coingecko.com/api/v3/coins/bitcoin/history?date=1-1-2020`;
-
-// async function fetchData(url) {
-//   return axios
-//     .get(url)
-//     .then((res) => res.data)
-//     .catch((err) => console.log(err));
-// }
+// TODO:
+// This url will be used to fetch data for all coins on the 1 Jan 2020, and
+// display the difference in %:
+// https://api.coingecko.com/api/v3/coins/bitcoin/history?date=1-1-2020
 
 function Prices() {
   const { coinProperties } = useOutletContext();
 
   const tableData = [
     {
-      id: "number",
+      id: "rank",
       label: "#",
       render: (obj) => obj.market_data.market_cap_rank,
     },
@@ -30,55 +25,46 @@ function Prices() {
       render: (obj) => <IconAndCurrencyIdCell obj={obj} />,
     },
     {
+      id: "price",
+      label: "Price",
+      render: (obj) => obj.market_data.current_price.usd.toLocaleString(),
+    },
+    {
       id: "1d",
       label: "1 Day",
-      render: (obj) => obj.market_data.current_price.usd.toLocaleString(),
+      render: (obj) => obj.market_data.price_change_percentage_24h.toFixed(2),
     },
     {
       id: "1w",
       label: "7 Days",
-      render: (obj) =>
-        obj.market_data.price_change_percentage_24h_in_currency.usd.toFixed(2),
+      render: (obj) => obj.market_data.price_change_percentage_7d.toFixed(2),
     },
     {
       id: "1m",
       label: "30 Days",
-      render: (obj) =>
-        obj.market_data.price_change_percentage_7d_in_currency.usd.toFixed(2),
-    },
-    {
-      id: "6m",
-      label: "60 Days",
-      render: (obj) =>
-        obj.market_data.price_change_percentage_30d_in_currency.usd.toFixed(2),
+      render: (obj) => obj.market_data.price_change_percentage_30d.toFixed(2),
     },
     {
       id: "1y",
-      label: "200 Days",
-      render: (obj) =>
-        obj.market_data.price_change_percentage_60d_in_currency.usd.toFixed(2),
+      label: "1 Year",
+      render: (obj) => obj.market_data.price_change_percentage_1y.toFixed(2),
     },
     {
-      id: "refDate",
-      label: "01/01/20",
-      render: (obj) =>
-        obj.market_data.price_change_percentage_200d_in_currency.usd,
+      id: "ath",
+      label: "ATH",
+      render: (obj) => obj.market_data.ath_change_percentage.usd.toFixed(2),
     },
   ];
 
   return (
     <div className={styles.container}>
       <div className={`${styles.row} ${styles.header}`}>
-        {tableData.map((item) => (
-          <span className={styles.cell} key={item.id}>
-            {item.label}
-          </span>
-        ))}
+        <Row header tableData={tableData} />
       </div>
 
       {Object.entries(coinProperties).map(([id, coin]) => (
-        <div className={`${styles.row} ${styles.data}`}>
-          <Row key={id} tableData={tableData} row={coin} />
+        <div key={id} className={`${styles.row} ${styles.data}`}>
+          <Row tableData={tableData} row={coin} />
         </div>
       ))}
     </div>
