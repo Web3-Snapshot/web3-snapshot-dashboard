@@ -1,16 +1,12 @@
 import React from "react";
+import styles from "./Prices.module.css";
 
-const Row = ({ row }) => {
-  return (
-    <>
-      {row.length > 0 &&
-        row.map((cell) => (
-          <span key={cell.id} className='cell'>
-            {cell.value}
-          </span>
-        ))}
-    </>
-  );
+const Row = ({ tableData, row }) => {
+  return tableData.map((cell) => (
+    <span key={cell.id} className={styles.cell}>
+      {cell.render(row)}
+    </span>
+  ));
 };
 
 export default Row;
