@@ -31,7 +31,7 @@ function Prices() {
     },
     {
       id: "1d",
-      label: "1 Days",
+      label: "1 Day",
       render: (obj) => obj.market_data.current_price.usd.toLocaleString(),
     },
     {
