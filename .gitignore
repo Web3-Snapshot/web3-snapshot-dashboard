@@ -3,6 +3,8 @@
 # React auto-generated files and project specific files
 build/
 
+.vscode/
+
 # dependencies
 /node_modules
 /build_original
