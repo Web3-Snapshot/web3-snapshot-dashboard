@@ -1,1 +1,1 @@
-export const PAGES = 2;
+export const COINS = 2;

@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { isEmpty } from "lodash";
 import { NavLink, Outlet } from "react-router-dom";
 import axios from "axios";
-import { PAGES } from "../constants";
+import { COINS } from "../constants";
 import styles from "./Dashboard.module.css";
 import navbarStyles from "../components/Navbar.module.css";
 
 export async function fetchCoins() {
-  const marketsUrl = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${PAGES}&page=1&sparkline=false&price_change_percentage=1h%2C%2024h%2C%207d%2C%2030d%2C%20200d%2C%201y%2C%203y`;
+  const marketsUrl = `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${COINS}&page=1&sparkline=false&price_change_percentage=1h%2C%2024h%2C%207d%2C%2030d%2C%20200d%2C%201y%2C%203y`;
   return axios({
     method: "GET",
     headers: {
@@ -79,7 +79,7 @@ function Dashboard() {
   }, [coins, coinProperties]);
 
   return (
-    <div>
+    <div className={styles.root}>
       <nav className={styles.navigation}>
         <NavLink to='/prices'>
           {({ isActive }) => (

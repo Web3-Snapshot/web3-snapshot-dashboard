@@ -1,3 +1,6 @@
+:root {
+  --bg-color: #3599f7;
+}
 .navbar {
   display: flex !important;
   justify-content: center;
@@ -6,23 +9,15 @@
 
 .icon {
   font-size: 2rem;
-  color: #0afa96;
-}
-
-.purple {
-  color: #0afa96;
-}
-
-.mainMenu {
-  margin: auto;
-  display: table;
+  color: var(--bg-color);
 }
 
 button {
-  border-radius: 3px;
-  padding: 5px;
-  width: 150px;
-  margin: 5px;
+  border-radius: 5px;
+  padding: 8px;
+  width: 180px;
+  margin: 25px 5px 15px 0;
+  font-size: 1em;
 }
 
 button:hover {
@@ -31,6 +26,5 @@ button:hover {
 }
 
 .active {
-  pointer-events: none;
-  background-color: #0afa96;
+  background-color: var(--bg-color);
 }
