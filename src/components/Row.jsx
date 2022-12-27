@@ -5,6 +5,7 @@ function getDataStyles(rowIndex) {
   if (rowIndex > 1 && rowIndex % 2 === 0) {
     return styles.lightCell;
   }
+  return "";
 }
 
 const Row = ({ tableData, row, header }) => {

@@ -36,15 +36,15 @@ img {
 
 .cell {
   display: flex;
-  padding-left: 2.8rem;
+  /* padding-left: 2.8rem; */
   min-width: 4rem;
+  align-items: center;
+  justify-content: center;
+  height: 4rem;
 }
 
 .lightCell {
-  display: flex;
-  align-items: center;
   background-color: #343434;
-  height: 4rem;
 }
 
 /* TODO: Adapt this and other media queries once cell content is more clear */
