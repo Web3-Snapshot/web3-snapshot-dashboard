@@ -5,7 +5,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: 40px 280px repeat(6, 1fr);
+  grid-template-columns: 30px 280px 200px repeat(5, 1fr);
   min-height: 4rem;
   align-items: center;
   min-width: fit-content;
@@ -51,12 +51,12 @@ img {
 @media screen and (max-width: 1550px) {
   .row {
     display: grid;
-    grid-template-columns: 30px 200px 120px repeat(5, 1.2fr);
+    grid-template-columns: 22px 180px 120px repeat(5, 1fr);
     min-height: 4rem;
     align-items: center;
   }
   .cell {
-    padding-left: 1rem;
+    padding-left: 1.2rem;
   }
 }
 

@@ -2,6 +2,7 @@ import React from "react";
 import Row from "./Row";
 import { useOutletContext } from "react-router-dom";
 import IconAndCurrencyIdCell from "./IconAndCurrencyIdCell";
+import { formatLongNumbers } from "../util/helpers";
 
 import styles from "./Supply.module.css";
 
@@ -22,28 +23,29 @@ function Supply() {
     {
       id: "marketCapUSD",
       label: "Market Cap",
-      render: (obj) => `$${obj.market_data.market_cap.usd.toLocaleString()}`,
+      render: (obj) => `$${formatLongNumbers(obj.market_data.market_cap.usd)}`,
     },
     {
       id: "FDMarketCap",
       label: "FD Market Cap",
       render: (obj) =>
-        `$${obj.market_data.fully_diluted_valuation.usd.toLocaleString()}`,
+        `$${formatLongNumbers(obj.market_data.fully_diluted_valuation.usd)}`,
     },
     {
       id: "circulatingSupply",
       label: "Circ. Supply",
-      render: (obj) => obj.market_data.circulating_supply,
+      render: (obj) => formatLongNumbers(obj.market_data.circulating_supply),
     },
     {
       id: "totalSupply",
       label: "Total Supply",
-      render: (obj) => obj.market_data.total_supply,
+      render: (obj) => formatLongNumbers(obj.market_data.total_supply),
     },
     {
       id: "maxSupply",
       label: "Max Supply",
-      render: (obj) => obj.market_data.max_supply,
+      render: (obj) =>
+        formatLongNumbers(Math.round(obj.market_data.max_supply)),
     },
   ];
 
