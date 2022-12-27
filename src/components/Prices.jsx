@@ -27,32 +27,37 @@ function Prices() {
     {
       id: "price",
       label: "Price",
-      render: (obj) => obj.market_data.current_price.usd.toLocaleString(),
+      render: (obj) => `$${obj.market_data.current_price.usd.toLocaleString()}`,
     },
     {
       id: "1d",
       label: "1 Day",
-      render: (obj) => obj.market_data.price_change_percentage_24h.toFixed(2),
+      render: (obj) =>
+        `${obj.market_data.price_change_percentage_24h.toFixed(2)}%`,
     },
     {
       id: "1w",
       label: "7 Days",
-      render: (obj) => obj.market_data.price_change_percentage_7d.toFixed(2),
+      render: (obj) =>
+        `${obj.market_data.price_change_percentage_7d.toFixed(2)}%`,
     },
     {
       id: "1m",
       label: "30 Days",
-      render: (obj) => obj.market_data.price_change_percentage_30d.toFixed(2),
+      render: (obj) =>
+        `${obj.market_data.price_change_percentage_30d.toFixed(2)}%`,
     },
     {
       id: "1y",
       label: "1 Year",
-      render: (obj) => obj.market_data.price_change_percentage_1y.toFixed(2),
+      render: (obj) =>
+        `${obj.market_data.price_change_percentage_1y.toFixed(2)}%`,
     },
     {
       id: "ath",
       label: "ATH",
-      render: (obj) => obj.market_data.ath_change_percentage.usd.toFixed(2),
+      render: (obj) =>
+        `${obj.market_data.ath_change_percentage.usd.toFixed(2)}%`,
     },
   ];
 
