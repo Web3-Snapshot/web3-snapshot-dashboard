@@ -10,12 +10,13 @@ function getDataStyles(rowIndex) {
 
 const Row = ({ tableData, row, header }) => {
   return tableData.map((cell, idx) => (
-    <span
+    <div
       key={cell.id}
+      style={{ justifyContent: idx === 1 ? "flex-start" : "center" }}
       className={`${styles.cell} ${!header && getDataStyles(idx)}`}
     >
       {header ? cell.label : cell.render(row)}
-    </span>
+    </div>
   ));
 };
 
