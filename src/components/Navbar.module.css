@@ -1,0 +1,30 @@
+:root {
+  --bg-color: #3599f7;
+}
+.navbar {
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon {
+  font-size: 2rem;
+  color: var(--bg-color);
+}
+
+button {
+  border-radius: 5px;
+  padding: 8px;
+  width: 180px;
+  margin: 25px 5px 15px 0;
+  font-size: 1em;
+}
+
+button:hover {
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.active {
+  background-color: var(--bg-color);
+}

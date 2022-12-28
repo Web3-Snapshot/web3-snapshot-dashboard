@@ -1,4 +1,11 @@
-### From a Tutorial
+# Web 3 Dashboard
 
-Next step 1: Deploy 
-Next step 1: Customize
+A Dashboard with the latest trends for various crypto currencies.
+
+## Development
+
+Run
+
+```sh
+yarn start
+```
