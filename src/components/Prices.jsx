@@ -2,8 +2,9 @@ import React from "react";
 import { useOutletContext } from "react-router-dom";
 
 import Row from "./Row";
-import styles from "./Prices.module.css";
+import styles from "../pages//Dashboard.module.css";
 import IconAndCurrencyIdCell from "./IconAndCurrencyIdCell";
+import Table from "./Table";
 
 // TODO:
 // This url will be used to fetch data for all coins on the 1 Jan 2020, and
@@ -61,19 +62,7 @@ function Prices() {
     },
   ];
 
-  return (
-    <div className={styles.container}>
-      <div className={`${styles.row} ${styles.header}`}>
-        <Row header tableData={tableData} />
-      </div>
-
-      {Object.entries(coinProperties).map(([id, coin]) => (
-        <div key={id} className={`${styles.row} ${styles.data}`}>
-          <Row tableData={tableData} row={coin} />
-        </div>
-      ))}
-    </div>
-  );
+  return <Table tableData={tableData} coinProperties={coinProperties} />;
 }
 
 export default Prices;
