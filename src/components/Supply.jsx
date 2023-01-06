@@ -49,7 +49,13 @@ function Supply() {
     },
   ];
 
-  return <Table tableData={tableData} coinProperties={coinProperties} />;
+  return (
+    <Table
+      tableData={tableData}
+      coinProperties={coinProperties}
+      styles={styles}
+    />
+  );
 }
 
 export default Supply;

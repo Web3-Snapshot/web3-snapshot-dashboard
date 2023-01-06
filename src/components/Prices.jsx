@@ -1,8 +1,7 @@
 import React from "react";
 import { useOutletContext } from "react-router-dom";
 
-import Row from "./Row";
-import styles from "../pages//Dashboard.module.css";
+import styles from "./Prices.module.css";
 import IconAndCurrencyIdCell from "./IconAndCurrencyIdCell";
 import Table from "./Table";
 
@@ -62,7 +61,13 @@ function Prices() {
     },
   ];
 
-  return <Table tableData={tableData} coinProperties={coinProperties} />;
+  return (
+    <Table
+      tableData={tableData}
+      coinProperties={coinProperties}
+      styles={styles}
+    />
+  );
 }
 
 export default Prices;
