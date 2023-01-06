@@ -1,10 +1,10 @@
 import React from "react";
-import Row from "./Row";
 import { useOutletContext } from "react-router-dom";
 import IconAndCurrencyIdCell from "./IconAndCurrencyIdCell";
 import { formatLongNumbers } from "../util/helpers";
-
 import styles from "./Supply.module.css";
+
+import Table from "./Table";
 
 function Supply() {
   const { coinProperties } = useOutletContext();
@@ -50,16 +50,11 @@ function Supply() {
   ];
 
   return (
-    <div className={styles.container}>
-      <div className={`${styles.row} ${styles.header}`}>
-        <Row header tableData={tableData} />
-      </div>
-      {Object.entries(coinProperties).map(([id, coin]) => (
-        <div key={id} className={`${styles.row} ${styles.data}`}>
-          <Row tableData={tableData} row={coin} />
-        </div>
-      ))}
-    </div>
+    <Table
+      tableData={tableData}
+      coinProperties={coinProperties}
+      styles={styles}
+    />
   );
 }
 

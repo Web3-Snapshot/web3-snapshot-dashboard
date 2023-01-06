@@ -1,3 +1,5 @@
+@value small as bp-small, medium as bp-medium, large as bp-large from "../breakpoints.css";
+
 .container {
   width: 85%;
   margin: 4rem auto;
@@ -5,10 +7,16 @@
 
 .row {
   display: grid;
-  grid-template-columns: 60px 280px 200px repeat(5, 1fr);
+  grid-template-columns: 40px 280px 200px repeat(5, 1fr);
   min-height: 4rem;
   align-items: center;
   min-width: fit-content;
+}
+
+@media bp-medium {
+  .row {
+    grid-template-columns: 32px 150px 130px repeat(5, 1fr);
+  }
 }
 
 .header {
@@ -20,10 +28,54 @@
   border-radius: 8px;
   font-weight: 600;
 }
+.header > div:nth-child(2n) {
+  display: flex;
+  align-items: center;
+  background-color: #2e2f30;
+  height: 3rem;
+}
+.header > div:nth-child(2n + 1) {
+  display: flex;
+  align-items: center;
+}
+
+.header div:nth-child(2) {
+  justify-content: flex-start;
+  padding-left: 2rem;
+}
 
 .data {
   margin: 2rem 0;
   box-shadow: 0px 0px 12px #18191b;
+}
+
+.data > div:nth-child(2n) {
+  display: flex;
+  align-items: center;
+  background-color: #2e2f30;
+  height: 4rem;
+}
+.data > div:nth-child(2n + 1) {
+  display: flex;
+  align-items: center;
+}
+
+.data div:nth-child(2) {
+  justify-content: flex-start;
+  padding-left: 2rem;
+}
+
+data > div:nth-child(2) {
+  background-color: inherit;
+}
+@media bp-medium {
+  .data > div:nth-child(2) {
+    padding-left: 1rem;
+  }
+  .header div:nth-child(2) {
+    /* justify-content: flex-start; */
+    padding-left: 1rem;
+  }
 }
 
 .data:hover {
@@ -39,25 +91,7 @@ img {
 
 .cell {
   display: flex;
-  min-width: 4rem;
   align-items: center;
   justify-content: center;
   height: 4rem;
-}
-
-.lightCell {
-  background-color: #2e2f30;
-}
-
-/* TODO: Adapt this and other media queries once cell content is more clear */
-@media screen and (max-width: 1550px) {
-  .row {
-    display: grid;
-    grid-template-columns: 22px 180px 120px repeat(5, 1fr);
-    min-height: 4rem;
-    align-items: center;
-  }
-  .cell {
-    padding-left: 1.2rem;
-  }
 }
