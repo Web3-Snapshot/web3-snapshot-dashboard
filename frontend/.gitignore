@@ -1,0 +1,45 @@
+# dependencies
+node_modules
+/.pnp
+.pnp.js
+
+# testing
+coverage/
+
+# production
+build/
+dist/
+
+# misc
+.DS_Store
+.inputrc
+
+# environment vars
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Eslint
+.eslintcache
+
+# Cypress artifacts and deps
+videos/
+screenshots/
+build/
+
+# IDEs
+.vscode
+.vim/
+.nvimlog
+
+# Random stuff
+.secret-*
+.DS_STORE
+null/

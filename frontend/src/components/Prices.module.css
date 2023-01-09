@@ -73,7 +73,6 @@ data > div:nth-child(2) {
     padding-left: 1rem;
   }
   .header div:nth-child(2) {
-    /* justify-content: flex-start; */
     padding-left: 1rem;
   }
 }

@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  frontend:
+    container_name: web3_frontend
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ${PWD}/frontend:/app
+
+  db:
+    container_name: web3_database
+    build:
+      context: ./database
+    volumes:
+      - ${PWD}/database/main.py:/app/main.py
