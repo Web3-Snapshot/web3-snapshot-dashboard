@@ -10,15 +10,10 @@ coverage/
 build/
 dist/
 
-# misc
-.DS_Store
-.inputrc
-
 # environment vars
 .env
 .env.local
 .env.development.local
-.env.test.local
 .env.production.local
 
 # logs
@@ -39,7 +34,8 @@ build/
 .vim/
 .nvimlog
 
-# Random stuff
+# misc
+.inputrc
 .secret-*
 .DS_STORE
 null/
