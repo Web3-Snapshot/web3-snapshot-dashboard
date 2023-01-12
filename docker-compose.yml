@@ -16,3 +16,7 @@ services:
       context: ./database
     volumes:
       - ${PWD}/database/main.py:/app/main.py
+      - ${PWD}/database/instance:/app/instance
+
+volumes:
+  database:
