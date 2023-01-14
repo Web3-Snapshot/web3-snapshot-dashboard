@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import axios from "axios";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Prices from "./components/Prices";
 import Supply from "./components/Supply";
@@ -12,6 +13,18 @@ export async function loader() {
 }
 
 function App() {
+  useEffect(() => {
+    async function checkBackend() {
+      return await axios
+        .get("/api/hello", {
+          headers: { "Content-Type": "application/json" },
+        })
+        .then((res) => console.log(res));
+    }
+
+    checkBackend();
+  }, []);
+
   return (
     <>
       <Navbar />
