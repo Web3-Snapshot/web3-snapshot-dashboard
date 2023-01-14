@@ -1,6 +1,7 @@
 from os import environ
 from flask import Flask
 
+
 class PrefixMiddleware(object):
     def __init__(self, app, prefix=""):
         self.app = app
@@ -28,11 +29,9 @@ def enable_debugger():
     debugpy.wait_for_client()
 
 
-
 def create_app(config_location="config.development"):
-    # if environ.get("VSCODE_DEBUGGER"):
-    #     enable_debugger()
-
+    if environ.get("VSCODE_DEBUGGER"):
+        enable_debugger()
 
     app = Flask(__name__, instance_relative_config=True)
     app.wsgi_app = PrefixMiddleware(app.wsgi_app, prefix="/api")
