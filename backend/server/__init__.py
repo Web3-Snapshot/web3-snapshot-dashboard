@@ -45,6 +45,10 @@ def create_app(config_location="config.development"):
 
     ma.init_app(app)
 
+    from .db import close_connection
+
+    app.teardown_appcontext(close_connection)
+
     from .routes import coins
 
     app.register_blueprint(coins.bp)
