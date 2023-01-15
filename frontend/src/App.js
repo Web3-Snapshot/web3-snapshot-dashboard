@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import axios from "axios";
+import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Prices from "./components/Prices";
 import Supply from "./components/Supply";
@@ -13,20 +12,6 @@ export async function loader() {
 }
 
 function App() {
-  // useEffect(() => {
-  //   async function checkBackend() {
-  //     return axios
-  //       .get("/api/coins", {
-  //         headers: { "Content-Type": "application/json" },
-  //       })
-  //       .then((res) => {
-  //         console.log(res);
-  //       });
-  //   }
-
-  //   checkBackend();
-  // }, []);
-
   return (
     <>
       <Navbar />

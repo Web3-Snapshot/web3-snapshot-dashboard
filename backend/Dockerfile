@@ -1,10 +1,7 @@
-FROM python:3.9-alpine
+FROM python:3.10-alpine
 
 # set working directory
 WORKDIR /app
-
-# Install
-# RUN apk update && apk install
 
 # add and install requirements
 COPY ./requirements.txt /app/requirements.txt
@@ -17,5 +14,4 @@ EXPOSE 5000
 
 # run server
 ENV FLASK_APP=server
-# ENV VSCODE_DEBUGGER=1
 CMD ["flask", "run", "--host", "backend", "--port", "5000"]

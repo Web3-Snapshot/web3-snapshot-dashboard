@@ -8,10 +8,6 @@ CLEAR_TABLES = ""
 @pytest.fixture(scope="session")
 def app_config():
     return {
-        # "DB_NAME": "testing",
-        # "DB_USER": "postgres",
-        # "DB_PASS": "foobar",
-        # "DB_HOST": "localhost",
         "SECRET_KEY": "testing",
         "TESTING": True,
         "DOMAIN": "localhost",
