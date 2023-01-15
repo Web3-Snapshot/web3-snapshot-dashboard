@@ -1,11 +1,8 @@
 import sqlite3
-from flask import g
+from flask import g, current_app
 
 
-DATABASE = "./instance/db.sqlite"
-
-
-def init_db():
+def init_db(app):
     with app.app_context():
         db = get_db()
         with app.open_resource("schema.sql", mode="r") as f:
@@ -23,7 +20,7 @@ def query_db(query, args=(), one=False):
 def get_db():
     db = getattr(g, "_database", None)
     if db is None:
-        db = g._database = sqlite3.connect(DATABASE)
+        db = g._database = sqlite3.connect(current_app.config["DATABASE_URI"])
         db.row_factory = sqlite3.Row
     return db
 
