@@ -16,5 +16,6 @@ COPY . /app
 EXPOSE 5000
 
 # run server
-ENV FLASK_APP=server/main.py
+ENV FLASK_APP=server
+# ENV VSCODE_DEBUGGER=1
 CMD ["flask", "run", "--host", "backend", "--port", "5000"]

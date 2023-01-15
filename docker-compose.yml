@@ -20,8 +20,8 @@ services:
       - ${PWD}/backend:/app
       - database:/app/instance
     restart: always
-    # depends_on:
-    #   - db
+    depends_on:
+      - db
   frontend:
     container_name: web3_frontend
     build:
@@ -30,7 +30,6 @@ services:
       - "3000:3000"
     volumes:
       - ${PWD}/frontend:/app
-      - database:/app/instance
     restart: always
     depends_on:
       - backend

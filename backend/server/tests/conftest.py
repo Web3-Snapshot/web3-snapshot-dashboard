@@ -1,8 +1,9 @@
 import pytest
 from flask import Flask
-from server.main import create_app
+from server import create_app
 
-CLEAR_TABLES = ''
+CLEAR_TABLES = ""
+
 
 @pytest.fixture(scope="session")
 def app_config():
@@ -43,4 +44,4 @@ def clear_db():
 def client(app: Flask):
     yield app.test_client()
     # with app.app_context():
-        # clear_db()
+    # clear_db()

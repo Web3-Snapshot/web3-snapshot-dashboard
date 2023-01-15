@@ -13,17 +13,19 @@ export async function loader() {
 }
 
 function App() {
-  useEffect(() => {
-    async function checkBackend() {
-      return await axios
-        .get("/api/hello", {
-          headers: { "Content-Type": "application/json" },
-        })
-        .then((res) => console.log(res));
-    }
+  // useEffect(() => {
+  //   async function checkBackend() {
+  //     return axios
+  //       .get("/api/coins", {
+  //         headers: { "Content-Type": "application/json" },
+  //       })
+  //       .then((res) => {
+  //         console.log(res);
+  //       });
+  //   }
 
-    checkBackend();
-  }, []);
+  //   checkBackend();
+  // }, []);
 
   return (
     <>
