@@ -35,5 +35,19 @@ services:
     links:
       - "backend"
 
+  interactive_db:
+    container_name: web3_interactive_db
+    tty: true
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: ./interactive_db/Dockerfile
+    volumes:
+      - ${PWD}/backend/server:/app/server
+      - ${PWD}/interactive_db/.ipython:/app/.ipython
+      - database:/app/instance
+    environment:
+      - IPYTHONDIR=/app/.ipython
+
 volumes:
   database:
