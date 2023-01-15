@@ -1,4 +1,3 @@
-# Python Base Image
 FROM python:3.9-alpine
 
 # Creating Working

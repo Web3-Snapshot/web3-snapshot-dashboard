@@ -1,6 +1,26 @@
-version: "3.7"
+version: "3.9"
 
 services:
+  db:
+    container_name: web3_database
+    build:
+      context: ./database
+    volumes:
+      - ${PWD}/database/main.py:/app/main.py
+      - database:/app/instance
+
+  backend:
+    container_name: web3_backend
+    build:
+      context: ./backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ${PWD}/backend:/app
+      - database:/app/instance
+    restart: always
+    depends_on:
+      - db
   frontend:
     container_name: web3_frontend
     build:
@@ -9,14 +29,11 @@ services:
       - "3000:3000"
     volumes:
       - ${PWD}/frontend:/app
-
-  db:
-    container_name: web3_database
-    build:
-      context: ./database
-    volumes:
-      - ${PWD}/database/main.py:/app/main.py
-      - ${PWD}/database/instance:/app/instance
+    restart: always
+    depends_on:
+      - backend
+    links:
+      - "backend"
 
 volumes:
   database:

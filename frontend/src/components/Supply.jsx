@@ -7,13 +7,13 @@ import styles from "./Supply.module.css";
 import Table from "./Table";
 
 function Supply() {
-  const { coinProperties } = useOutletContext();
+  const { coins } = useOutletContext();
 
   const tableData = [
     {
       id: "marketCapRank",
       label: "#",
-      render: (obj) => obj.market_data.market_cap_rank,
+      render: (obj) => obj.market_cap_rank,
     },
     {
       id: "icon",
@@ -23,39 +23,31 @@ function Supply() {
     {
       id: "marketCapUSD",
       label: "Market Cap",
-      render: (obj) => `$${formatLongNumbers(obj.market_data.market_cap.usd)}`,
+      render: (obj) => `$${formatLongNumbers(obj.market_cap_usd)}`,
     },
     {
       id: "FDMarketCap",
       label: "FD Market Cap",
-      render: (obj) =>
-        `$${formatLongNumbers(obj.market_data.fully_diluted_valuation.usd)}`,
+      render: (obj) => `$${formatLongNumbers(obj.fully_diluted_valuation_usd)}`,
     },
     {
       id: "circulatingSupply",
       label: "Circ. Supply",
-      render: (obj) => formatLongNumbers(obj.market_data.circulating_supply),
+      render: (obj) => formatLongNumbers(obj.circulating_supply),
     },
     {
       id: "totalSupply",
       label: "Total Supply",
-      render: (obj) => formatLongNumbers(obj.market_data.total_supply),
+      render: (obj) => formatLongNumbers(obj.total_supply),
     },
     {
       id: "maxSupply",
       label: "Max Supply",
-      render: (obj) =>
-        formatLongNumbers(Math.round(obj.market_data.max_supply)),
+      render: (obj) => formatLongNumbers(Math.round(obj.max_supply)),
     },
   ];
 
-  return (
-    <Table
-      tableData={tableData}
-      coinProperties={coinProperties}
-      styles={styles}
-    />
-  );
+  return <Table tableData={tableData} coins={coins} styles={styles} />;
 }
 
 export default Supply;

@@ -11,13 +11,13 @@ import Table from "./Table";
 // https://api.coingecko.com/api/v3/coins/bitcoin/history?date=1-1-2020
 
 function Prices() {
-  const { coinProperties } = useOutletContext();
+  const { coins } = useOutletContext();
 
   const tableData = [
     {
       id: "rank",
       label: "#",
-      render: (obj) => obj.market_data.market_cap_rank,
+      render: (obj) => obj.market_cap_rank,
     },
     {
       id: "coin",
@@ -27,47 +27,36 @@ function Prices() {
     {
       id: "price",
       label: "Price",
-      render: (obj) => `$${obj.market_data.current_price.usd.toLocaleString()}`,
+      render: (obj) => `$${obj.current_price.toLocaleString()}`,
     },
     {
       id: "1d",
       label: "1 Day",
-      render: (obj) =>
-        `${obj.market_data.price_change_percentage_24h.toFixed(2)}%`,
+      render: (obj) => `${obj.price_change_percentage_24h.toFixed(2)}%`,
     },
     {
       id: "1w",
       label: "7 Days",
-      render: (obj) =>
-        `${obj.market_data.price_change_percentage_7d.toFixed(2)}%`,
+      render: (obj) => `${obj.price_change_percentage_7d.toFixed(2)}%`,
     },
     {
       id: "1m",
       label: "30 Days",
-      render: (obj) =>
-        `${obj.market_data.price_change_percentage_30d.toFixed(2)}%`,
+      render: (obj) => `${obj.price_change_percentage_30d.toFixed(2)}%`,
     },
     {
       id: "1y",
       label: "1 Year",
-      render: (obj) =>
-        `${obj.market_data.price_change_percentage_1y.toFixed(2)}%`,
+      render: (obj) => `${obj.price_change_percentage_1y.toFixed(2)}%`,
     },
     {
       id: "ath",
       label: "ATH",
-      render: (obj) =>
-        `${obj.market_data.ath_change_percentage.usd.toFixed(2)}%`,
+      render: (obj) => `${obj.ath_change_percentage.toFixed(2)}%`,
     },
   ];
 
-  return (
-    <Table
-      tableData={tableData}
-      coinProperties={coinProperties}
-      styles={styles}
-    />
-  );
+  return <Table tableData={tableData} coins={coins} styles={styles} />;
 }
 
 export default Prices;
