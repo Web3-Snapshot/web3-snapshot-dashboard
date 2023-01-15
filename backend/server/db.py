@@ -20,7 +20,7 @@ def query_db(query, args=(), one=False):
 def get_db():
     db = getattr(g, "_database", None)
     if db is None:
-        db = g._database = sqlite3.connect(current_app.config["DATABASE_URI"])
+        db = g._database = sqlite3.connect(current_app.config["DATABASE_URI"], uri=True)
         db.row_factory = sqlite3.Row
     return db
 

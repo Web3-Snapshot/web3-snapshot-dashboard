@@ -4,9 +4,10 @@ import pytest
 def test_get_coins(client):
     response = client.get("/api/coins")
     assert response.status_code == 200
+    assert len(response.json) == 1
     assert all(
         [
-            True
+            True if el in response.json[0] else False
             for el in [
                 "id",
                 "name",
@@ -25,6 +26,5 @@ def test_get_coins(client):
                 "price_change_percentage_1y",
                 "ath_change_percentage",
             ]
-            if el in response.json
         ]
     )
