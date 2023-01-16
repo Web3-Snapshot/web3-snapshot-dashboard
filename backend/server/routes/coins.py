@@ -42,7 +42,4 @@ def get_coins():
         """
     )
 
-    if items is None:
-        return {"error": "No items found."}
-
     return coins_schema.dump(items), 200
