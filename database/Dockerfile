@@ -3,7 +3,9 @@ FROM python:3.9-alpine
 # Creating Working
 WORKDIR /app
 
-RUN pip install --upgrade pip && pip install --no-cache-dir -U requests
+COPY ./requirements.txt /app/requirements.txt
+
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Copying the crontab file
 COPY crontab /etc/cron.d/crontab

@@ -44,6 +44,7 @@ services:
       dockerfile: ./interactive_db/Dockerfile
     volumes:
       - ${PWD}/backend/server:/app/server
+      - ${PWD}/database:/app/database
       - ${PWD}/interactive_db/.ipython:/app/.ipython
       - database:/app/instance
     environment:

@@ -1,5 +1,5 @@
+from datetime import datetime
 from flask import Blueprint
-from flask.json import jsonify
 from server.db import query_db
 
 from server import ma
@@ -26,6 +26,7 @@ class CoinSchema(ma.Schema):
             "price_change_percentage_30d",
             "price_change_percentage_1y",
             "ath_change_percentage",
+            "timestamp",
         )
 
 
@@ -40,5 +41,8 @@ def get_coins():
             FROM coins
         """
     )
+
+    if items is None:
+        return {"error": "No items found."}
 
     return coins_schema.dump(items), 200
