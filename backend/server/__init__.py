@@ -1,6 +1,6 @@
 from os import environ
-from flask import Flask
 
+from flask import Flask
 from flask_marshmallow import Marshmallow
 
 ma = Marshmallow()

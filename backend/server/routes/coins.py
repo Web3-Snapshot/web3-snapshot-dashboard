@@ -1,8 +1,8 @@
 from datetime import datetime
-from flask import Blueprint
-from server.db import query_db
 
+from flask import Blueprint
 from server import ma
+from server.db import query_db
 
 bp = Blueprint("coins", __name__, url_prefix="/coins")
 

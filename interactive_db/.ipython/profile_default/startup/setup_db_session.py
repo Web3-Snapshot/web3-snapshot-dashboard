@@ -1,6 +1,6 @@
+import sqlite3
 from os import environ
 from pprint import pprint
-import sqlite3
 
 from server import create_app
 from server.routes.coins import coins_schema

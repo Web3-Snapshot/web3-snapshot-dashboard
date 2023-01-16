@@ -3,7 +3,6 @@ from flask import Flask, g
 from server import create_app
 from server.db import get_db
 
-
 SCHEMA = """
             CREATE TABLE IF NOT EXISTS coins
             (
