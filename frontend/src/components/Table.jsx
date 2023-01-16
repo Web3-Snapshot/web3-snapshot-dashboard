@@ -1,5 +1,5 @@
-import tableStyles from "./Table.module.css";
-import Row from "./Row";
+import tableStyles from './Table.module.css';
+import Row from './Row';
 
 function Table({ tableData, coins, styles }) {
   return (

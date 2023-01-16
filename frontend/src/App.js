@@ -1,10 +1,10 @@
-import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import Prices from "./components/Prices";
-import Supply from "./components/Supply";
-import Navbar from "./components/Navbar";
-import Dashboard from "./pages/Dashboard";
-import { fetchCoins } from "./pages/Dashboard";
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Prices from './components/Prices';
+import Supply from './components/Supply';
+import Navbar from './components/Navbar';
+import Dashboard from './pages/Dashboard';
+import { fetchCoins } from './pages/Dashboard';
 
 export async function loader() {
   const coins = await fetchCoins();
@@ -16,12 +16,12 @@ function App() {
     <>
       <Navbar />
       <Routes>
-        <Route path='/' element={<Dashboard />}>
-          <Route index element={<Navigate to='prices' />} />
-          <Route path='prices' element={<Prices />} />
-          <Route path='supply' element={<Supply />} />
+        <Route path="/" element={<Dashboard />}>
+          <Route index element={<Navigate to="prices" />} />
+          <Route path="prices" element={<Prices />} />
+          <Route path="supply" element={<Supply />} />
         </Route>
-        <Route path='*' element={<></>} />
+        <Route path="*" element={<></>} />
       </Routes>
     </>
   );

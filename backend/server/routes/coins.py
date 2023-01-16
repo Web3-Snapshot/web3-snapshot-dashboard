@@ -1,8 +1,8 @@
-from flask import Blueprint
-from flask.json import jsonify
-from server.db import query_db
+from datetime import datetime
 
+from flask import Blueprint
 from server import ma
+from server.db import query_db
 
 bp = Blueprint("coins", __name__, url_prefix="/coins")
 
@@ -26,6 +26,7 @@ class CoinSchema(ma.Schema):
             "price_change_percentage_30d",
             "price_change_percentage_1y",
             "ath_change_percentage",
+            "timestamp",
         )
 
 
