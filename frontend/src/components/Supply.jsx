@@ -50,7 +50,9 @@ function Supply() {
     },
   ];
 
-  return <Table tableData={tableData} coins={coins} styles={styles} />;
+  return (
+    <Table tableData={tableData} coins={coins} styles={styles} defaultOrderBy={'market_cap_rank'} />
+  );
 }
 
 export default Supply;

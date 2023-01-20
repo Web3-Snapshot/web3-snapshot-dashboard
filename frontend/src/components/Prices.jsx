@@ -15,48 +15,50 @@ function Prices() {
 
   const tableData = [
     {
-      id: 'rank',
+      id: 'market_cap_rank',
       label: '#',
       render: (obj) => obj.market_cap_rank,
     },
     {
-      id: 'coin',
+      id: 'symbol',
       label: 'Coin',
       render: (obj) => <IconAndCurrencyIdCell obj={obj} />,
     },
     {
-      id: 'price',
+      id: 'current_price',
       label: 'Price',
       render: (obj) => `$${obj.current_price.toLocaleString()}`,
     },
     {
-      id: '1d',
+      id: 'price_change_percentage_24h',
       label: '1 Day',
       render: (obj) => `${obj.price_change_percentage_24h.toFixed(2)}%`,
     },
     {
-      id: '1w',
+      id: 'price_change_percentage_7d',
       label: '7 Days',
       render: (obj) => `${obj.price_change_percentage_7d.toFixed(2)}%`,
     },
     {
-      id: '1m',
+      id: 'price_change_percentage_30d',
       label: '30 Days',
       render: (obj) => `${obj.price_change_percentage_30d.toFixed(2)}%`,
     },
     {
-      id: '1y',
+      id: 'price_change_percentage_1y',
       label: '1 Year',
       render: (obj) => `${obj.price_change_percentage_1y.toFixed(2)}%`,
     },
     {
-      id: 'ath',
+      id: 'ath_change_percentage',
       label: 'ATH',
       render: (obj) => `${obj.ath_change_percentage.toFixed(2)}%`,
     },
   ];
 
-  return <Table tableData={tableData} coins={coins} styles={styles} />;
+  return (
+    <Table tableData={tableData} coins={coins} styles={styles} defaultOrderBy={'market_cap_rank'} />
+  );
 }
 
 export default Prices;

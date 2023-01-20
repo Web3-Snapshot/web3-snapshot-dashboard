@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import tableStyles from './Table.module.css';
 import Row from './Row';
 import HeaderRow from './HeaderRow';
@@ -26,8 +27,10 @@ export function objectSort(obj, order, orderBy) {
   return res;
 }
 
-function Table({ tableData, coins, styles }) {
+function Table({ tableData, coins, styles, defaultOrderBy }) {
   function handleSort() {}
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState(defaultOrderBy);
 
   return (
     <div className={tableStyles.container}>
