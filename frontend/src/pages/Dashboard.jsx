@@ -24,18 +24,7 @@ export async function fetchCoins() {
 }
 
 function Dashboard() {
-  // const [coins, setCoins] = useState([]);
   const [coins, setCoins] = useState({ data: {}, order: [] });
-
-  //   useEffect(() => {
-  //     const fetchData = async function () {
-  //       fetchCoins().then((res) => setCoins(res));
-  //     };
-
-  //     if (coins.length < 1) {
-  //       fetchData();
-  //     }
-  //   }, [coins]);
 
   useEffect(() => {
     const fetchData = async function () {
