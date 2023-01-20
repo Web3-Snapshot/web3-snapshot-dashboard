@@ -1,5 +1,5 @@
-@value small as bp-small, medium as bp-medium, large as bp-large from "../breakpoints.css";
-@value first-column-wide, first-column-medium from "../global-constants.css";
+@value xl, lg, sm, xs from "../breakpoints.css";
+@value first-column-wide, first-column-medium, second-column-wide, second-column-medium from "../global-constants.css";
 
 .container {
   width: 85%;
@@ -8,15 +8,15 @@
 
 .row {
   display: grid;
-  grid-template-columns: first-column-wide 280px 200px repeat(5, 1fr);
+  grid-template-columns: first-column-wide second-column-wide repeat(6, 1fr);
   min-height: 4rem;
   align-items: center;
   min-width: fit-content;
 }
 
-@media bp-medium {
+@media lg {
   .row {
-    grid-template-columns: first-column-medium 150px 130px repeat(5, 1fr);
+    grid-template-columns: first-column-medium second-column-medium repeat(6, 1fr);
   }
 }
 
@@ -42,7 +42,7 @@
 
 .header div:nth-child(2) {
   justify-content: flex-start;
-  padding-left: 2rem;
+  padding-left: 0.5rem;
 }
 
 .data {
@@ -63,7 +63,8 @@
 
 .data div:nth-child(2) {
   justify-content: flex-start;
-  padding-left: 2rem;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
 }
 
 data > div:nth-child(2) {
