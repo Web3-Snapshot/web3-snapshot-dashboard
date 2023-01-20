@@ -1,11 +1,45 @@
 import tableStyles from './Table.module.css';
 import Row from './Row';
+import HeaderRow from './HeaderRow';
+
+export function comparator(a, b, order, orderBy) {
+  const multiplier = order === 'asc' ? 1 : -1;
+  return orderBy.reduce((acc, curr) => {
+    acc ||= a[curr] - b[curr];
+    return multiplier * acc;
+  }, false);
+}
+
+//TODO
+export function stringComparator(a, b, order, orderBy) {
+  // const multiplier = order === 'asc' ? 1 : -1;
+  // return orderBy.reduce((acc, curr) => {
+  //   acc ||= a[curr] - b[curr];
+  //   return multiplier * acc;
+  // }, false);
+}
+
+export function objectSort(obj, order, orderBy) {
+  const res = Object.entries(obj)
+    .sort(([_, av], [__, bv]) => comparator(av, bv, order, orderBy))
+    .reduce((acc, [currk, _]) => [...acc, currk], []);
+  return res;
+}
 
 function Table({ tableData, coins, styles }) {
+  function handleSort() {}
+
   return (
     <div className={tableStyles.container}>
       <div className={`${styles.row} ${styles.header}`}>
-        <Row header tableData={tableData} styles={styles} />
+        <HeaderRow
+          headers={tableData}
+          styles={styles}
+          tableStyles={tableStyles}
+          sortHandler={handleSort}
+          order="asc"
+          orderBy="market_cap_rank"
+        />
       </div>
       {Object.entries(coins).map(([id, coin]) => (
         <div key={id} className={`${styles.row} ${styles.data}`}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
 
-const Row = ({ headers, row, styles, tableStyles, sortHandler, order, orderBy }) => {
+const HeaderRow = ({ headers, styles, tableStyles, sortHandler, order, orderBy }) => {
   return headers.map((cell) => (
     <div key={cell.id} className={styles.cell}>
       <FaAngleDown
@@ -21,9 +21,8 @@ const Row = ({ headers, row, styles, tableStyles, sortHandler, order, orderBy })
   ));
 };
 
-Row.defaultProps = {
+HeaderRow.defaultProps = {
   row: [],
-  header: false,
 };
 
-export default Row;
+export default HeaderRow;
