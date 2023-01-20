@@ -1,8 +1,9 @@
 @value small as bp-small, medium as bp-medium, large as bp-large from "../breakpoints.css";
+@value first-column-wide, first-column-medium, second-column-wide, second-column-medium from "../global-constants.css";
 
 .row {
   display: grid;
-  grid-template-columns: 40px 280px 200px repeat(4, 1fr);
+  grid-template-columns: first-column-wide second-column-wide 200px repeat(4, 1fr);
   min-height: 4rem;
   align-items: center;
   min-width: fit-content;
@@ -10,7 +11,7 @@
 
 @media bp-medium {
   .row {
-    grid-template-columns: 32px 150px 130px repeat(4, 1fr);
+    grid-template-columns: first-column-medium second-column-medium 130px repeat(4, 1fr);
   }
 }
 

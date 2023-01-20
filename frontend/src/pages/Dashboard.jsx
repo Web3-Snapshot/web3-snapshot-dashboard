@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { v4 as uuid } from 'uuid';
 import { isEmpty } from 'lodash';
 import { NavLink, Outlet } from 'react-router-dom';
 import axios from 'axios';
@@ -23,14 +24,26 @@ export async function fetchCoins() {
 }
 
 function Dashboard() {
-  const [coins, setCoins] = useState([]);
+  const [coins, setCoins] = useState({ data: {}, order: [] });
 
   useEffect(() => {
     const fetchData = async function () {
-      fetchCoins().then((res) => setCoins(res));
+      fetchCoins().then((res) => {
+        const normalizedRes = res.reduce(
+          (acc, curr) => {
+            const guid = uuid();
+            acc.data = { ...acc.data, [guid]: curr };
+            acc.order.push(guid);
+            return acc;
+          },
+          { data: {}, order: [] }
+        );
+        console.log('normalizedRes', normalizedRes);
+        setCoins(normalizedRes);
+      });
     };
 
-    if (coins.length < 1) {
+    if (isEmpty(coins.data)) {
       fetchData();
     }
   }, [coins]);
