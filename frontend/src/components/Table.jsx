@@ -3,10 +3,16 @@ import tableStyles from './Table.module.css';
 import Row from './Row';
 import HeaderRow from './HeaderRow';
 
+function comparison(a, b) {
+  if (a > b) return -1;
+  if (b > a) return 1;
+  return 0;
+}
+
 export function comparator(a, b, order, orderBy) {
-  const multiplier = order === 'asc' ? 1 : -1;
+  const multiplier = order === 'desc' ? 1 : -1;
   return orderBy.reduce((acc, curr) => {
-    acc ||= a[curr] - b[curr];
+    acc ||= comparison(a[curr], b[curr]);
     return multiplier * acc;
   }, false);
 }

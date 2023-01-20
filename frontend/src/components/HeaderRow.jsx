@@ -6,14 +6,14 @@ const HeaderRow = ({ headers, styles, tableStyles, sortHandler, order, orderBy }
     <div key={cell.id} className={styles.cell}>
       <FaAngleDown
         className={`${tableStyles.iconDown} ${
-          order === 'desc' && orderBy === cell.id && tableStyles.iconActive
+          order === 'desc' && orderBy.includes(cell.id) && tableStyles.iconActive
         }`}
         onClick={(evt) => sortHandler(evt, cell.id, 'desc')}
       />
       <span className={tableStyles.headerText}>{cell.label}</span>
       <FaAngleUp
         className={`${tableStyles.iconUp} ${
-          order === 'asc' && orderBy === cell.id && tableStyles.iconActive
+          order === 'asc' && orderBy.includes(cell.id) && tableStyles.iconActive
         }`}
         onClick={(evt) => sortHandler(evt, cell.id, 'asc')}
       />
