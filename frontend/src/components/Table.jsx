@@ -2,6 +2,22 @@ import React, { useState, useEffect } from 'react';
 import tableStyles from './Table.module.css';
 import Row from './Row';
 import HeaderRow from './HeaderRow';
+import { useBreakpoints } from 'react-breakpoints-hook';
+
+// let { xs, sm, md, lg } = useBreakpoints({
+//   xs: { min: 0, max: 360 },
+//   sm: { min: 361, max: 960 },
+//   md: { min: 961, max: 1400 },
+//   lg: { min: 1401, max: null },
+// });
+
+const BREAKPOINTS = {
+  xs: { min: 0, max: 599 },
+  sm: { min: 600, max: 1159 },
+  // md: { min: 961, max: 1400 },
+  lg: { min: 1160, max: 1559 },
+  xl: { min: 1560, max: null },
+};
 
 function comparison(a, b) {
   if (a > b) return -1;
@@ -29,6 +45,8 @@ function Table({ tableData, coins, styles, defaultOrderBy }) {
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
 
+  let { xs, sm, lg, xl } = useBreakpoints(BREAKPOINTS);
+
   function handleSort(_, cellId, order) {
     setOrder(order);
     setOrderBy([cellId]);
@@ -42,21 +60,27 @@ function Table({ tableData, coins, styles, defaultOrderBy }) {
 
   return (
     <div className={tableStyles.container}>
-      <div className={`${styles.row} ${styles.header}`}>
-        <HeaderRow
-          headers={tableData}
-          styles={styles}
-          tableStyles={tableStyles}
-          sortHandler={handleSort}
-          order={order}
-          orderBy={orderBy}
-        />
-      </div>
-      {orderedCoins.map((coinGuid) => (
-        <div key={coinGuid} className={`${styles.row} ${styles.data}`}>
-          <Row tableData={tableData} row={coins.data[coinGuid]} styles={styles} />
-        </div>
-      ))}
+      {xl || lg ? (
+        <>
+          <div className={`${styles.row} ${styles.header}`}>
+            <HeaderRow
+              headers={tableData}
+              styles={styles}
+              tableStyles={tableStyles}
+              sortHandler={handleSort}
+              order={order}
+              orderBy={orderBy}
+            />
+          </div>
+          {orderedCoins.map((coinGuid) => (
+            <div key={coinGuid} className={`${styles.row} ${styles.data}`}>
+              <Row tableData={tableData} row={coins.data[coinGuid]} styles={styles} />
+            </div>
+          ))}
+        </>
+      ) : (
+        <h1>Here we will see the Card View later</h1>
+      )}
     </div>
   );
 }
