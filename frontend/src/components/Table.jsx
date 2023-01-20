@@ -41,9 +41,9 @@ function Table({ tableData, coins, styles }) {
           orderBy="market_cap_rank"
         />
       </div>
-      {Object.entries(coins).map(([id, coin]) => (
-        <div key={id} className={`${styles.row} ${styles.data}`}>
-          <Row tableData={tableData} row={coin} styles={styles} />
+      {coins.order.map((coinGuid) => (
+        <div key={coinGuid} className={`${styles.row} ${styles.data}`}>
+          <Row tableData={tableData} row={coins.data[coinGuid]} styles={styles} />
         </div>
       ))}
     </div>
