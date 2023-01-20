@@ -11,37 +11,40 @@ function Supply() {
 
   const tableData = [
     {
-      id: 'marketCapRank',
+      id: 'market_cap_rank',
       label: '#',
       render: (obj) => obj.market_cap_rank,
     },
     {
-      id: 'icon',
+      id: 'symbol',
       label: 'Coin',
       render: (obj) => <IconAndCurrencyIdCell obj={obj} />,
     },
     {
-      id: 'marketCapUSD',
+      id: 'market_cap_usd',
       label: 'Market Cap',
       render: (obj) => `$${formatLongNumbers(obj.market_cap_usd)}`,
     },
     {
-      id: 'FDMarketCap',
+      id: 'fully_diluted_valuation_usd',
       label: 'FD Market Cap',
-      render: (obj) => `$${formatLongNumbers(obj.fully_diluted_valuation_usd)}`,
+      render: (obj) =>
+        `${obj.fully_diluted_valuation_usd ? '$' : ''}${formatLongNumbers(
+          obj.fully_diluted_valuation_usd
+        )}`,
     },
     {
-      id: 'circulatingSupply',
+      id: 'circulating_supply',
       label: 'Circ. Supply',
       render: (obj) => formatLongNumbers(obj.circulating_supply),
     },
     {
-      id: 'totalSupply',
+      id: 'total_supply',
       label: 'Total Supply',
       render: (obj) => formatLongNumbers(obj.total_supply),
     },
     {
-      id: 'maxSupply',
+      id: 'max_supply',
       label: 'Max Supply',
       render: (obj) => formatLongNumbers(Math.round(obj.max_supply)),
     },
