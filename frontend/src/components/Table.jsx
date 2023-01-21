@@ -3,21 +3,9 @@ import tableStyles from './Table.module.css';
 import Row from './Row';
 import HeaderRow from './HeaderRow';
 import { useBreakpoints } from 'react-breakpoints-hook';
+import { BREAKPOINTS } from '../constants';
 
-// let { xs, sm, md, lg } = useBreakpoints({
-//   xs: { min: 0, max: 360 },
-//   sm: { min: 361, max: 960 },
-//   md: { min: 961, max: 1400 },
-//   lg: { min: 1401, max: null },
-// });
-
-const BREAKPOINTS = {
-  xs: { min: 0, max: 599 },
-  sm: { min: 600, max: 1159 },
-  // md: { min: 961, max: 1400 },
-  lg: { min: 1160, max: 1559 },
-  xl: { min: 1560, max: null },
-};
+const CARD_HEADER_FIELDS = ['market_cap_rank', 'symbol', 'market_cap_usd'];
 
 function comparison(a, b) {
   if (a > b) return -1;
@@ -84,9 +72,7 @@ function Table({ tableData, coins, styles, defaultOrderBy }) {
             <div key={coinGuid} className={tableStyles.cardContainer}>
               <div className={tableStyles.cardHeader}>
                 {tableData
-                  .filter((item) =>
-                    ['market_cap_rank', 'symbol', 'market_cap_usd'].includes(item.id)
-                  )
+                  .filter((item) => CARD_HEADER_FIELDS.includes(item.id))
                   .map((item) => (
                     <div key={item.id} className={tableStyles.topSection}>
                       <span className={tableStyles.cardLabels}>
@@ -97,9 +83,7 @@ function Table({ tableData, coins, styles, defaultOrderBy }) {
               </div>
               <div className={tableStyles.cardBody}>
                 {tableData
-                  .filter(
-                    (item) => !['market_cap_rank', 'symbol', 'market_cap_usd'].includes(item.id)
-                  )
+                  .filter((item) => !CARD_HEADER_FIELDS.includes(item.id))
                   .map((item) => (
                     <div key={item.id} className={tableStyles.bottomItem}>
                       <span className={tableStyles.cardItemLabel}>{item.label}</span>

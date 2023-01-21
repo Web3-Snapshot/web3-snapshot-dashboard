@@ -1,3 +1,4 @@
+@value xl, lg, sm, xs from "../breakpoints.css";
 .container {
   width: 85%;
   margin: 4rem auto;
@@ -6,12 +7,19 @@
 .cardContainer {
   display: flex;
   flex-direction: column;
+  flex-wrap: 'wrap';
   justify-content: space-between;
   background: #2e2f30;
   border-radius: 8px;
   margin: 1rem;
   padding: 20px;
   min-height: 10rem;
+}
+
+@media xs {
+  .cardContainer {
+    min-height: 15rem;
+  }
 }
 
 .cardHeader {
@@ -36,6 +44,13 @@
   flex: auto;
   flex-direction: column;
   row-gap: 8px;
+}
+
+@media xs {
+  .cardBody {
+    display: grid;
+    grid-auto-flow: column;
+  }
 }
 
 .bottomItem > span {
