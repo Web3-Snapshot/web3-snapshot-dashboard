@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import tableStyles from './Table.module.css';
+import styles from './Table.module.css';
 import Row from './Row';
 import HeaderRow from './HeaderRow';
 import { useBreakpoints } from 'react-breakpoints-hook';
@@ -28,7 +28,7 @@ export function objectSort(obj, order, orderBy) {
     .reduce((acc, [currk, _]) => [...acc, currk], []);
 }
 
-function Table({ tableData, coins, styles, defaultOrderBy }) {
+function Table({ tableData, coins, rowStyles, defaultOrderBy }) {
   const [orderedCoins, setOrderedCoins] = useState(coins.order);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
@@ -47,46 +47,43 @@ function Table({ tableData, coins, styles, defaultOrderBy }) {
   }, [order, orderBy, coins]);
 
   return (
-    <div className={tableStyles.container}>
+    <div className={styles.container}>
       {xl || lg ? (
         <>
-          <div className={`${styles.row} ${tableStyles.header}`}>
+          <div className={`${rowStyles.row} ${styles.header}`}>
             <HeaderRow
               headers={tableData}
               styles={styles}
-              tableStyles={tableStyles}
               sortHandler={handleSort}
               order={order}
               orderBy={orderBy}
             />
           </div>
           {orderedCoins.map((coinGuid) => (
-            <div key={coinGuid} className={`${styles.row} ${tableStyles.data}`}>
-              <Row tableData={tableData} row={coins.data[coinGuid]} tableStyles={tableStyles} />
+            <div key={coinGuid} className={`${rowStyles.row} ${styles.data}`}>
+              <Row tableData={tableData} row={coins.data[coinGuid]} styles={styles} />
             </div>
           ))}
         </>
       ) : (
         <>
           {orderedCoins.map((coinGuid) => (
-            <div key={coinGuid} className={tableStyles.cardContainer}>
-              <div className={tableStyles.cardHeader}>
+            <div key={coinGuid} className={styles.cardContainer}>
+              <div className={styles.cardHeader}>
                 {tableData
                   .filter((item) => CARD_HEADER_FIELDS.includes(item.id))
                   .map((item) => (
-                    <div key={item.id} className={tableStyles.topSection}>
-                      <span className={tableStyles.cardLabels}>
-                        {item.render(coins.data[coinGuid])}
-                      </span>
+                    <div key={item.id} className={styles.topSection}>
+                      <span className={styles.cardLabels}>{item.render(coins.data[coinGuid])}</span>
                     </div>
                   ))}
               </div>
-              <div className={tableStyles.cardBody}>
+              <div className={styles.cardBody}>
                 {tableData
                   .filter((item) => !CARD_HEADER_FIELDS.includes(item.id))
                   .map((item) => (
-                    <div key={item.id} className={tableStyles.bottomItem}>
-                      <span className={tableStyles.cardItemLabel}>{item.label}</span>
+                    <div key={item.id} className={styles.bottomItem}>
+                      <span className={styles.cardItemLabel}>{item.label}</span>
                       <span>{item.render(coins.data[coinGuid])}</span>
                     </div>
                   ))}
