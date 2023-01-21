@@ -3,7 +3,7 @@ import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
 
 const HeaderRow = ({ headers, styles, tableStyles, sortHandler, order, orderBy }) => {
   return headers.map((cell) => (
-    <div key={cell.id} className={styles.cell}>
+    <div key={cell.id} className={tableStyles.cell}>
       <FaAngleDown
         className={`${tableStyles.iconDown} ${
           order === 'desc' && orderBy.includes(cell.id) && tableStyles.iconActive

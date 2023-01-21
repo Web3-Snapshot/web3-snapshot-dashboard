@@ -1,8 +1,8 @@
 import React from 'react';
 
-const Row = ({ tableData, row, styles }) => {
+const Row = ({ tableData, row, tableStyles }) => {
   return tableData.map((cell) => (
-    <div key={cell.id} className={styles.cell}>
+    <div key={cell.id} className={tableStyles.cell}>
       {cell.render(row)}
     </div>
   ));

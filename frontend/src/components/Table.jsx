@@ -33,7 +33,7 @@ function Table({ tableData, coins, styles, defaultOrderBy }) {
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
 
-  let { xs, sm, lg, xl } = useBreakpoints(BREAKPOINTS);
+  let { lg, xl } = useBreakpoints(BREAKPOINTS);
 
   function handleSort(_, cellId, order) {
     setOrder(order);
@@ -50,7 +50,7 @@ function Table({ tableData, coins, styles, defaultOrderBy }) {
     <div className={tableStyles.container}>
       {xl || lg ? (
         <>
-          <div className={`${styles.row} ${styles.header}`}>
+          <div className={`${styles.row} ${tableStyles.header}`}>
             <HeaderRow
               headers={tableData}
               styles={styles}
@@ -61,8 +61,8 @@ function Table({ tableData, coins, styles, defaultOrderBy }) {
             />
           </div>
           {orderedCoins.map((coinGuid) => (
-            <div key={coinGuid} className={`${styles.row} ${styles.data}`}>
-              <Row tableData={tableData} row={coins.data[coinGuid]} styles={styles} />
+            <div key={coinGuid} className={`${styles.row} ${tableStyles.data}`}>
+              <Row tableData={tableData} row={coins.data[coinGuid]} tableStyles={tableStyles} />
             </div>
           ))}
         </>

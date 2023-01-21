@@ -4,6 +4,84 @@
   margin: 4rem auto;
 }
 
+.header {
+  background-color: #26272b;
+  min-height: 3rem !important;
+  height: 3rem;
+  align-content: center;
+  box-shadow: 0px 0px 12px #18191b;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.header > div:nth-child(2n) {
+  display: flex;
+  align-items: center;
+  background-color: #2e2f30;
+  height: 3rem;
+}
+.header > div:nth-child(2n + 1) {
+  display: flex;
+  align-items: center;
+}
+
+.header div:nth-child(2) {
+  justify-content: flex-start;
+  padding-left: 0.5rem;
+}
+
+.data {
+  margin: 2rem 0;
+  box-shadow: 0px 0px 12px #18191b;
+}
+
+.data > div:nth-child(2n) {
+  display: flex;
+  align-items: center;
+  background-color: #2e2f30;
+  height: 4rem;
+}
+.data > div:nth-child(2n + 1) {
+  display: flex;
+  align-items: center;
+}
+
+.data div:nth-child(2) {
+  justify-content: flex-start;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+}
+@media lg {
+  .header div:nth-child(2) {
+    padding-left: 1rem;
+  }
+}
+.data div:nth-child(2) {
+  justify-content: flex-start;
+  padding-left: 0.8rem;
+}
+
+@media lg {
+  .data > div:nth-child(2) {
+    padding-left: 0.8rem;
+  }
+  .header div:nth-child(2) {
+    padding-left: 0.8rem;
+  }
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 4rem;
+}
+.data:hover {
+  transform: scale(1.04);
+  transition: 0.3s ease-in-out;
+  cursor: pointer;
+}
+
 .cardContainer {
   display: flex;
   flex-direction: column;
@@ -14,6 +92,11 @@
   margin: 1rem;
   padding: 20px;
   min-height: 10rem;
+}
+
+img {
+  height: 30px;
+  margin-right: 10px;
 }
 
 @media xs {
