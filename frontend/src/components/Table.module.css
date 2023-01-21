@@ -3,6 +3,53 @@
   margin: 4rem auto;
 }
 
+.cardContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: #2e2f30;
+  border-radius: 8px;
+  margin: 1rem;
+  padding: 20px;
+  min-height: 10rem;
+}
+
+.cardHeader {
+  display: flex;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  align-items: center;
+  gap: 16px;
+}
+
+.cardHeader div:nth-child(2) {
+  flex-grow: 100;
+}
+
+.cardBody {
+  display: flex;
+  align-items: center;
+}
+
+.bottomItem {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  row-gap: 8px;
+}
+
+.bottomItem > span {
+  margin: auto;
+}
+
+.cardLabels {
+  font-weight: bold;
+}
+
+.cardItemLabel {
+  color: #858585;
+}
+
 .iconDown {
   fill-opacity: 0.4;
 }

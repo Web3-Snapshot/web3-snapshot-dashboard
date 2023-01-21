@@ -79,7 +79,37 @@ function Table({ tableData, coins, styles, defaultOrderBy }) {
           ))}
         </>
       ) : (
-        <h1>Here we will see the Card View later</h1>
+        <>
+          {orderedCoins.map((coinGuid) => (
+            <div key={coinGuid} className={tableStyles.cardContainer}>
+              <div className={tableStyles.cardHeader}>
+                {tableData
+                  .filter((item) =>
+                    ['market_cap_rank', 'symbol', 'market_cap_usd'].includes(item.id)
+                  )
+                  .map((item) => (
+                    <div key={item.id} className={tableStyles.topSection}>
+                      <span className={tableStyles.cardLabels}>
+                        {item.render(coins.data[coinGuid])}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+              <div className={tableStyles.cardBody}>
+                {tableData
+                  .filter(
+                    (item) => !['market_cap_rank', 'symbol', 'market_cap_usd'].includes(item.id)
+                  )
+                  .map((item) => (
+                    <div key={item.id} className={tableStyles.bottomItem}>
+                      <span className={tableStyles.cardItemLabel}>{item.label}</span>
+                      <span>{item.render(coins.data[coinGuid])}</span>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          ))}
+        </>
       )}
     </div>
   );
