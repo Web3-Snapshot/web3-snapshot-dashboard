@@ -90,7 +90,7 @@
   background: #2e2f30;
   border-radius: 8px;
   margin: 1rem;
-  padding: 20px;
+  padding: 1rem;
   min-height: 10rem;
 }
 
@@ -99,18 +99,12 @@ img {
   margin-right: 10px;
 }
 
-@media xs {
-  .cardContainer {
-    min-height: 15rem;
-  }
-}
-
 .cardHeader {
   display: flex;
-  padding-left: 2rem;
-  padding-right: 2rem;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
+  margin-bottom: 2rem;
 }
 
 .cardHeader div:nth-child(2) {
@@ -122,32 +116,53 @@ img {
   align-items: center;
 }
 
-.bottomItem {
-  display: flex;
-  flex: auto;
-  flex-direction: column;
-  row-gap: 8px;
-}
-
 @media xs {
   .cardBody {
     display: grid;
-    grid-auto-flow: column;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    row-gap: 20px;
+    padding-top: 20px;
   }
 }
 
-.bottomItem > span {
-  margin: auto;
+.cardHeader div:nth-child(n + 1):nth-child(-n + 2) .cardHeaderCellLabel {
+  display: none;
 }
-
-.cardLabels {
+.cardHeaderCellValue {
   font-weight: bold;
+  padding-left: 8px;
 }
 
-.cardItemLabel {
+.cardHeaderCell {
+  display: flex;
+}
+
+.cardHeaderCellLabel {
   color: #858585;
+  padding-right: 10px;
 }
 
+.cardBodyCell {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  row-gap: 4px;
+  width: 100%;
+}
+
+.cardBodyCellLabel {
+  color: #858585;
+  padding-left: 8px;
+}
+.cardBodyCellValue {
+  width: 100%;
+  padding-left: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  height: 2.2rem;
+  background: #272829;
+  align-content: center;
+}
 .iconDown {
   fill-opacity: 0.4;
 }

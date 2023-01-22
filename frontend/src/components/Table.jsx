@@ -71,20 +71,25 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy }) {
             <div key={coinGuid} className={styles.cardContainer}>
               <div className={styles.cardHeader}>
                 {tableData
-                  .filter((item) => CARD_HEADER_FIELDS.includes(item.id))
+                  .slice(0, 3) // The first 3 items go into the header
                   .map((item) => (
-                    <div key={item.id} className={styles.topSection}>
-                      <span className={styles.cardLabels}>{item.render(coins.data[coinGuid])}</span>
+                    <div key={item.id} className={styles.cardHeaderCell}>
+                      <span className={styles.cardHeaderCellLabel}>{item.label}</span>
+                      <div className={styles.cardHeaderCellValue}>
+                        {item.render(coins.data[coinGuid])}
+                      </div>
                     </div>
                   ))}
               </div>
               <div className={styles.cardBody}>
                 {tableData
-                  .filter((item) => !CARD_HEADER_FIELDS.includes(item.id))
+                  .slice(3) // All the rest gos into the content area
                   .map((item) => (
-                    <div key={item.id} className={styles.bottomItem}>
-                      <span className={styles.cardItemLabel}>{item.label}</span>
-                      <span>{item.render(coins.data[coinGuid])}</span>
+                    <div key={item.id} className={styles.cardBodyCell}>
+                      <span className={styles.cardBodyCellLabel}>{item.label}</span>
+                      <div className={styles.cardBodyCellValue}>
+                        {item.render(coins.data[coinGuid])}
+                      </div>
                     </div>
                   ))}
               </div>
