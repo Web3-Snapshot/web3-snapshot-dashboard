@@ -1,7 +1,14 @@
-@value xl, lg, sm, xs from "../breakpoints.css";
+@value xl, lg, md, sm, xs from "../breakpoints.css";
 .container {
   width: 85%;
   margin: 4rem auto;
+}
+
+@media xs {
+  .container {
+    width: 94%;
+    margin: 0 auto;
+  }
 }
 
 .header {
@@ -85,8 +92,7 @@
 .cardContainer {
   display: flex;
   flex-direction: column;
-  flex-wrap: 'wrap';
-  justify-content: space-between;
+  flex-wrap: wrap;
   background: #2e2f30;
   border-radius: 8px;
   margin: 1rem;
@@ -94,6 +100,13 @@
   min-height: 10rem;
 }
 
+@media xs {
+  .cardContainer {
+    margin: 0.4rem 0;
+    padding: 0 0.4rem 0 0;
+    min-height: 8rem;
+  }
+}
 img {
   height: 30px;
   margin-right: 10px;
@@ -107,6 +120,14 @@ img {
   margin-bottom: 2rem;
 }
 
+@media xs {
+  .cardHeader {
+    gap: 2px;
+    margin-bottom: 0;
+  }
+}
+
+/* This is the element to the right on the card (price or current market cap) */
 .cardHeader div:nth-child(2) {
   flex-grow: 100;
 }
@@ -118,23 +139,22 @@ img {
 
 @media xs {
   .cardBody {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    row-gap: 20px;
-    padding-top: 20px;
+    display: flex;
+    flex-wrap: wrap-reverse;
+    align-items: flex-start;
+    font-size: 12px;
   }
 }
 
 .cardHeader div:nth-child(n + 1):nth-child(-n + 2) .cardHeaderCellLabel {
   display: none;
-}
-.cardHeaderCellValue {
   font-weight: bold;
   padding-left: 8px;
 }
 
 .cardHeaderCell {
   display: flex;
+  padding-left: 0.5rem;
 }
 
 .cardHeaderCellLabel {
@@ -147,7 +167,7 @@ img {
   flex: auto;
   flex-direction: column;
   row-gap: 4px;
-  width: 100%;
+  width: 28px;
 }
 
 .cardBodyCellLabel {

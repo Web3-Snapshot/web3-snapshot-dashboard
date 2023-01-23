@@ -5,8 +5,6 @@ import HeaderRow from './HeaderRow';
 import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
 
-const CARD_HEADER_FIELDS = ['market_cap_rank', 'symbol', 'market_cap_usd'];
-
 function comparison(a, b) {
   if (a > b) return -1;
   if (b > a) return 1;
