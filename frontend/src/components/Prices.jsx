@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 
 import styles from './Prices.module.scss';
 import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
@@ -11,8 +12,41 @@ import { renderCell, renderCellOverlay } from './CellOverlay';
 // display the difference in %:
 // https://api.coingecko.com/api/v3/coins/bitcoin/history?date=1-1-2020
 
+function CoinInfo({ onClose, row }) {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
+  return (
+    <div className={styles.coinInfo} onClick={() => console.log('Clicked on coinInfo')}>
+      <div
+        className={styles.backdrop}
+        onClick={(evt) => {
+          evt.stopPropagation();
+          onClose();
+        }}>
+        <div
+          className={styles.dialogRoot}
+          onClick={(evt) => {
+            evt.stopPropagation();
+          }}>
+          {Object.values(row).map((item) => {
+            return <p>{item}</p>;
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Prices() {
   const { coins } = useOutletContext();
+  const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
+  const [row, setRow] = useState();
 
   const tableData = [
     {
@@ -74,13 +108,32 @@ function Prices() {
     },
   ];
 
+  function handleRowClick(evt, row, cell) {
+    console.log('cell ', cell);
+    console.log('row', row);
+    setRow(row);
+    setIsCoinInfoModalOpen(true);
+  }
+
   return (
-    <Table
-      tableData={tableData}
-      coins={coins}
-      rowStyles={styles}
-      defaultOrderBy={['market_cap_rank']}
-    />
+    <>
+      {isCoinInfoModalOpen &&
+        createPortal(
+          <CoinInfo
+            isOpen={isCoinInfoModalOpen}
+            onClose={() => setIsCoinInfoModalOpen(false)}
+            row={row}
+          />,
+          document.body
+        )}
+      <Table
+        tableData={tableData}
+        coins={coins}
+        rowStyles={styles}
+        defaultOrderBy={['market_cap_rank']}
+        onRowClick={handleRowClick}
+      />
+    </>
   );
 }
 

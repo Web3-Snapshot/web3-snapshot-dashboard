@@ -6,7 +6,7 @@ import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
 import { objectSort } from '../util/helpers';
 
-function Table({ tableData, coins, rowStyles, defaultOrderBy }) {
+function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
   const [orderedCoins, setOrderedCoins] = useState(coins.order);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
@@ -39,7 +39,12 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy }) {
           </div>
           {orderedCoins.map((coinGuid) => (
             <div key={coinGuid} className={`${rowStyles.row} ${styles.data}`}>
-              <Row tableData={tableData} row={coins.data[coinGuid]} styles={styles} />
+              <Row
+                tableData={tableData}
+                row={coins.data[coinGuid]}
+                styles={styles}
+                onRowClick={onRowClick}
+              />
             </div>
           ))}
         </>
