@@ -22,12 +22,12 @@ function Supply() {
     },
     {
       id: 'market_cap_usd',
-      label: 'Market Cap',
+      label: 'Mkt. Cap',
       render: (obj) => `$${formatLongNumbers(obj.market_cap_usd)}`,
     },
     {
       id: 'fully_diluted_valuation_usd',
-      label: 'FD Market Cap',
+      label: 'FD Mkt. Cap',
       render: (obj) =>
         `${obj.fully_diluted_valuation_usd ? '$' : ''}${formatLongNumbers(
           obj.fully_diluted_valuation_usd
@@ -54,7 +54,7 @@ function Supply() {
     <Table
       tableData={tableData}
       coins={coins}
-      styles={styles}
+      rowStyles={styles}
       defaultOrderBy={['market_cap_rank']}
     />
   );

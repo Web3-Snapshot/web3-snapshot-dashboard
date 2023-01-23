@@ -60,7 +60,7 @@ function Prices() {
     <Table
       tableData={tableData}
       coins={coins}
-      styles={styles}
+      rowStyles={styles}
       defaultOrderBy={['market_cap_rank']}
     />
   );

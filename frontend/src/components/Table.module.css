@@ -1,8 +1,217 @@
+@value xl, lg, md, sm, xs from "../breakpoints.css";
 .container {
   width: 85%;
   margin: 4rem auto;
 }
 
+@media xs {
+  .container {
+    width: 94%;
+    margin: 0 auto;
+  }
+}
+
+.header {
+  background-color: #26272b;
+  min-height: 3rem !important;
+  height: 3rem;
+  align-content: center;
+  box-shadow: 0px 0px 12px #18191b;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.header > div:nth-child(2n) {
+  display: flex;
+  align-items: center;
+  background-color: #2e2f30;
+  height: 3rem;
+}
+.header > div:nth-child(2n + 1) {
+  display: flex;
+  align-items: center;
+}
+
+.header div:nth-child(2) {
+  justify-content: flex-start;
+  padding-left: 0.5rem;
+}
+
+.data {
+  margin: 2rem 0;
+  box-shadow: 0px 0px 12px #18191b;
+}
+
+.data > div:nth-child(2n) {
+  display: flex;
+  align-items: center;
+  background-color: #2e2f30;
+  height: 4rem;
+}
+.data > div:nth-child(2n + 1) {
+  display: flex;
+  align-items: center;
+}
+
+.data div:nth-child(2) {
+  justify-content: flex-start;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+}
+@media lg {
+  .header div:nth-child(2) {
+    padding-left: 1rem;
+  }
+}
+.data div:nth-child(2) {
+  justify-content: flex-start;
+  padding-left: 0.8rem;
+}
+
+@media lg {
+  .data > div:nth-child(2) {
+    padding-left: 0.8rem;
+  }
+  .header div:nth-child(2) {
+    padding-left: 0.8rem;
+  }
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 4rem;
+}
+.data:hover {
+  transform: scale(1.04);
+  transition: 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.cardContainer {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  background: #2e2f30;
+  border-radius: 8px;
+  margin: 1rem;
+  padding: 1rem;
+  min-height: 10rem;
+}
+
+@media xs {
+  .cardContainer {
+    margin: 0.4rem 0;
+    padding: 0 0.4rem 0.4rem 0;
+    min-height: 8rem;
+  }
+}
+
+@media (max-width: 470) {
+  .cardContainer {
+    flex-wrap: wrap;
+  }
+}
+img {
+  height: 30px;
+  margin-right: 10px;
+}
+
+.cardHeader {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 2rem;
+}
+
+@media xs {
+  .cardHeader {
+    gap: 2px;
+    margin-bottom: 0;
+  }
+}
+@media (max-width: 400px) {
+  .cardHeader {
+    flex-wrap: wrap;
+  }
+  .cardHeader div:nth-child(2) {
+    flex-basis: 80%;
+  }
+}
+
+/* This is symbol element in the  header of the car */
+.cardHeader div:nth-child(2) {
+  flex-grow: 100;
+}
+
+@media (max-width: 400px) {
+  .cardHeader div:nth-child(2) {
+    flex-basis: 80%;
+  }
+}
+
+.cardBody {
+  display: flex;
+  align-items: center;
+}
+
+@media xs {
+  .cardBody {
+    display: flex;
+    flex-wrap: wrap-reverse;
+    align-items: flex-start;
+    font-size: 12px;
+    padding-left: 0.5rem;
+  }
+}
+
+.cardHeader div:nth-child(n + 1):nth-child(-n + 2) .cardHeaderCellLabel {
+  display: none;
+  font-weight: bold;
+  padding-left: 8px;
+}
+
+.cardHeaderCell {
+  display: flex;
+  padding-left: 0.5rem;
+}
+
+.cardHeaderCellLabel {
+  display: flex;
+  flex-wrap: nowrap;
+  color: #858585;
+  padding-right: 10px;
+}
+
+@media (max-width: 400px) {
+  .cardHeaderCellLabel {
+    width: 8rem;
+  }
+}
+
+.cardBodyCell {
+  display: flex;
+  flex: auto;
+  flex-direction: column;
+  row-gap: 4px;
+  width: 28px;
+}
+
+.cardBodyCellLabel {
+  color: #858585;
+  padding-left: 8px;
+}
+.cardBodyCellValue {
+  width: 100%;
+  padding-left: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  height: 2.2rem;
+  background: #272829;
+  align-content: center;
+}
 .iconDown {
   fill-opacity: 0.4;
 }
