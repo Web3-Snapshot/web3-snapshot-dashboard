@@ -111,10 +111,6 @@
 @media (max-width: 470) {
   .cardContainer {
     flex-wrap: wrap;
-
-    /* margin: 0.4rem 0;
-    padding: 0 0.4rem 0.4rem 0;
-    min-height: 8rem; */
   }
 }
 img {
