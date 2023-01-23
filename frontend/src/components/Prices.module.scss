@@ -14,3 +14,27 @@
     grid-template-columns: $first-column-medium $second-column-medium repeat(6, 1fr);
   }
 }
+
+/* Popover */
+.coinInfo {
+  display: table;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.backdrop {
+  display: table-cell;
+  vertical-align: middle;
+  background: rgba(40, 40, 40, 0.6);
+}
+
+.dialogRoot {
+  margin-left: auto;
+  margin-right: auto;
+  width: 600px;
+  background-color: white;
+  color: black;
+}

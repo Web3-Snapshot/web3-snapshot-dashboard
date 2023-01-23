@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 
@@ -31,6 +31,37 @@ const COIN_INFO_PROPS = [
 // This url will be used to fetch data for all coins on the 1 Jan 2020, and
 // display the difference in %:
 // https://api.coingecko.com/api/v3/coins/bitcoin/history?date=1-1-2020
+
+function CoinInfo({ onClose, row }) {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
+  return (
+    <div className={styles.coinInfo} onClick={() => console.log('Clicked on coinInfo')}>
+      <div
+        className={styles.backdrop}
+        onClick={(evt) => {
+          evt.stopPropagation();
+          onClose();
+        }}>
+        <div
+          className={styles.dialogRoot}
+          onClick={(evt) => {
+            evt.stopPropagation();
+          }}>
+          {Object.values(row).map((item) => {
+            return <p>{item}</p>;
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function Prices() {
   const { coins } = useOutletContext();
