@@ -34,8 +34,8 @@ function CoinInfo({ onClose, row }) {
           onClick={(evt) => {
             evt.stopPropagation();
           }}>
-          {Object.values(row).map((item) => {
-            return <p>{item}</p>;
+          {Object.values(row).map((item, idx) => {
+            return <p key={`${row.id}-${idx}`}>{item}</p>;
           })}
         </div>
       </div>
