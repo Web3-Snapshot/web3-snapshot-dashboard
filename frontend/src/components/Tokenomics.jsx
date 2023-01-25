@@ -2,10 +2,15 @@ import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
 import { formatLongNumbers } from '../util/helpers';
+<<<<<<< HEAD:frontend/src/components/Supply.jsx
+=======
+import styles from './Tokenomics.module.css';
+
+>>>>>>> 66d63478 (Change Supply to Tokenomics):frontend/src/components/Tokenomics.jsx
 import Table from './Table';
 import styles from './Supply.module.scss';
 
-function Supply() {
+function Tokenomics() {
   const { coins } = useOutletContext();
 
   const tableData = [
@@ -60,4 +65,4 @@ function Supply() {
   );
 }
 
-export default Supply;
+export default Tokenomics;

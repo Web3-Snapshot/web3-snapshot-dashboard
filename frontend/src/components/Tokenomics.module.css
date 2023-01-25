@@ -1,0 +1,16 @@
+@value xl, lg, sm, xs from "../breakpoints.css";
+@value first-column-wide, first-column-medium, second-column-wide, second-column-medium from "../global-constants.css";
+
+.row {
+  display: grid;
+  grid-template-columns: first-column-wide second-column-wide 200px repeat(4, 1fr);
+  min-height: 4rem;
+  align-items: center;
+  min-width: fit-content;
+}
+
+@media lg {
+  .row {
+    grid-template-columns: first-column-medium second-column-medium repeat(5, 1fr);
+  }
+}

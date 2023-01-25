@@ -14,6 +14,10 @@ def deep_get(dictionary, keys, default=None):
     )
 
 
+def transformListToCleanString(list_item):
+    return ", ".join([item for item in list_item if item])
+
+
 COINS = 100
 URL1 = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page={COINS}&page=1&sparkline=false&price_change_percentage=1h%2C%2024h%2C%207d%2C%2030d%2C%20200d%2C%201y%2C%203y"
 URL2 = f"https://api.coingecko.com/api/v3/coins"
@@ -198,21 +202,11 @@ def main():
                             coin_item["name"],
                             coin_item["image"]["thumb"],
                             coin_item["symbol"],
-                            ", ".join(
-                                [
-                                    item
-                                    for item in coin_item["links"]["homepage"]
-                                    if item
-                                ]
+                            transformListToCleanString(coin_item["links"]["homepage"]),
+                            transformListToCleanString(
+                                coin_item["links"]["blockchain_site"]
                             ),
-                            ", ".join(
-                                [
-                                    item
-                                    for item in coin_item["links"]["blockchain_site"]
-                                    if item
-                                ]
-                            ),
-                            ", ".join(coin_item["categories"]),
+                            transformListToCleanString(coin_item["categories"]),
                             coin_item["market_cap_rank"],
                             coin_item["market_data"]["market_cap"]["usd"],
                             coin_item["market_data"]["fully_diluted_valuation"].get(
@@ -270,21 +264,11 @@ def main():
                     cur.execute(
                         UPDATE_SQL,
                         [
-                            ", ".join(
-                                [
-                                    item
-                                    for item in coin_item["links"]["homepage"]
-                                    if item
-                                ]
+                            transformListToCleanString(coin_item["links"]["homepage"]),
+                            transformListToCleanString(
+                                coin_item["links"]["blockchain_site"]
                             ),
-                            ", ".join(
-                                [
-                                    item
-                                    for item in coin_item["links"]["blockchain_site"]
-                                    if item
-                                ]
-                            ),
-                            ", ".join(coin_item["categories"]),
+                            transformListToCleanString(coin_item["categories"]),
                             coin_item["market_cap_rank"],
                             coin_item["market_data"]["market_cap"]["usd"],
                             coin_item["market_data"]["fully_diluted_valuation"].get(
