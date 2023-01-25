@@ -198,8 +198,20 @@ def main():
                             coin_item["name"],
                             coin_item["image"]["thumb"],
                             coin_item["symbol"],
-                            ", ".join(coin_item["links"]["homepage"]),
-                            ", ".join(coin_item["links"]["blockchain_site"]),
+                            ", ".join(
+                                [
+                                    item
+                                    for item in coin_item["links"]["homepage"]
+                                    if item
+                                ]
+                            ),
+                            ", ".join(
+                                [
+                                    item
+                                    for item in coin_item["links"]["blockchain_site"]
+                                    if item
+                                ]
+                            ),
                             ", ".join(coin_item["categories"]),
                             coin_item["market_cap_rank"],
                             coin_item["market_data"]["market_cap"]["usd"],
@@ -258,8 +270,20 @@ def main():
                     cur.execute(
                         UPDATE_SQL,
                         [
-                            ", ".join(coin_item["links"]["homepage"]),
-                            ", ".join(coin_item["links"]["blockchain_site"]),
+                            ", ".join(
+                                [
+                                    item
+                                    for item in coin_item["links"]["homepage"]
+                                    if item
+                                ]
+                            ),
+                            ", ".join(
+                                [
+                                    item
+                                    for item in coin_item["links"]["blockchain_site"]
+                                    if item
+                                ]
+                            ),
                             ", ".join(coin_item["categories"]),
                             coin_item["market_cap_rank"],
                             coin_item["market_data"]["market_cap"]["usd"],
