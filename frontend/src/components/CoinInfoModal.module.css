@@ -1,0 +1,19 @@
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(40, 40, 40, 0.6);
+}
+
+.dialogRoot {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10rem;
+  overflow-y: auto;
+  width: 60%;
+  height: 75%;
+  background-color: #383838;
+  color: white;
+}

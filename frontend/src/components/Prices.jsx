@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 
@@ -6,42 +6,29 @@ import styles from './Prices.module.scss';
 import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
 import Table from './Table';
 import { renderCell, renderCellOverlay } from './CellOverlay';
+import CoinInfoModal from './CoinInfoModal';
+
+const COIN_INFO_PROPS = [
+  'name',
+  'symbol',
+  'categories',
+  'genesis_date',
+  'total_value_locked',
+  'homepage',
+  'blockchain_site',
+  'hashing_algorithm',
+  'coingecko_score',
+  'developer_score',
+  'community_score',
+  'liquidity_score',
+  'public_interest_score',
+  'description',
+];
 
 // TODO:
 // This url will be used to fetch data for all coins on the 1 Jan 2020, and
 // display the difference in %:
 // https://api.coingecko.com/api/v3/coins/bitcoin/history?date=1-1-2020
-
-function CoinInfo({ onClose, row }) {
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, []);
-
-  return (
-    <div className={styles.coinInfo} onClick={() => console.log('Clicked on coinInfo')}>
-      <div
-        className={styles.backdrop}
-        onClick={(evt) => {
-          evt.stopPropagation();
-          onClose();
-        }}>
-        <div
-          className={styles.dialogRoot}
-          onClick={(evt) => {
-            evt.stopPropagation();
-          }}>
-          {Object.values(row).map((item, idx) => {
-            return <p key={`${row.id}-${idx}`}>{item}</p>;
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function Prices() {
   const { coins } = useOutletContext();
@@ -115,14 +102,18 @@ function Prices() {
     setIsCoinInfoModalOpen(true);
   }
 
+  function filterCoinInfoProps(obj) {
+    return Object.fromEntries(Object.entries(obj).filter(([key]) => COIN_INFO_PROPS.includes(key)));
+  }
+
   return (
     <>
       {isCoinInfoModalOpen &&
         createPortal(
-          <CoinInfo
+          <CoinInfoModal
             isOpen={isCoinInfoModalOpen}
             onClose={() => setIsCoinInfoModalOpen(false)}
-            row={row}
+            row={filterCoinInfoProps(row)}
           />,
           document.body
         )}
