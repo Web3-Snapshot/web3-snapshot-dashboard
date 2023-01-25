@@ -9,8 +9,10 @@ import { renderCell, renderCellOverlay } from './CellOverlay';
 import CoinInfoModal from './CoinInfoModal';
 
 const COIN_INFO_PROPS = [
+  'id',
   'name',
   'symbol',
+  'image_thumb',
   'categories',
   'genesis_date',
   'total_value_locked',

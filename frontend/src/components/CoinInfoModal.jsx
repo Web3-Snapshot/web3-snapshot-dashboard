@@ -1,15 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styles from './CoinInfoModal.module.css';
+import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
+import { Markup } from 'interweave';
 
 function CoinInfoModal({ onClose, row }) {
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, []);
-
   function handleBackdropClick(evt) {
     evt.stopPropagation();
     onClose();
@@ -22,9 +16,14 @@ function CoinInfoModal({ onClose, row }) {
         onClick={(evt) => {
           evt.stopPropagation();
         }}>
-        {Object.values(row).map((item, idx) => {
-          return <p key={`${row.id}-${idx}`}>{item}</p>;
-        })}
+        <div className={styles.dialogContent}>
+          <div className={styles.dialogHeader}>
+            <IconAndCurrencyIdCell obj={row} />
+          </div>
+          <p className={styles.coinDescription}>
+            <Markup content={row.description}></Markup>
+          </p>
+        </div>
       </div>
     </div>
   );
