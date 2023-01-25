@@ -41,6 +41,10 @@ function CoinInfoModal({ onClose, row }) {
               <div>{row.blockchain_site}</div>
             </div>
             <div className={styles.dialogPropertyPair}>
+              <div>Genesis Date</div>
+              <div>{row.genesis_date}</div>
+            </div>
+            <div className={styles.dialogPropertyPair}>
               <div>Hashing Algorithm</div>
               <div>{row.hashing_algorithm}</div>
             </div>
