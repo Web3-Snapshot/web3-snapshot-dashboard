@@ -17,7 +17,7 @@
 
 /* Popover */
 .coinInfo {
-  display: table;
+  overflow-y: scroll;
   position: fixed;
   top: 0;
   left: 0;
@@ -26,7 +26,6 @@
 }
 
 .backdrop {
-  display: table-cell;
   vertical-align: middle;
   background: rgba(40, 40, 40, 0.6);
 }
@@ -34,6 +33,7 @@
 .dialogRoot {
   margin-left: auto;
   margin-right: auto;
+  overflow-y: scroll;
   width: 600px;
   background-color: white;
   color: black;
