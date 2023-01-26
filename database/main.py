@@ -85,6 +85,58 @@ INSERT_SQL = """
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
+# TODO
+# Later we will update the description (and possibly other fields only when they are not protected)
+# This is an example statement to achieve this:
+#
+#      UPDATE example_table
+#      SET description = CASE
+#          WHEN protected = 'false' THEN 'new description'
+#          ELSE description
+#          END,
+#          other = 'new other'
+#      WHERE protected = 'false' OR other is not null;
+#
+#     ---------- This is the pytest ----------
+#
+#     import sqlite3
+#     import pytest
+
+#     def test_update_description():
+#         # Connect to the test database
+#         conn = sqlite3.connect(':memory:')
+
+#         # Create the test table
+#         conn.execute('''CREATE TABLE example_table (
+#                           description TEXT,
+#                           other TEXT,
+#                           protected BOOLEAN
+#                         );''')
+
+#         # Insert test data
+#         conn.execute("INSERT INTO example_table VALUES ('old description', 'old other', 'false')")
+#         conn.execute("INSERT INTO example_table VALUES ('old description', 'old other', 'true')")
+
+#         # Execute the update statement
+#         conn.execute('''UPDATE example_table SET description = CASE
+#                             WHEN protected = 'false' THEN 'new description'
+#                             ELSE description
+#                             END,
+#                             other = 'new other'
+#                           WHERE protected = 'false' OR other is not null;''')
+
+#         # Fetch the updated data
+#         cursor = conn.execute("SELECT * FROM example_table")
+#         rows = cursor.fetchall()
+
+#         # Assert that the description field has been updated only when protected is false
+#         assert rows[0][0] == 'new description'
+#         assert rows[1][0] == 'old description'
+
+#         # Assert that the other field has been updated
+#         assert rows[0][1] == 'new other'
+#         assert rows[1][1] == 'new other'
+
 UPDATE_SQL = """
     UPDATE
         coins

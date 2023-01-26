@@ -4,27 +4,7 @@ import Row from './Row';
 import HeaderRow from './HeaderRow';
 import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
-
-function comparison(a, b) {
-  if (a > b) return -1;
-  if (b > a) return 1;
-  return 0;
-}
-
-export function comparator(a, b, order, orderBy) {
-  const multiplier = order === 'desc' ? 1 : -1;
-  return orderBy.reduce((acc, curr) => {
-    acc ||= comparison(a[curr], b[curr]);
-    return multiplier * acc;
-  }, false);
-}
-
-export function objectSort(obj, order, orderBy) {
-  const dataObj = obj.data;
-  return Object.entries(dataObj)
-    .sort(([_, av], [__, bv]) => comparator(av, bv, order, orderBy))
-    .reduce((acc, [currk, _]) => [...acc, currk], []);
-}
+import { objectSort } from '../util/helpers';
 
 function Table({ tableData, coins, rowStyles, defaultOrderBy }) {
   const [orderedCoins, setOrderedCoins] = useState(coins.order);
