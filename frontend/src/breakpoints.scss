@@ -1,0 +1,39 @@
+@function media-query($key) {
+  @return map-get($media, $key);
+}
+
+@function breakpoint($key) {
+  @return map-get($breakpoints, $key);
+}
+
+// Sass variables that define breakpoint values
+$breakpoints: (
+  xs: 600px,
+  sm: 900px,
+  md: 1200px,
+  lg: 1536px,
+);
+
+// Sass variables for writing out media queries
+//
+//     Example usage with the above defined function `media-query`:
+//     @media #{media-query(lg)} {
+//       background-color: black;
+//     }
+
+$media: (
+  xs: '(max-width: #{map-get($breakpoints, xs)})',
+  sm: '(min-width: #{map-get($breakpoints, xs) + 1}) and (max-width: #{map-get($breakpoints, sm)})',
+  md: '(min-width: #{map-get($breakpoints, sm) + 1}) and (max-width: #{map-get($breakpoints, md)})',
+  lg: '(min-width: #{map-get($breakpoints, md) + 1}) and (max-width: #{map-get($breakpoints, lg)})',
+  xl: '(min-width: #{map-get($breakpoints, lg) + 1})',
+);
+
+// The export module that makes Sass variables accessible in JavaScript
+:export {
+  xs: unquote(map-get($media, xs));
+  sm: unquote(map-get($media, sm));
+  md: unquote(map-get($media, md));
+  lg: unquote(map-get($media, lg));
+  xl: unquote(map-get($media, xl));
+}

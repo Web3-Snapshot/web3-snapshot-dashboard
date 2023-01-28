@@ -1,6 +1,0 @@
-@value xl, lg, md, sm, xs from "../breakpoints.css";
-
-.imgSymbol {
-  display: flex;
-  align-items: center;
-}

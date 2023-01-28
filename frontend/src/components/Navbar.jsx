@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaCoins } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import styles from './Navbar.module.css';
+import styles from './Navbar.module.scss';
 
 function Navbar() {
   return (

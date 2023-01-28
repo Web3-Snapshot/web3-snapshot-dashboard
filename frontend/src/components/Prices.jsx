@@ -1,7 +1,7 @@
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 
-import styles from './Prices.module.css';
+import styles from './Prices.module.scss';
 import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
 import Table from './Table';
 

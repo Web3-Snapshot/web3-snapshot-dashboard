@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styles from './Table.module.css';
+import styles from './Table.module.scss';
 import Row from './Row';
 import HeaderRow from './HeaderRow';
 import { useBreakpoints } from 'react-breakpoints-hook';

@@ -3,8 +3,8 @@ import { v4 as uuid } from 'uuid';
 import { isEmpty } from 'lodash';
 import { NavLink, Outlet } from 'react-router-dom';
 import axios from 'axios';
-import styles from './Dashboard.module.css';
-import navbarStyles from '../components/Navbar.module.css';
+import styles from './Dashboard.module.scss';
+import navbarStyles from '../components/Navbar.module.scss';
 
 export async function fetchCoins() {
   return axios({

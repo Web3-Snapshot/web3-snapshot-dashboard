@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 
-import './Coin.module.css';
+import './Coin.module.scss';
 
 const Coin = () => {
   const params = useParams();

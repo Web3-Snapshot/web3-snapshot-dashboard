@@ -1,4 +1,4 @@
-@value sm, xs from "../breakpoints.css";
+@import '../breakpoints.scss';
 
 :root {
   --bg-color: #3599f7;
@@ -22,7 +22,7 @@ button {
   font-size: 1em;
 }
 
-@media xs {
+@media #{media-query(xs)} {
   button {
     width: 100px;
   }

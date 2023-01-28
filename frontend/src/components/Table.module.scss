@@ -1,10 +1,14 @@
-@value xl, lg, md, sm, xs from "../breakpoints.css";
+// @value xl, lg, md, sm, xs from "../breakpoints.css";
+// @value first-column-wide, first-column-medium, second-column-wide, second-column-medium from "../global-constants.css";
+@import '../breakpoints.scss';
+@import '../global-constants.scss';
+
 .container {
   width: 85%;
   margin: 4rem auto;
 }
 
-@media xs {
+@media #{media-query(xs)} {
   .container {
     width: 94%;
     margin: 0 auto;
@@ -58,7 +62,8 @@
   padding-left: 0.8rem;
   padding-right: 0.8rem;
 }
-@media lg {
+
+@media #{media-query(lg)} {
   .header div:nth-child(2) {
     padding-left: 1rem;
   }
@@ -68,7 +73,7 @@
   padding-left: 0.8rem;
 }
 
-@media lg {
+@media #{media-query(lg)} {
   .data > div:nth-child(2) {
     padding-left: 0.8rem;
   }
@@ -100,7 +105,7 @@
   min-height: 10rem;
 }
 
-@media xs {
+@media #{media-query(xs)} {
   .cardContainer {
     margin: 0.4rem 0;
     padding: 0 0.4rem 0.4rem 0;
@@ -126,7 +131,7 @@ img {
   margin-bottom: 2rem;
 }
 
-@media xs {
+@media #{media-query(xs)} {
   .cardHeader {
     gap: 2px;
     margin-bottom: 0;
@@ -141,7 +146,7 @@ img {
   }
 }
 
-/* This is symbol element in the  header of the car */
+/* This is symbol element in the  header of the card */
 .cardHeader div:nth-child(2) {
   flex-grow: 100;
 }
@@ -157,7 +162,7 @@ img {
   align-items: center;
 }
 
-@media xs {
+@media #{media-query(xs)} {
   .cardBody {
     display: flex;
     flex-wrap: wrap-reverse;
