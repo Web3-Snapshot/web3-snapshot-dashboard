@@ -1,78 +1,41 @@
 from copy import deepcopy
 
-# def process_percentages(data, keys_to_process):
-#     res = data[:]
 
-#     buffer = {}
-#     for key in keys_to_process:
-#         print("DEBUGGING: ", key)
-#         buffer[key] = max(
-#             [abs(item.get(key, 0)) for item in data if item.get(key) is not None]
-#         )
-
-#     for i, item in enumerate(res):
-#         for key in keys_to_process:
-#             item[key] = {
-#                 "original": int(item[key]) if item.get(key) is not None else None,
-#                 "relative": int((abs(item[key]) / buffer[key]) * 100)
-#                 if item.get(key) is not None
-#                 else 0,
-#             }
-
-#     return res
+def calculate_relative_percentage(key, original_value, d):
+    if original_value is None:
+        return 0
+    if original_value >= 0:
+        return round(((original_value) / d[key]["positive"]) * 100)
+    else:
+        return round((abs(original_value) / d[key]["negative"]) * 100)
 
 
-def process_percentages(data):
+def process_percentages(data, keys):
     d = {}
-    keys = [
-        # "total_supply",
-        "max_supply",
-        "ath_change_percentage",
-        "price_change_percentage_30d",
-        "price_change_percentage_1y",
-        "price_change_percentage_7d",
-        "fully_diluted_valuation_usd",
-        "current_price",
-        "circulating_supply",
-        "current_price",
-        "market_cap_usd",
-    ]
 
     for key in keys:
-        print("\nProcesing key", key)
-        print()
-        original_values = []
-        for o in data:
-            original_values.append(o[key])
-
-        if None in original_values:
-            continue
+        positive_max = 0
+        negative_max = 0
+        for item in data:
+            if item.get(key) is None:
+                continue
+            if item[key] >= 0:
+                positive_max = item[key] if item[key] >= positive_max else positive_max
+            else:
+                negative_max = item[key] if item[key] < negative_max else negative_max
 
         if d.get(key) == None:
             d[key] = {}
-        d[key]["original"] = original_values
-
-    for key, value in d.items():
-        if len(value["original"]) > 0:
-            max_value = max([abs(item) for item in value["original"]])
-            print(f"max value of {max_value} for {value['original']}")
-
-            d[key]["relative"] = [
-                (abs(item) / max_value) * 100 for item in d[key]["original"]
-            ]
-        else:
-            d[key]["relative"] = None
+        d[key]["positive"] = positive_max
+        d[key]["negative"] = abs(negative_max)
 
     res = deepcopy(data)
-    print(d)
 
-    for key, value in d.items():
-        for i, o in enumerate(res):
-            o[key] = {
-                "original": d[key]["original"][i],
-                "relative": d[key]["relative"][i]
-                if d[key]["relative"] is not None
-                else None,
-            }
+    for key in d.keys():
+        for item in res:
+            original_value = item[key]
+            item[f"{key}_relative"] = calculate_relative_percentage(
+                key, original_value, d
+            )
 
     return res
