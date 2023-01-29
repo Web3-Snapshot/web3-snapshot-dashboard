@@ -10,13 +10,6 @@ export function formatLongNumbers(value) {
   }).format(value);
 }
 
-// Calculate percentages of cells for visualization
-export function relativePercentages(percentages) {
-  let maxPercentage = Math.max(...percentages);
-  let relativePercentages = percentages.map((p) => (p / maxPercentage) * 100.0);
-  return relativePercentages;
-}
-
 // Sorting
 function comparison(a, b) {
   if (a > b) return -1;
