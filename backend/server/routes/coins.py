@@ -1,8 +1,7 @@
-from datetime import datetime
-
 from flask import Blueprint
 from server import ma
 from server.db import query_db
+from util.helpers import process_percentages
 
 bp = Blueprint("coins", __name__, url_prefix="/coins")
 
@@ -42,4 +41,20 @@ def get_coins():
         """
     )
 
-    return coins_schema.dump(items), 200
+    processed_items = process_percentages(
+        items,
+        [
+            "total_supply",
+            "max_supply",
+            "ath_change_percentage",
+            "price_change_percentage_24h",
+            "price_change_percentage_7d",
+            "price_change_percentage_30d",
+            "price_change_percentage_1y",
+            "fully_diluted_valuation_usd",
+            "circulating_supply",
+            "market_cap_usd",
+        ],
+    )
+
+    return processed_items, 200
