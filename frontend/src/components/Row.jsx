@@ -10,15 +10,7 @@ const Row = ({ tableData, row, styles }) => {
       ))}
       {tableData.slice(2).map((cell) => (
         <div key={cell.id} className={styles.cell}>
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              backgroundColor: 'red',
-              opacity: 0.2,
-              width: '50%',
-              height: '100%',
-            }}></div>
+          {cell.renderOverlay && cell.renderOverlay(row)}
           <div>{cell.render(row)}</div>
         </div>
       ))}
