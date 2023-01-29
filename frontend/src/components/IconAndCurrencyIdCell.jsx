@@ -1,4 +1,4 @@
-import styles from './Shared.module.scss';
+import styles from './IconAndCurrencyIdCell.module.scss';
 
 function IconAndCurrencyIdCell({ obj }) {
   return (
