@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './CoinInfoModal.module.css';
+import styles from './CoinInfoModal.module.scss';
 import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
 import { Markup } from 'interweave';
 import { convertSnakeCaseToStringRrepresentation } from '../util/helpers';

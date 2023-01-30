@@ -10,7 +10,6 @@ export function formatLongNumbers(value) {
   }).format(value);
 }
 
-<<<<<<< HEAD
 // Sorting
 function comparison(a, b) {
   if (a > b) return -1;
@@ -31,7 +30,8 @@ export function objectSort(obj, order, orderBy) {
   return Object.entries(dataObj)
     .sort(([_, av], [__, bv]) => comparator(av, bv, order, orderBy))
     .reduce((acc, [currk, _]) => [...acc, currk], []);
-=======
+}
+
 export function capitalize(string) {
   return `${string.slice(0, 1).toUpperCase()}${string.slice(1)}`;
 }
@@ -41,5 +41,4 @@ export function convertSnakeCaseToStringRrepresentation(string) {
     acc += ` ${capitalize(curr)}`;
     return acc;
   }, '');
->>>>>>> 66d63478 (Change Supply to Tokenomics)
 }
