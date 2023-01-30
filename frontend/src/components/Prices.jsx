@@ -4,7 +4,7 @@ import { useOutletContext } from 'react-router-dom';
 import styles from './Prices.module.scss';
 import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
 import Table from './Table';
-import { renderCellOverlay } from './CellOverlay';
+import { renderCell, renderCellOverlay } from './CellOverlay';
 
 // TODO:
 // This url will be used to fetch data for all coins on the 1 Jan 2020, and
@@ -34,7 +34,7 @@ function Prices() {
     {
       id: 'price_change_percentage_24h',
       label: '1 Day',
-      render: (obj) => `${obj.price_change_percentage_24h.toFixed(2)}%`,
+      render: (obj) => renderCell(obj.price_change_percentage_24h, (val) => `${val.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(
           obj.price_change_percentage_24h_relative,
@@ -44,14 +44,14 @@ function Prices() {
     {
       id: 'price_change_percentage_7d',
       label: '7 Days',
-      render: (obj) => `${obj.price_change_percentage_7d.toFixed(2)}%`,
+      render: (obj) => renderCell(obj.price_change_percentage_7d, (val) => `${val.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(obj.price_change_percentage_7d_relative, obj.price_change_percentage_7d),
     },
     {
       id: 'price_change_percentage_30d',
       label: '30 Days',
-      render: (obj) => `${obj.price_change_percentage_30d.toFixed(2)}%`,
+      render: (obj) => renderCell(obj.price_change_percentage_30d, (val) => `${val.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(
           obj.price_change_percentage_30d_relative,
@@ -61,14 +61,14 @@ function Prices() {
     {
       id: 'price_change_percentage_1y',
       label: '1 Year',
-      render: (obj) => `${obj.price_change_percentage_1y.toFixed(2)}%`,
+      render: (obj) => renderCell(obj.price_change_percentage_1y, (val) => `${val.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(obj.price_change_percentage_1y_relative, obj.price_change_percentage_1y),
     },
     {
       id: 'ath_change_percentage',
       label: 'ATH',
-      render: (obj) => `${obj.ath_change_percentage.toFixed(2)}%`,
+      render: (obj) => renderCell(obj.ath_change_percentage, (val) => `${val.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(obj.ath_change_percentage_relative, obj.ath_change_percentage),
     },

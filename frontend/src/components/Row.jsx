@@ -11,7 +11,7 @@ const Row = ({ tableData, row, styles }) => {
       {tableData.slice(2).map((cell) => (
         <div key={cell.id} className={styles.cell}>
           {cell.renderOverlay && cell.renderOverlay(row)}
-          <div>{cell.render(row)}</div>
+          {cell.render(row)}
         </div>
       ))}
     </>
