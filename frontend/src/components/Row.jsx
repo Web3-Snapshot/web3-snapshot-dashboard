@@ -9,9 +9,7 @@ const Row = ({ tableData, row, styles, onRowClick }) => {
         </div>
       ))}
       {tableData.slice(2).map((cell) => (
-        <div key={cell.id} className={styles.cell}>
-          {' '}
-          onClick={(evt) => onRowClick(evt, row, cell)}
+        <div key={cell.id} className={styles.cell} onClick={(evt) => onRowClick(evt, row, cell)}>
           {cell.renderOverlay && cell.renderOverlay(row)}
           {cell.render(row)}
         </div>
