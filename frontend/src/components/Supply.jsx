@@ -2,9 +2,8 @@ import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
 import { formatLongNumbers } from '../util/helpers';
-import styles from './Supply.module.css';
-
 import Table from './Table';
+import styles from './Supply.module.scss';
 
 function Supply() {
   const { coins } = useOutletContext();
@@ -52,6 +51,7 @@ function Supply() {
 
   return (
     <Table
+      numberOfDynamicRows={4}
       tableData={tableData}
       coins={coins}
       rowStyles={styles}

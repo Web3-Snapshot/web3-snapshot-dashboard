@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.9'
 
 services:
   db:
@@ -14,7 +14,7 @@ services:
     build:
       context: ./backend
     ports:
-      - "5000:5000"
+      - '5000:5000'
     volumes:
       - ${PWD}/backend:/app
       - database:/app/instance
@@ -26,14 +26,14 @@ services:
     build:
       context: ./frontend
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
       - ${PWD}/frontend:/app
     restart: always
     depends_on:
       - backend
     links:
-      - "backend"
+      - 'backend'
 
   interactive_db:
     container_name: web3_interactive_db
@@ -44,8 +44,11 @@ services:
       dockerfile: ./interactive_db/Dockerfile
     volumes:
       - ${PWD}/backend/server:/app/server
+      - ${PWD}/backend/util:/app/util
       - ${PWD}/database:/app/database
       - ${PWD}/interactive_db/.ipython:/app/.ipython
+      - /app/.ipython/profile_default/pid
+      - /app/.ipython/profile_default/security
       - database:/app/instance
     environment:
       - IPYTHONDIR=/app/.ipython
