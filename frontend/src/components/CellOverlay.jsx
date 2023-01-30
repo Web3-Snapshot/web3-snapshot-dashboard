@@ -1,7 +1,6 @@
 import React from 'react';
 
 export function renderCell(value, applyFunc) {
-  // const color = value >= 0 ? ' #3ebc9c' : '#ff7b93';
   const color = value >= 0 ? ' #3ebc9c' : '#bc1c39';
   return <div style={{ color }}>{applyFunc(value)}</div>;
 }
@@ -20,11 +19,9 @@ function Overlay({ width, color }) {
   return (
     <div
       style={{
-        // borderLeft: '1px solid',
         position: 'absolute',
         left: 0,
         backgroundColor: color,
-        // opacity: 0.2,
         width: `${width}%`,
         height: '100%',
         zIndex: -1,
