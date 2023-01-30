@@ -44,16 +44,12 @@ def get_coins():
     processed_items = process_percentages(
         items,
         [
-            "total_supply",
-            "max_supply",
             "ath_change_percentage",
             "price_change_percentage_24h",
             "price_change_percentage_7d",
             "price_change_percentage_30d",
             "price_change_percentage_1y",
             "fully_diluted_valuation_usd",
-            "circulating_supply",
-            "market_cap_usd",
         ],
     )
 
