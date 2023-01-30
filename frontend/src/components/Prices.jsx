@@ -1,10 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 
 import styles from './Prices.module.scss';
 import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
 import Table from './Table';
 import { renderCell, renderCellOverlay } from './CellOverlay';
+import CoinInfoModal from './CoinInfoModal';
+
+const COIN_INFO_PROPS = [
+  'id',
+  'name',
+  'symbol',
+  'image_thumb',
+  'categories',
+  'genesis_date',
+  'total_value_locked',
+  'homepage',
+  'blockchain_site',
+  'hashing_algorithm',
+  'coingecko_score',
+  'developer_score',
+  'community_score',
+  'liquidity_score',
+  'public_interest_score',
+  'description',
+];
 
 // TODO:
 // This url will be used to fetch data for all coins on the 1 Jan 2020, and
@@ -13,6 +34,8 @@ import { renderCell, renderCellOverlay } from './CellOverlay';
 
 function Prices() {
   const { coins } = useOutletContext();
+  const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
+  const [row, setRow] = useState();
 
   const tableData = [
     {
@@ -74,13 +97,36 @@ function Prices() {
     },
   ];
 
+  function handleRowClick(evt, row, cell) {
+    console.log('cell ', cell);
+    console.log('row', row);
+    setRow(row);
+    setIsCoinInfoModalOpen(true);
+  }
+
+  function filterCoinInfoProps(obj) {
+    return Object.fromEntries(Object.entries(obj).filter(([key]) => COIN_INFO_PROPS.includes(key)));
+  }
+
   return (
-    <Table
-      tableData={tableData}
-      coins={coins}
-      rowStyles={styles}
-      defaultOrderBy={['market_cap_rank']}
-    />
+    <>
+      {isCoinInfoModalOpen &&
+        createPortal(
+          <CoinInfoModal
+            isOpen={isCoinInfoModalOpen}
+            onClose={() => setIsCoinInfoModalOpen(false)}
+            row={filterCoinInfoProps(row)}
+          />,
+          document.body
+        )}
+      <Table
+        tableData={tableData}
+        coins={coins}
+        rowStyles={styles}
+        defaultOrderBy={['market_cap_rank']}
+        onRowClick={handleRowClick}
+      />
+    </>
   );
 }
 
