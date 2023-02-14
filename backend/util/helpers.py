@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import List
 
 
 def calculate_relative_percentage(key, original_value, d):
@@ -37,5 +38,25 @@ def process_percentages(data, keys):
             item[f"{key}_relative"] = calculate_relative_percentage(
                 key, original_value, d
             )
+
+    return res
+
+
+def calculate_mc_fdv_ratio(objs: List):
+    res = []
+    objects = deepcopy(objs)
+
+    for obj in objects:
+        if (
+            obj["market_cap_usd"] is not None
+            and obj["fully_diluted_valuation_usd"] is not None
+        ):
+            obj["mc_fdv_ratio"] = round(
+                obj["market_cap_usd"] / obj["fully_diluted_valuation_usd"], 2
+            )
+        else:
+            obj["mc_fdv_ratio"] = None
+
+        res.append(obj)
 
     return res
