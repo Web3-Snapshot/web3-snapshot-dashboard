@@ -47,6 +47,7 @@ SCHEMA = """
                 [price_change_percentage_30d] REAL,
                 [price_change_percentage_1y] REAL,
                 [ath_change_percentage] REAL,
+                [total_volume] REAL,
                 [description] TEXT,
                 [genesis_date] TEXT,
                 [hashing_algorithm] TEXT,
@@ -110,6 +111,7 @@ INSERT_SQL = """
         price_change_percentage_30d,
         price_change_percentage_1y,
         ath_change_percentage,
+        total_volume,
         description,
         genesis_date,
         hashing_algorithm,
@@ -120,7 +122,7 @@ INSERT_SQL = """
         public_interest_score,
         timestamp
         )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
 UPDATE_SQL = """
@@ -143,6 +145,7 @@ UPDATE_SQL = """
         price_change_percentage_30d=?,
         price_change_percentage_1y=?,
         ath_change_percentage=?,
+        total_volume=?,
         description=?,
         genesis_date=?,
         hashing_algorithm=?,
@@ -224,6 +227,7 @@ def main():
                             coin_item["market_data"]["price_change_percentage_30d"],
                             coin_item["market_data"]["price_change_percentage_1y"],
                             coin_item["market_data"]["ath_change_percentage"]["usd"],
+                            coin_item["market_data"]["total_volume"]["usd"],
                             coin_item["description"]["en"],
                             coin_item["genesis_date"],
                             coin_item["hashing_algorithm"],
@@ -286,6 +290,7 @@ def main():
                             coin_item["market_data"]["price_change_percentage_30d"],
                             coin_item["market_data"]["price_change_percentage_1y"],
                             coin_item["market_data"]["ath_change_percentage"]["usd"],
+                            coin_item["market_data"]["total_volume"]["usd"],
                             coin_item["description"]["en"],
                             coin_item["genesis_date"],
                             coin_item["hashing_algorithm"],
