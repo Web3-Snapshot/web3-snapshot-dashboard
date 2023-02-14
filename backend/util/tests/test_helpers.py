@@ -1,5 +1,5 @@
 import pytest
-from util.helpers import process_percentages, calculate_mc_fdv_ratio
+from util.helpers import process_percentages, compute_extra_columns
 
 
 @pytest.fixture
@@ -93,4 +93,4 @@ def test_calculate_mc_fdv_ratio():
             "fully_diluted_valuation_usd": 188109860328,
         },
     ]
-    assert expected == calculate_mc_fdv_ratio(input_data)
+    assert expected == compute_extra_columns(input_data)

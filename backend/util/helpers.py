@@ -42,20 +42,30 @@ def process_percentages(data, keys):
     return res
 
 
-def calculate_mc_fdv_ratio(objs: List):
+def compute_extra_columns(objs: List):
     res = []
     objects = deepcopy(objs)
 
     for obj in objects:
         if (
-            obj["market_cap_usd"] is not None
-            and obj["fully_diluted_valuation_usd"] is not None
+            obj.get("market_cap_usd") is not None
+            and obj.get("fully_diluted_valuation_usd") is not None
         ):
             obj["mc_fdv_ratio"] = round(
-                obj["market_cap_usd"] / obj["fully_diluted_valuation_usd"], 2
+                obj["market_cap_usd"] / obj["fully_diluted_valuation_usd"], 3
             )
         else:
             obj["mc_fdv_ratio"] = None
+
+        if (
+            obj.get("circulating_supply") is not None
+            and obj.get("total_supply") is not None
+        ):
+            obj["circ_supply_total_supply_ratio"] = round(
+                obj["circulating_supply"] / obj["total_supply"], 2
+            )
+        else:
+            obj["circ_supply_total_supply_ratio"] = None
 
         res.append(obj)
 

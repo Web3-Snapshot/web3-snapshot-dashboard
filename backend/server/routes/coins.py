@@ -1,7 +1,7 @@
 from flask import Blueprint
 
 from server.db import query_db
-from util.helpers import process_percentages, calculate_mc_fdv_ratio
+from util.helpers import process_percentages, compute_extra_columns
 
 bp = Blueprint("coins", __name__, url_prefix="/coins")
 
@@ -16,7 +16,7 @@ def get_coins():
     )
 
     # Calcultate MC/FDV which is the ratio MC/FDV
-    items = calculate_mc_fdv_ratio(items)
+    items = compute_extra_columns(items)
 
     processed_items = process_percentages(
         items,
