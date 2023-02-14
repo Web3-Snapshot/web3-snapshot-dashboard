@@ -4,13 +4,10 @@ from pprint import pprint
 
 from server import create_app
 from server.db import dict_factory
-from server.routes.coins import coins_schema
 
 
-def fetchall(result, schema=coins_schema):
-    res = schema.dumps(result)
-    pprint(res)
-    return res
+def fetchall(result):
+    return pprint(result)
 
 
 env = environ.get("ENV") or "development"
