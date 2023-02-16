@@ -189,6 +189,12 @@ img {
   padding-right: 10px;
 }
 
+@media #{media-query(xs)} {
+  .cardHeaderCellLabel {
+    font-size: 13px;
+  }
+}
+
 @media (max-width: 400px) {
   .cardHeaderCellLabel {
     width: 8rem;
@@ -216,6 +222,13 @@ img {
   background: #272829;
   align-content: center;
 }
+
+@media #{media-query(xs)} {
+  .cardHeaderCellValue {
+    font-size: 13px;
+  }
+}
+
 .iconDown {
   fill-opacity: 0.4;
 }

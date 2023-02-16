@@ -24,6 +24,7 @@ button {
 
 @media #{media-query(xs)} {
   button {
+    font-size: 10px;
     width: 100px;
   }
 }
