@@ -8,6 +8,7 @@
 
 // Sass variables that define breakpoint values
 $breakpoints: (
+  ss: 400px,
   xs: 600px,
   sm: 900px,
   md: 1200px,
@@ -22,7 +23,8 @@ $breakpoints: (
 //     }
 
 $media: (
-  xs: '(max-width: #{map-get($breakpoints, xs)})',
+  ss: '(max-width: #{map-get($breakpoints, ss)})',
+  xs: '(min-width: #{map-get($breakpoints, ss) + 1}) and (max-width: #{map-get($breakpoints, xs)})',
   sm: '(min-width: #{map-get($breakpoints, xs) + 1}) and (max-width: #{map-get($breakpoints, sm)})',
   md: '(min-width: #{map-get($breakpoints, sm) + 1}) and (max-width: #{map-get($breakpoints, md)})',
   lg: '(min-width: #{map-get($breakpoints, md) + 1}) and (max-width: #{map-get($breakpoints, lg)})',
@@ -31,6 +33,7 @@ $media: (
 
 // The export module that makes Sass variables accessible in JavaScript
 :export {
+  ss: unquote(map-get($media, ss));
   xs: unquote(map-get($media, xs));
   sm: unquote(map-get($media, sm));
   md: unquote(map-get($media, md));

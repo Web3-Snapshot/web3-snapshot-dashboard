@@ -31,3 +31,14 @@ export function objectSort(obj, order, orderBy) {
     .sort(([_, av], [__, bv]) => comparator(av, bv, order, orderBy))
     .reduce((acc, [currk, _]) => [...acc, currk], []);
 }
+
+export function capitalize(string) {
+  return `${string.slice(0, 1).toUpperCase()}${string.slice(1)}`;
+}
+
+export function convertSnakeCaseToStringRrepresentation(string) {
+  return string.split('_').reduce((acc, curr) => {
+    acc += ` ${capitalize(curr)}`;
+    return acc;
+  }, '');
+}

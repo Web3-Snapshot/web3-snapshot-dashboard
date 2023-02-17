@@ -56,9 +56,9 @@ function Dashboard() {
             <button className={isActive ? navbarStyles.active : undefined}>PRICES</button>
           )}
         </NavLink>
-        <NavLink to="/supply">
+        <NavLink to="/tokenomics">
           {({ isActive }) => (
-            <button className={isActive ? navbarStyles.active : undefined}>SUPPLY</button>
+            <button className={isActive ? navbarStyles.active : undefined}>TOKENOMICS</button>
           )}
         </NavLink>
       </nav>

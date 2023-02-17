@@ -2,11 +2,18 @@
 @import '../global-constants.scss';
 
 .container {
+  font-size: 13px;
   width: 85%;
   margin: 4rem auto;
 }
 
-@media #{media-query(xs)} {
+@media #{media-query(xs)}, #{media-query(ss)} {
+  .container {
+    font-size: 12px;
+  }
+}
+
+@media #{media-query(xs)}, #{media-query(ss)} {
   .container {
     width: 94%;
     margin: 0 auto;
@@ -36,7 +43,16 @@
 
 .header div:nth-child(2) {
   justify-content: flex-start;
-  padding-left: 0.5rem;
+}
+
+.header div:nth-child(2) > .headerText {
+  flex-grow: 10;
+}
+
+.header > .cell {
+  padding-left: 3px;
+  padding-right: 3px;
+  justify-content: space-between;
 }
 
 .data {
@@ -61,11 +77,6 @@
   padding-right: 0.8rem;
 }
 
-@media #{media-query(lg)} {
-  .header div:nth-child(2) {
-    padding-left: 1rem;
-  }
-}
 .data div:nth-child(2) {
   justify-content: flex-start;
   padding-left: 0.8rem;
@@ -75,18 +86,17 @@
   .data > div:nth-child(2) {
     padding-left: 0.8rem;
   }
-  .header div:nth-child(2) {
-    padding-left: 0.8rem;
-  }
 }
 
 .cell {
   position: relative;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 4rem;
 }
+
 .data:hover {
   transform: scale(1.04);
   transition: 0.3s ease-in-out;
@@ -104,7 +114,7 @@
   min-height: 10rem;
 }
 
-@media #{media-query(xs)} {
+@media #{media-query(xs)}, #{media-query(ss)} {
   .cardContainer {
     margin: 0.4rem 0;
     padding: 0 0.4rem 0.4rem 0;
@@ -117,6 +127,7 @@
     flex-wrap: wrap;
   }
 }
+
 img {
   height: 30px;
   margin-right: 10px;
@@ -130,7 +141,7 @@ img {
   margin-bottom: 2rem;
 }
 
-@media #{media-query(xs)} {
+@media #{media-query(xs)}, #{media-query(ss)} {
   .cardHeader {
     gap: 2px;
     margin-bottom: 0;
@@ -138,22 +149,13 @@ img {
 }
 @media (max-width: 400px) {
   .cardHeader {
-    flex-wrap: wrap;
-  }
-  .cardHeader div:nth-child(2) {
-    flex-basis: 80%;
+    white-space: nowrap;
   }
 }
 
-/* This is symbol element in the  header of the card */
+/* This is symbol element in the header of the card */
 .cardHeader div:nth-child(2) {
   flex-grow: 100;
-}
-
-@media (max-width: 400px) {
-  .cardHeader div:nth-child(2) {
-    flex-basis: 80%;
-  }
 }
 
 .cardBody {
@@ -161,7 +163,13 @@ img {
   align-items: center;
 }
 
-@media #{media-query(xs)} {
+@media #{media-query(sm)} {
+  .cardBody {
+    align-items: flex-end;
+  }
+}
+
+@media #{media-query(xs)}, #{media-query(ss)} {
   .cardBody {
     display: flex;
     flex-wrap: wrap-reverse;
@@ -189,9 +197,9 @@ img {
   padding-right: 10px;
 }
 
-@media (max-width: 400px) {
+@media #{media-query(xs)}, #{media-query(ss)} {
   .cardHeaderCellLabel {
-    width: 8rem;
+    font-size: 13px;
   }
 }
 
@@ -216,12 +224,31 @@ img {
   background: #272829;
   align-content: center;
 }
+
+@media #{media-query(xs)}, #{media-query(ss)} {
+  .cardHeaderCellValue {
+    font-size: 13px;
+  }
+}
+
+.leftSortArrowContainer {
+  width: 1rem;
+  margin-left: 0;
+}
+
+.rightSortArrowContainer {
+  width: 1rem;
+  margin-right: 0;
+}
+
 .iconDown {
   fill-opacity: 0.4;
+  margin: 2px;
 }
 
 .iconUp {
   fill-opacity: 0.4;
+  margin: 2px;
 }
 
 .iconActive {
@@ -229,6 +256,6 @@ img {
 }
 
 .headerText {
-  margin-left: 8px;
-  margin-right: 8px;
+  padding-left: 0 !important;
+  text-align: center;
 }

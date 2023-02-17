@@ -14,6 +14,10 @@ def deep_get(dictionary, keys, default=None):
     )
 
 
+def transformListToCleanString(list_item):
+    return ", ".join([item for item in list_item if item])
+
+
 COINS = 100
 URL1 = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page={COINS}&page=1&sparkline=false&price_change_percentage=1h%2C%2024h%2C%207d%2C%2030d%2C%20200d%2C%201y%2C%203y"
 URL2 = f"https://api.coingecko.com/api/v3/coins"
@@ -43,6 +47,7 @@ SCHEMA = """
                 [price_change_percentage_30d] REAL,
                 [price_change_percentage_1y] REAL,
                 [ath_change_percentage] REAL,
+                [total_volume] REAL,
                 [description] TEXT,
                 [genesis_date] TEXT,
                 [hashing_algorithm] TEXT,
@@ -106,6 +111,7 @@ INSERT_SQL = """
         price_change_percentage_30d,
         price_change_percentage_1y,
         ath_change_percentage,
+        total_volume,
         description,
         genesis_date,
         hashing_algorithm,
@@ -116,7 +122,7 @@ INSERT_SQL = """
         public_interest_score,
         timestamp
         )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
 UPDATE_SQL = """
@@ -139,6 +145,7 @@ UPDATE_SQL = """
         price_change_percentage_30d=?,
         price_change_percentage_1y=?,
         ath_change_percentage=?,
+        total_volume=?,
         description=?,
         genesis_date=?,
         hashing_algorithm=?,
@@ -198,21 +205,11 @@ def main():
                             coin_item["name"],
                             coin_item["image"]["thumb"],
                             coin_item["symbol"],
-                            ", ".join(
-                                [
-                                    item
-                                    for item in coin_item["links"]["homepage"]
-                                    if item
-                                ]
+                            transformListToCleanString(coin_item["links"]["homepage"]),
+                            transformListToCleanString(
+                                coin_item["links"]["blockchain_site"]
                             ),
-                            ", ".join(
-                                [
-                                    item
-                                    for item in coin_item["links"]["blockchain_site"]
-                                    if item
-                                ]
-                            ),
-                            ", ".join(coin_item["categories"]),
+                            transformListToCleanString(coin_item["categories"]),
                             coin_item["market_cap_rank"],
                             coin_item["market_data"]["market_cap"]["usd"],
                             coin_item["market_data"]["fully_diluted_valuation"].get(
@@ -230,6 +227,7 @@ def main():
                             coin_item["market_data"]["price_change_percentage_30d"],
                             coin_item["market_data"]["price_change_percentage_1y"],
                             coin_item["market_data"]["ath_change_percentage"]["usd"],
+                            coin_item["market_data"]["total_volume"]["usd"],
                             coin_item["description"]["en"],
                             coin_item["genesis_date"],
                             coin_item["hashing_algorithm"],
@@ -270,21 +268,11 @@ def main():
                     cur.execute(
                         UPDATE_SQL,
                         [
-                            ", ".join(
-                                [
-                                    item
-                                    for item in coin_item["links"]["homepage"]
-                                    if item
-                                ]
+                            transformListToCleanString(coin_item["links"]["homepage"]),
+                            transformListToCleanString(
+                                coin_item["links"]["blockchain_site"]
                             ),
-                            ", ".join(
-                                [
-                                    item
-                                    for item in coin_item["links"]["blockchain_site"]
-                                    if item
-                                ]
-                            ),
-                            ", ".join(coin_item["categories"]),
+                            transformListToCleanString(coin_item["categories"]),
                             coin_item["market_cap_rank"],
                             coin_item["market_data"]["market_cap"]["usd"],
                             coin_item["market_data"]["fully_diluted_valuation"].get(
@@ -302,6 +290,7 @@ def main():
                             coin_item["market_data"]["price_change_percentage_30d"],
                             coin_item["market_data"]["price_change_percentage_1y"],
                             coin_item["market_data"]["ath_change_percentage"]["usd"],
+                            coin_item["market_data"]["total_volume"]["usd"],
                             coin_item["description"]["en"],
                             coin_item["genesis_date"],
                             coin_item["hashing_algorithm"],

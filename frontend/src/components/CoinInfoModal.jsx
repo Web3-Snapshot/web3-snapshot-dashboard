@@ -1,14 +1,8 @@
 import React from 'react';
-import styles from './CoinInfoModal.module.css';
+import styles from './CoinInfoModal.module.scss';
 import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
 import { Markup } from 'interweave';
-
-function convertSnakeCaseToStringRrepresentation(string) {
-  return string.split('_').reduce((acc, curr) => {
-    acc += ` ${curr.slice(0, 1).toUpperCase()}${curr.slice(1)}`;
-    return acc;
-  }, '');
-}
+import { convertSnakeCaseToStringRrepresentation } from '../util/helpers';
 
 function CoinInfoModal({ onClose, row }) {
   function handleBackdropClick(evt) {
@@ -28,26 +22,14 @@ function CoinInfoModal({ onClose, row }) {
             <IconAndCurrencyIdCell obj={row} />
           </div>
           <div className={styles.dialogBody}>
-            <div className={styles.dialogPropertyPair}>
-              <div>Categories</div>
-              <div>{row.categories}</div>
-            </div>
-            <div className={styles.dialogPropertyPair}>
-              <div>HomePage</div>
-              <div>{row.homepage}</div>
-            </div>
-            <div className={styles.dialogPropertyPair}>
-              <div>Blockchain site</div>
-              <div>{row.blockchain_site}</div>
-            </div>
-            <div className={styles.dialogPropertyPair}>
-              <div>Genesis Date</div>
-              <div>{row.genesis_date}</div>
-            </div>
-            <div className={styles.dialogPropertyPair}>
-              <div>Hashing Algorithm</div>
-              <div>{row.hashing_algorithm}</div>
-            </div>
+            {['categories', 'homepage', 'blockchain_site', 'genesis_date', 'hashing_algorithm'].map(
+              (item) => (
+                <div className={styles.dialogPropertyPair}>
+                  <div>{convertSnakeCaseToStringRrepresentation(item)}</div>
+                  <div>{row[item] || '-'}</div>
+                </div>
+              )
+            )}
             {[
               'coingecko_score',
               'developer_score',

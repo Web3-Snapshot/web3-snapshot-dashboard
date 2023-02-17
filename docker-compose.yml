@@ -13,8 +13,12 @@ services:
     container_name: web3_backend
     build:
       context: ./backend
+      target: debug
+    stdin_open: true # comment out for build.target:prod
+    tty: true # comment out for build.target:prod
     ports:
-      - '5000:5000'
+      - 5000:5000
+      - 5678:5678
     volumes:
       - ${PWD}/backend:/app
       - database:/app/instance
