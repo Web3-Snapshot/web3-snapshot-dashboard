@@ -4,8 +4,11 @@ import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
 import { formatLongNumbers } from '../util/helpers';
 import styles from './Tokenomics.module.scss';
 import Table from './Table';
+import { useBreakpoints } from 'react-breakpoints-hook';
+import { BREAKPOINTS } from '../constants';
 
 function Tokenomics() {
+  let { ss, xs } = useBreakpoints(BREAKPOINTS);
   const { coins } = useOutletContext();
 
   const tableData = [
@@ -21,7 +24,7 @@ function Tokenomics() {
     },
     {
       id: 'market_cap_usd',
-      label: 'Market Cap',
+      label: ss ? 'M. Cap' : 'Market Cap',
       render: (obj) => `$${formatLongNumbers(obj.market_cap_usd)}`,
     },
     {
@@ -34,12 +37,12 @@ function Tokenomics() {
     },
     {
       id: 'market_cap_fully_diluted_valuation_usd_ratio',
-      label: ' MC/FDV',
+      label: ' MC/ FDV',
       render: (obj) => obj.mc_fdv_ratio || '-',
     },
     {
       id: 'circulating_supply',
-      label: 'Circ.',
+      label: xs || ss ? 'Circ.' : 'Circulating',
       render: (obj) => formatLongNumbers(obj.circulating_supply),
     },
     {
@@ -54,12 +57,12 @@ function Tokenomics() {
     },
     {
       id: 'circ_total_ratio',
-      label: 'Circ./Tot.',
+      label: 'Circ./ Tot.',
       render: (obj) => obj.circ_supply_total_supply_ratio || '-',
     },
     {
       id: 'volume_24h',
-      label: '24h Volume',
+      label: '24h Vol.',
       render: (obj) => formatLongNumbers(obj.total_volume),
     },
   ];
