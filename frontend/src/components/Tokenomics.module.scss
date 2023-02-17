@@ -3,7 +3,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: $first-column-wide $second-column-wide 200px repeat(4, 1fr);
+  grid-template-columns: $first-column-wide $second-column-wide 200px repeat(7, 1fr);
   min-height: 4rem;
   align-items: center;
   min-width: fit-content;
@@ -11,6 +11,6 @@
 
 @media #{media-query(lg)} {
   .row {
-    grid-template-columns: $first-column-medium $second-column-medium repeat(5, 1fr);
+    grid-template-columns: $first-column-medium $second-column-medium repeat(8, 1fr);
   }
 }

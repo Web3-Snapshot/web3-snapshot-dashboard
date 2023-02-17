@@ -21,31 +21,46 @@ function Tokenomics() {
     },
     {
       id: 'market_cap_usd',
-      label: 'Mkt. Cap',
+      label: 'Market Cap',
       render: (obj) => `$${formatLongNumbers(obj.market_cap_usd)}`,
     },
     {
       id: 'fully_diluted_valuation_usd',
-      label: 'FD Mkt. Cap',
+      label: 'Fully Diluted',
       render: (obj) =>
         `${obj.fully_diluted_valuation_usd ? '$' : ''}${formatLongNumbers(
           obj.fully_diluted_valuation_usd
         )}`,
     },
     {
+      id: 'market_cap_fully_diluted_valuation_usd_ratio',
+      label: ' MC/FDV',
+      render: (obj) => obj.mc_fdv_ratio || '-',
+    },
+    {
       id: 'circulating_supply',
-      label: 'Circ. Supply',
+      label: 'Circ.',
       render: (obj) => formatLongNumbers(obj.circulating_supply),
     },
     {
       id: 'total_supply',
-      label: 'Total Supply',
+      label: 'Total',
       render: (obj) => formatLongNumbers(obj.total_supply),
     },
     {
       id: 'max_supply',
-      label: 'Max Supply',
+      label: 'Max',
       render: (obj) => formatLongNumbers(Math.round(obj.max_supply)),
+    },
+    {
+      id: 'circ_total_ratio',
+      label: 'Circ./Tot.',
+      render: (obj) => obj.circ_supply_total_supply_ratio || '-',
+    },
+    {
+      id: 'volume_24h',
+      label: '24h Volume',
+      render: (obj) => formatLongNumbers(obj.total_volume),
     },
   ];
 
