@@ -1,3 +1,5 @@
+@import '../colors.scss';
+
 .backdrop {
   position: fixed;
   top: 0;
@@ -15,7 +17,7 @@
   overflow-y: auto;
   width: 50%;
   height: 75%;
-  background-color: #383838;
+  background-color: $grey4;
   color: white;
 }
 
@@ -49,8 +51,6 @@
   margin-right: 1rem;
 }
 
-.dialogPropertyPair > div:nth-child(2) {
-}
 .coinDescription {
   color: #c2c2c2;
 }

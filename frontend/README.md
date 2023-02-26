@@ -1,4 +1,4 @@
-# Web 3 Dashboard
+# Web 3 Snapshot
 
 A Dashboard with the latest trends for various crypto currencies.
 

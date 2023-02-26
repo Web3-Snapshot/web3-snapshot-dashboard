@@ -1,0 +1,24 @@
+@import '../colors.scss';
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+}
+
+.positiveValueBackground {
+  background-color: $greenBg;
+}
+
+.positiveTextColor {
+  color: $greenTxt !important;
+}
+
+.negativeValueBackground {
+  background-color: $redBg;
+}
+
+.negativeTextColor {
+  color: $redTxt !important;
+}

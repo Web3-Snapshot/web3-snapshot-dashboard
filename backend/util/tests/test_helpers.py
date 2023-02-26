@@ -1,5 +1,5 @@
 import pytest
-from util.helpers import process_percentages, compute_extra_columns
+from util.helpers import compute_extra_columns, process_percentages
 
 
 @pytest.fixture
@@ -69,17 +69,21 @@ def test_process_percentages(coin_data):
     )
 
 
-def test_calculate_mc_fdv_ratio():
+def test_compute_extra_columns():
     expected = [
         {
             "market_cap_usd": 428569062162,
             "fully_diluted_valuation_usd": 466538642853,
-            "mc_fdv_ratio": 0.92,
+            "circulating_supply": 251816.736,
+            "total_supply": 251816.736,
+            "mc_fdv_ratio": 0.919,
+            "circ_supply_total_supply_ratio": 1.0,
         },
         {
             "market_cap_usd": 188109860328,
             "fully_diluted_valuation_usd": 188109860328,
             "mc_fdv_ratio": 1.0,
+            "circ_supply_total_supply_ratio": None,
         },
     ]
 
@@ -87,6 +91,8 @@ def test_calculate_mc_fdv_ratio():
         {
             "market_cap_usd": 428569062162,
             "fully_diluted_valuation_usd": 466538642853,
+            "circulating_supply": 251816.736,
+            "total_supply": 251816.736,
         },
         {
             "market_cap_usd": 188109860328,

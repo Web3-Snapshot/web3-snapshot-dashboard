@@ -7,9 +7,12 @@ function IconAndCurrencyIdCell({ obj }) {
   let { ss, xs } = useBreakpoints(BREAKPOINTS);
 
   return (
-    <div className={styles.imgSymbol}>
+    <div className={styles.iconRoot}>
       <img src={obj.image_thumb} alt="coin" />
-      <p>{`${obj.symbol.toUpperCase()}${ss || xs ? '' : ' - ' + capitalize(obj.id)}`}</p>
+      <div>
+        <span>{`${obj.symbol.toUpperCase()}`}</span>
+        <span>{`${capitalize(obj.id)}`}</span>
+      </div>
     </div>
   );
 }

@@ -1,30 +1,30 @@
 import React from 'react';
+import styles from './CellOverlay.module.scss';
 
 export function renderCell(value, applyFunc) {
-  const color = value >= 0 ? ' #3ebc9c' : '#bc1c39';
-  return <div style={{ color }}>{applyFunc(value)}</div>;
+  if (value === null) {
+    return '';
+  }
+  const colorClass = value >= 0 ? styles.positiveTextColor : styles.negativeTextColor;
+  return <div className={colorClass}>{applyFunc(value)}</div>;
 }
 
 export function renderCellOverlay(value, originalValue) {
   if (!originalValue) {
     return <></>;
   } else if (originalValue >= 0) {
-    return <Overlay width={`${value}`} color="#062827" />;
+    return <Overlay width={`${value}`} className={styles.positiveValueBackground} />;
   } else if (originalValue < 0) {
-    return <Overlay width={`${value}`} color="#28080d" />;
+    return <Overlay width={`${value}`} className={styles.negativeValueBackground} />;
   }
 }
 
-function Overlay({ width, color }) {
+function Overlay({ width, className }) {
   return (
     <div
+      className={`${className} ${styles.overlay}`}
       style={{
-        position: 'absolute',
-        left: 0,
-        backgroundColor: color,
         width: `${width}%`,
-        height: '100%',
-        zIndex: -1,
       }}></div>
   );
 }
