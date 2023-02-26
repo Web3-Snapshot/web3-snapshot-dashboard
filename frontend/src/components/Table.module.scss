@@ -28,6 +28,7 @@
   align-content: center;
   border-radius: 8px;
   font-weight: 600;
+  cursor: pointer;
 }
 
 // lighter table cells
@@ -41,20 +42,6 @@
 .header > div:nth-child(2n + 1) {
   display: flex;
   align-items: center;
-}
-
-.header div:nth-child(2) {
-  justify-content: flex-start;
-}
-
-.header div:nth-child(2) > .headerText {
-  flex-grow: 10;
-}
-
-.header > .cell {
-  padding-left: 3px;
-  padding-right: 3px;
-  justify-content: space-between;
 }
 
 .data {
@@ -231,31 +218,18 @@ img {
   }
 }
 
-.leftSortArrowContainer {
-  width: 1rem;
-  margin-left: 0;
-}
-
-.rightSortArrowContainer {
-  width: 1rem;
-  margin-right: 0;
-}
-
 .iconDown {
   color: $grey4;
   margin: 2px;
+  padding: 2px;
 }
 
 .iconUp {
   color: $grey4;
   margin: 2px;
+  padding: 2px;
 }
 
 .iconActive {
   color: $white;
-}
-
-.headerText {
-  padding-left: 0 !important;
-  text-align: center;
 }
