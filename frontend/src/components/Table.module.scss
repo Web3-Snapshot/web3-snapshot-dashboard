@@ -1,5 +1,6 @@
 @import '../breakpoints.scss';
 @import '../global-constants.scss';
+@import '../colors.scss';
 
 .container {
   font-size: 13px;
@@ -21,20 +22,21 @@
 }
 
 .header {
-  background-color: #26272b;
+  background-color: $grey2;
   min-height: 3rem !important;
   height: 3rem;
   align-content: center;
-  box-shadow: 0px 0px 12px #18191b;
   border-radius: 8px;
   font-weight: 600;
 }
 
+// lighter table cells
 .header > div:nth-child(2n) {
   display: flex;
   align-items: center;
-  background-color: #2e2f30;
+  background-color: $grey3;
   height: 3rem;
+  border-radius: 8px;
 }
 .header > div:nth-child(2n + 1) {
   display: flex;
@@ -56,15 +58,14 @@
 }
 
 .data {
-  margin: 2rem 0;
-  box-shadow: 0px 0px 12px #18191b;
+  margin: 1rem 0 1.6rem 0;
 }
 
+// lighter data cells
 .data > div:nth-child(2n) {
   display: flex;
   align-items: center;
-  background-color: #2e2f30;
-  height: 4rem;
+  background-color: $grey3;
 }
 .data > div:nth-child(2n + 1) {
   display: flex;
@@ -89,17 +90,16 @@
 }
 
 .cell {
+  background-color: $grey2;
   position: relative;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 4rem;
+  height: 2.6rem;
 }
 
 .data:hover {
-  transform: scale(1.04);
-  transition: 0.3s ease-in-out;
   cursor: pointer;
 }
 
@@ -107,7 +107,7 @@
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  background: #2e2f30;
+  background: $grey0;
   border-radius: 8px;
   margin: 1rem;
   padding: 1rem;
@@ -221,7 +221,7 @@ img {
   display: flex;
   flex-wrap: wrap;
   height: 2.2rem;
-  background: #272829;
+  background: rgb(38 38 38 / 30%);
   align-content: center;
 }
 
@@ -242,17 +242,17 @@ img {
 }
 
 .iconDown {
-  fill-opacity: 0.4;
+  color: $grey4;
   margin: 2px;
 }
 
 .iconUp {
-  fill-opacity: 0.4;
+  color: $grey4;
   margin: 2px;
 }
 
 .iconActive {
-  fill-opacity: 0.8;
+  color: $white;
 }
 
 .headerText {
