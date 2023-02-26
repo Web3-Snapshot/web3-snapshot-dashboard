@@ -1,4 +1,20 @@
-.imgSymbol {
+@import '../colors.scss';
+
+.iconRoot {
   display: flex;
   align-items: center;
+}
+
+.iconRoot > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.iconRoot > div > span:nth-child(1) {
+  color: $grey5;
+}
+
+.iconRoot > div > span:nth-child(2) {
+  color: $white;
+  font-size: smaller;
 }
