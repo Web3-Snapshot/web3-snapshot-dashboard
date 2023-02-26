@@ -1,25 +1,30 @@
 @import '../breakpoints.scss';
+@import '../colors.scss';
 
-:root {
-  --bg-color: #3599f7;
-}
 .navbar {
-  display: flex !important;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-.icon {
-  font-size: 2rem;
-  color: var(--bg-color);
+.navbar > h1,
+.navbar > h2 {
+  margin: 0;
+}
+
+.navbar > h2 {
+  color: $yellow;
 }
 
 button {
-  border-radius: 5px;
-  padding: 8px;
+  border-radius: 10px;
+  border-style: none;
+  padding: 5px;
   width: 180px;
-  margin: 25px 5px 15px 0;
-  font-size: 1em;
+  font-size: 14px;
+  margin-left: 0.4rem;
+  margin-right: 0.4rem;
 }
 
 @media #{media-query(xs)} {
@@ -35,5 +40,5 @@ button:hover {
 }
 
 .active {
-  background-color: var(--bg-color);
+  background-color: $yellow;
 }

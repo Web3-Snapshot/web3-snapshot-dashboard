@@ -1,5 +1,4 @@
 import React from 'react';
-import { FaCoins } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import styles from './Navbar.module.scss';
 
@@ -8,8 +7,8 @@ function Navbar() {
     <div>
       <Link to="/">
         <div className={styles.navbar}>
-          <FaCoins className={styles.icon} />
-          <h1> Web3 Dashboard</h1>
+          <h1> Web3</h1>
+          <h2> SNAPSHOT</h2>
         </div>
       </Link>
     </div>
