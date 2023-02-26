@@ -1,5 +1,5 @@
 import pytest
-from util.helpers import process_percentages, compute_extra_columns
+from util.helpers import compute_extra_columns, process_percentages
 
 
 @pytest.fixture

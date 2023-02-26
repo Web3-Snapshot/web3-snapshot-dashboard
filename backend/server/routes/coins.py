@@ -1,7 +1,6 @@
 from flask import Blueprint
-
 from server.db import query_db
-from util.helpers import process_percentages, compute_extra_columns
+from util.helpers import compute_extra_columns, process_percentages
 
 bp = Blueprint("coins", __name__, url_prefix="/coins")
 
