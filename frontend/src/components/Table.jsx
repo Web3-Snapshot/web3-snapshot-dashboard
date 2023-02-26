@@ -13,8 +13,8 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
 
   let { lg, xl } = useBreakpoints(BREAKPOINTS);
 
-  function handleSort(_, cellId, order) {
-    setOrder(order);
+  function handleSort(_, cellId) {
+    setOrder(order === 'asc' ? 'desc' : 'asc');
     setOrderBy([cellId]);
   }
 
