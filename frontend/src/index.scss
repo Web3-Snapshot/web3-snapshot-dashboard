@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
 @import './colors.scss';
 
 * {
@@ -6,20 +5,20 @@
   padding: 0;
 }
 
-#root {
-  margin: 0 auto;
-  max-width: 2000px;
-  width: 85%;
-}
-
 body {
   margin: 0;
-  font-family: 'Rubik', sans-serif;
+  font-family: 'Chivo', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: $grey1;
   color: #f4f4f4;
   margin-top: 2rem;
+}
+
+#root {
+  margin: 0 auto;
+  max-width: 2000px;
+  width: 85%;
 }
 
 a {
