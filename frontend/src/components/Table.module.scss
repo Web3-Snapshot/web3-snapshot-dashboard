@@ -4,7 +4,6 @@
 
 .container {
   font-size: 13px;
-  width: 85%;
   margin: 4rem auto;
 }
 
@@ -22,13 +21,20 @@
 }
 
 .header {
-  background-color: $grey2;
-  min-height: 3rem !important;
-  height: 3rem;
   align-content: center;
-  border-radius: 8px;
   font-weight: 600;
+  margin-bottom: 1.4rem;
   cursor: pointer;
+}
+
+.header > div:first-child {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.header > div:last-child {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
 }
 
 // lighter table cells
@@ -36,16 +42,28 @@
   display: flex;
   align-items: center;
   background-color: $grey3;
-  height: 3rem;
-  border-radius: 8px;
 }
+
+// darker table cells
 .header > div:nth-child(2n + 1) {
   display: flex;
   align-items: center;
+  background-color: $grey2;
 }
 
-.data {
-  margin: 1rem 0 1.6rem 0;
+.header > div:nth-child(2) {
+  justify-content: flex-start;
+  padding: 4px;
+}
+
+.data > div:first-child {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+}
+
+.data > div:last-child {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
 }
 
 // lighter data cells
@@ -61,13 +79,6 @@
 
 .data div:nth-child(2) {
   justify-content: flex-start;
-  padding-left: 0.8rem;
-  padding-right: 0.8rem;
-}
-
-.data div:nth-child(2) {
-  justify-content: flex-start;
-  padding-left: 0.8rem;
 }
 
 @media #{media-query(lg)} {
@@ -219,13 +230,13 @@ img {
 }
 
 .iconDown {
-  color: $grey4;
+  color: $grey5;
   margin: 2px;
   padding: 2px;
 }
 
 .iconUp {
-  color: $grey4;
+  color: $grey5;
   margin: 2px;
   padding: 2px;
 }
