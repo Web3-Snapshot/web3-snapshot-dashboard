@@ -21,13 +21,20 @@
 }
 
 .header {
-  background-color: $grey2;
-  min-height: 3rem !important;
-  height: 3rem;
   align-content: center;
-  border-radius: 8px;
   font-weight: 600;
+  margin-bottom: 1.4rem;
   cursor: pointer;
+}
+
+.header > div:first-child {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.header > div:last-child {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 // lighter table cells
@@ -35,12 +42,13 @@
   display: flex;
   align-items: center;
   background-color: $grey3;
-  height: 3rem;
-  border-radius: 8px;
 }
+
+// darker table cells
 .header > div:nth-child(2n + 1) {
   display: flex;
   align-items: center;
+  background-color: $grey2;
 }
 
 .header > div:nth-child(2) {
@@ -48,8 +56,14 @@
   padding: 4px;
 }
 
-.data {
-  margin: 1rem 0 1.6rem 0;
+.data > div:first-child {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.data > div:last-child {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
 }
 
 // lighter data cells
