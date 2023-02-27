@@ -36,7 +36,7 @@ function Tokenomics() {
         )}`,
     },
     {
-      id: 'market_cap_fully_diluted_valuation_usd_ratio',
+      id: 'mc_fdv_ratio',
       label: ' MC/ FDV',
       render: (obj) => obj.mc_fdv_ratio || '-',
     },
@@ -56,12 +56,12 @@ function Tokenomics() {
       render: (obj) => formatLongNumbers(Math.round(obj.max_supply)),
     },
     {
-      id: 'circ_total_ratio',
+      id: 'circ_supply_total_supply_ratio',
       label: 'Circ./ Tot.',
       render: (obj) => obj.circ_supply_total_supply_ratio || '-',
     },
     {
-      id: 'volume_24h',
+      id: 'total_volume',
       label: '24h Vol.',
       render: (obj) => formatLongNumbers(obj.total_volume),
     },
