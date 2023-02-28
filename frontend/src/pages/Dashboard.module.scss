@@ -1,7 +1,31 @@
+@import '../breakpoints.scss';
+
 .root {
   margin-top: 1rem;
 }
 .navigation {
   display: flex;
   justify-content: center;
+}
+
+.tabNavButton {
+  border-radius: 10px;
+  border-style: none;
+  padding: 5px;
+  width: 180px;
+  font-size: 14px;
+  margin-left: 0.4rem;
+  margin-right: 0.4rem;
+}
+
+@media #{media-query(xs)}, #{media-query(ss)} {
+  .tabNavButton {
+    font-size: 12px;
+    width: 120px;
+  }
+}
+
+.tabNavButton:hover {
+  cursor: pointer;
+  opacity: 0.7;
 }

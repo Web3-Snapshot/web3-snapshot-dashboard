@@ -3,40 +3,13 @@
 
 .navbar {
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  align-items: center;
+  height: 10rem;
 }
 
-.navbar > h1,
-.navbar > h2 {
-  margin: 0;
-}
-
-.navbar > h2 {
-  color: $yellow;
-}
-
-button {
-  border-radius: 10px;
-  border-style: none;
-  padding: 5px;
-  width: 180px;
-  font-size: 14px;
-  margin-left: 0.4rem;
-  margin-right: 0.4rem;
-}
-
-@media #{media-query(xs)}, #{media-query(ss)} {
-  button {
-    font-size: 12px;
-    width: 120px;
-  }
-}
-
-button:hover {
-  cursor: pointer;
-  opacity: 0.7;
+.navbar svg {
+  width: inherit;
+  height: inherit;
 }
 
 .active {

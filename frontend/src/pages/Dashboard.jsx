@@ -53,12 +53,16 @@ function Dashboard() {
       <nav className={styles.navigation}>
         <NavLink to="/prices">
           {({ isActive }) => (
-            <button className={isActive ? navbarStyles.active : undefined}>PRICES</button>
+            <button className={`${isActive && navbarStyles.active} ${styles.tabNavButton}`}>
+              PRICES
+            </button>
           )}
         </NavLink>
         <NavLink to="/tokenomics">
           {({ isActive }) => (
-            <button className={isActive ? navbarStyles.active : undefined}>TOKENOMICS</button>
+            <button className={`${isActive && navbarStyles.active} ${styles.tabNavButton}`}>
+              TOKENOMICS
+            </button>
           )}
         </NavLink>
       </nav>
