@@ -8,7 +8,7 @@ function Navbar() {
     <div>
       <Link to="/">
         <div className={styles.navbar}>
-          <Logo styles={{ width: '10rem' }} />
+          <Logo />
         </div>
       </Link>
     </div>
