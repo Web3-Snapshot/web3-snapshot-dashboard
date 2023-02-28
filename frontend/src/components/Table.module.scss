@@ -4,7 +4,8 @@
 
 .container {
   font-size: 13px;
-  margin: 4rem auto;
+  margin-top: 0.8rem;
+  margin-bottom: 4rem;
 }
 
 @media #{media-query(xs)}, #{media-query(ss)} {
