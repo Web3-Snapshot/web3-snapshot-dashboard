@@ -8,11 +8,11 @@
 
 // Sass variables that define breakpoint values
 $breakpoints: (
-  ss: 400px,
-  xs: 600px,
-  sm: 900px,
-  md: 1200px,
-  lg: 1536px,
+  ss: 400,
+  xs: 600,
+  sm: 900,
+  md: 1200,
+  lg: 1536,
 );
 
 // Sass variables for writing out media queries
@@ -23,20 +23,33 @@ $breakpoints: (
 //     }
 
 $media: (
-  ss: '(max-width: #{map-get($breakpoints, ss)})',
-  xs: '(min-width: #{map-get($breakpoints, ss) + 1}) and (max-width: #{map-get($breakpoints, xs)})',
-  sm: '(min-width: #{map-get($breakpoints, xs) + 1}) and (max-width: #{map-get($breakpoints, sm)})',
-  md: '(min-width: #{map-get($breakpoints, sm) + 1}) and (max-width: #{map-get($breakpoints, md)})',
-  lg: '(min-width: #{map-get($breakpoints, md) + 1}) and (max-width: #{map-get($breakpoints, lg)})',
-  xl: '(min-width: #{map-get($breakpoints, lg) + 1})',
+  ss: '(max-width: #{map-get($breakpoints, ss)}px)',
+  xs:
+    '(min-width: #{map-get($breakpoints, ss) + 1}px) and (max-width: #{map-get($breakpoints, xs)}px)',
+  sm:
+    '(min-width: #{map-get($breakpoints, xs) + 1}px) and (max-width: #{map-get($breakpoints, sm)}px)',
+  md:
+    '(min-width: #{map-get($breakpoints, sm) + 1}px) and (max-width: #{map-get($breakpoints, md)}px)',
+  lg:
+    '(min-width: #{map-get($breakpoints, md) + 1}px) and (max-width: #{map-get($breakpoints, lg)}px)',
+  xl: '(min-width: #{map-get($breakpoints, lg) + 1}px)',
 );
 
 // The export module that makes Sass variables accessible in JavaScript
 :export {
-  ss: unquote(map-get($media, ss));
-  xs: unquote(map-get($media, xs));
-  sm: unquote(map-get($media, sm));
+  // Media Queries
+  ss: unquote(map-get($media, ss)); // '(max-width: 400px)'
+  xs: unquote(map-get($media, xs)); // '(min-width: 401px) and (max-width: 600px)'
+  sm: unquote(map-get($media, sm)); // etc.
   md: unquote(map-get($media, md));
   lg: unquote(map-get($media, lg));
   xl: unquote(map-get($media, xl));
+
+  // Breakpoints
+  ssBp: #{map-get($breakpoints, ss)}; // 400
+  xsBp: #{map-get($breakpoints, xs)}; // 600
+  smBp: #{map-get($breakpoints, sm)}; // etc.
+  mdBp: #{map-get($breakpoints, md)};
+  lgBp: #{map-get($breakpoints, lg)};
+  xlBp: #{map-get($breakpoints, xl)};
 }
