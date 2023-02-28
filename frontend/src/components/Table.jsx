@@ -14,7 +14,7 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
   const location = useLocation();
 
-  let { ss, xs, sm, lg, xl } = useBreakpoints(BREAKPOINTS);
+  let { mobile, desktop } = useBreakpoints(BREAKPOINTS);
 
   function handleSort(_, cellId) {
     setOrder(order === 'asc' ? 'desc' : 'asc');
@@ -29,7 +29,7 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
 
   return (
     <div className={styles.container}>
-      {xl || lg ? (
+      {desktop ? (
         <>
           <div className={`${rowStyles.row} ${styles.header}`}>
             <HeaderRow
@@ -67,7 +67,7 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
                     </div>
                   ))}
               </div>
-              {(ss || xs || sm) && location.pathname === '/tokenomics' && <GroupingHeader />}
+              {mobile && location.pathname === '/tokenomics' && <GroupingHeader />}
               <div className={styles.cardBody}>
                 {tableData
                   .slice(3) // All the rest gos into the content area

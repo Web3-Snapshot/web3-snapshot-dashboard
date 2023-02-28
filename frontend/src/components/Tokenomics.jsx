@@ -8,7 +8,7 @@ import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
 
 function Tokenomics() {
-  let { ss, xs, sm, mobile, tablet } = useBreakpoints(BREAKPOINTS);
+  let { ss, mobile } = useBreakpoints(BREAKPOINTS);
   const { coins } = useOutletContext();
 
   const tableData = [
