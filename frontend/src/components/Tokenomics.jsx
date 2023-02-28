@@ -8,7 +8,7 @@ import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
 
 function Tokenomics() {
-  let { ss, mobile } = useBreakpoints(BREAKPOINTS);
+  let { ss, mobile, tablet } = useBreakpoints(BREAKPOINTS);
   const { coins } = useOutletContext();
 
   const tableData = [
@@ -29,7 +29,7 @@ function Tokenomics() {
     },
     {
       id: 'fully_diluted_valuation_usd',
-      label: mobile ? 'FD' : 'Fully Diluted',
+      label: mobile || tablet ? 'FD' : 'Fully Diluted',
       render: (obj) =>
         `${obj.fully_diluted_valuation_usd ? '$' : ''}${formatLongNumbers(
           obj.fully_diluted_valuation_usd
@@ -37,32 +37,41 @@ function Tokenomics() {
     },
     {
       id: 'mc_fdv_ratio',
-      label: ' MC/ FDV',
+      label: ' MC/FDV',
       render: (obj) => obj.mc_fdv_ratio || '-',
     },
     {
       id: 'circulating_supply',
-      label: mobile ? 'Circ.' : 'Circulating Supply',
+      // TODO: Create a hook for this
+      label: (function () {
+        if (mobile) {
+          return 'Circ.';
+        } else if (tablet) {
+          return 'Circulating';
+        } else {
+          return 'Circulating Supply';
+        }
+      })(),
       render: (obj) => formatLongNumbers(obj.circulating_supply),
     },
     {
       id: 'total_supply',
-      label: mobile ? 'Total' : 'Total Supply',
+      label: mobile || tablet ? 'Total' : 'Total Supply',
       render: (obj) => formatLongNumbers(obj.total_supply),
     },
     {
       id: 'max_supply',
-      label: mobile ? 'Max' : 'Max Supply',
+      label: mobile || tablet ? 'Max' : 'Max Supply',
       render: (obj) => formatLongNumbers(Math.round(obj.max_supply)),
     },
     {
       id: 'circ_supply_total_supply_ratio',
-      label: mobile ? 'Circ/Tot' : 'Circ./ Tot.',
+      label: mobile || tablet ? 'Circ/Tot' : 'Circ./ Tot.',
       render: (obj) => obj.circ_supply_total_supply_ratio || '-',
     },
     {
       id: 'total_volume',
-      label: mobile ? '24h' : '24h Vol.',
+      label: mobile || tablet ? '24h' : '24h Vol.',
       render: (obj) => formatLongNumbers(obj.total_volume),
     },
   ];
