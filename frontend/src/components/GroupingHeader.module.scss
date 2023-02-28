@@ -4,9 +4,10 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr) repeat(4, 1fr) repeat(1, 1fr);
   background-color: $grey1;
-  padding: 3px;
+  // padding: 3px;
   color: $grey5;
   font-weight: bold;
+  margin-bottom: 2px;
 }
 
 .groupingHeaderRoot div:nth-child(1) {
@@ -14,6 +15,7 @@
   grid-column-start: 1;
   grid-column-end: span 2;
   text-align: center;
+  line-height: 1rem;
 }
 
 .groupingHeaderRoot div:nth-child(2) {
@@ -21,6 +23,7 @@
   grid-column-start: 3;
   grid-column-end: span 4;
   text-align: center;
+  line-height: 1rem;
 }
 
 .groupingHeaderRoot div:nth-child(3) {
@@ -28,4 +31,5 @@
   grid-column-start: 7;
   grid-column-end: 8;
   text-align: center;
+  line-height: 1rem;
 }

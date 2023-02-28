@@ -14,7 +14,7 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
   const location = useLocation();
 
-  let { mobile, desktop } = useBreakpoints(BREAKPOINTS);
+  let { mobile, tablet, desktop } = useBreakpoints(BREAKPOINTS);
 
   function handleSort(_, cellId) {
     setOrder(order === 'asc' ? 'desc' : 'asc');
@@ -67,18 +67,20 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
                     </div>
                   ))}
               </div>
-              {mobile && location.pathname === '/tokenomics' && <GroupingHeader />}
-              <div className={styles.cardBody}>
-                {tableData
-                  .slice(3) // All the rest gos into the content area
-                  .map((item) => (
-                    <div key={item.id} className={styles.cardBodyCell}>
-                      <span className={styles.cardBodyCellLabel}>{item.label}</span>
-                      <div className={styles.cardBodyCellValue}>
-                        {item.render(coins.data[coinGuid])}
+              <div>
+                {(mobile || tablet) && location.pathname === '/tokenomics' && <GroupingHeader />}
+                <div className={styles.cardBody}>
+                  {tableData
+                    .slice(3) // All the rest gos into the content area
+                    .map((item) => (
+                      <div key={item.id} className={styles.cardBodyCell}>
+                        <span className={styles.cardBodyCellLabel}>{item.label}</span>
+                        <div className={styles.cardBodyCellValue}>
+                          {item.render(coins.data[coinGuid])}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                </div>
               </div>
             </div>
           ))}

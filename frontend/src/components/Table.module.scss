@@ -55,6 +55,10 @@
   padding: 4px;
 }
 
+.data {
+  opacity: 0.95;
+}
+
 .data > div:first-child {
   border-top-left-radius: 6px;
   border-bottom-left-radius: 6px;
@@ -77,10 +81,11 @@
 }
 
 .data div:nth-child(2) {
+  text-align: left;
   justify-content: flex-start;
 }
 
-@media #{media-query(lg)} {
+@media #{media-query(lg)}, #{media-query(xl)} {
   .data > div:nth-child(2) {
     padding-left: 0.8rem;
   }
@@ -98,6 +103,7 @@
 }
 
 .data:hover {
+  opacity: 1;
   cursor: pointer;
 }
 
@@ -109,13 +115,13 @@
   justify-content: space-between;
   margin-bottom: 1rem;
   padding: 1rem;
-  min-height: 10rem;
+  min-height: 9.4rem;
 }
 
 @media #{media-query(xs)}, #{media-query(ss)} {
   .cardContainer {
-    padding-left: 0.2rem;
-    padding-right: 0.2rem;
+    padding: 2px 0.2rem;
+    min-height: 8rem;
   }
 }
 
