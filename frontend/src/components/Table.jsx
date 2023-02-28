@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import styles from './Table.module.scss';
 import Row from './Row';
 import HeaderRow from './HeaderRow';
 import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
 import { objectSort } from '../util/helpers';
+import GroupingHeader from './GroupingHeader';
 
 function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
   const [orderedCoins, setOrderedCoins] = useState(coins.order);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
+  const location = useLocation();
 
-  let { lg, xl } = useBreakpoints(BREAKPOINTS);
+  let { ss, xs, sm, lg, xl } = useBreakpoints(BREAKPOINTS);
 
   function handleSort(_, cellId) {
     setOrder(order === 'asc' ? 'desc' : 'asc');
@@ -64,6 +67,7 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
                     </div>
                   ))}
               </div>
+              {(ss || xs || sm) && location.pathname === '/tokenomics' && <GroupingHeader />}
               <div className={styles.cardBody}>
                 {tableData
                   .slice(3) // All the rest gos into the content area
