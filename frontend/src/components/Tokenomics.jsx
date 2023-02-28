@@ -8,7 +8,7 @@ import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
 
 function Tokenomics() {
-  let { ss, xs } = useBreakpoints(BREAKPOINTS);
+  let { ss, mobile } = useBreakpoints(BREAKPOINTS);
   const { coins } = useOutletContext();
 
   const tableData = [
@@ -29,7 +29,7 @@ function Tokenomics() {
     },
     {
       id: 'fully_diluted_valuation_usd',
-      label: 'Fully Diluted',
+      label: mobile ? 'FD' : 'Fully Diluted',
       render: (obj) =>
         `${obj.fully_diluted_valuation_usd ? '$' : ''}${formatLongNumbers(
           obj.fully_diluted_valuation_usd
@@ -42,27 +42,27 @@ function Tokenomics() {
     },
     {
       id: 'circulating_supply',
-      label: xs || ss ? 'Circ.' : 'Circulating',
+      label: mobile ? 'Circ.' : 'Circulating Supply',
       render: (obj) => formatLongNumbers(obj.circulating_supply),
     },
     {
       id: 'total_supply',
-      label: 'Total',
+      label: mobile ? 'Total' : 'Total Supply',
       render: (obj) => formatLongNumbers(obj.total_supply),
     },
     {
       id: 'max_supply',
-      label: 'Max',
+      label: mobile ? 'Max' : 'Max Supply',
       render: (obj) => formatLongNumbers(Math.round(obj.max_supply)),
     },
     {
       id: 'circ_supply_total_supply_ratio',
-      label: 'Circ./ Tot.',
+      label: mobile ? 'Circ/Tot' : 'Circ./ Tot.',
       render: (obj) => obj.circ_supply_total_supply_ratio || '-',
     },
     {
       id: 'total_volume',
-      label: '24h Vol.',
+      label: mobile ? '24h' : '24h Vol.',
       render: (obj) => formatLongNumbers(obj.total_volume),
     },
   ];

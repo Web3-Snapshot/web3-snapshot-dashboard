@@ -98,8 +98,6 @@ function Prices() {
   ];
 
   function handleRowClick(evt, row, cell) {
-    console.log('cell ', cell);
-    console.log('row', row);
     setRow(row);
     setIsCoinInfoModalOpen(true);
   }
