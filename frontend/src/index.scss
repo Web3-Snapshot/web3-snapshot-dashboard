@@ -1,3 +1,4 @@
+@import './breakpoints.scss';
 @import './colors.scss';
 
 * {
@@ -19,6 +20,12 @@ body {
   margin: 0 auto;
   max-width: 2000px;
   width: 85%;
+}
+
+@media #{media-query(xs)}, #{media-query(ss)} {
+  #root {
+    width: 100%;
+  }
 }
 
 a {
