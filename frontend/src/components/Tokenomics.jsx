@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { createPortal } from 'react-dom';
+
+import CoinInfoModal from './CoinInfoModal';
 import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
 import { formatLongNumbers } from '../util/helpers';
 import styles from './Tokenomics.module.scss';
@@ -10,6 +13,8 @@ import { BREAKPOINTS } from '../constants';
 function Tokenomics() {
   let { ss, mobile, tablet } = useBreakpoints(BREAKPOINTS);
   const { coins } = useOutletContext();
+  const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
+  const [row, setRow] = useState();
 
   const tableData = [
     {
@@ -76,14 +81,31 @@ function Tokenomics() {
     },
   ];
 
+  function handleRowClick(evt, row) {
+    setRow(row);
+    setIsCoinInfoModalOpen(true);
+  }
+
   return (
-    <Table
-      numberOfDynamicRows={4}
-      tableData={tableData}
-      coins={coins}
-      rowStyles={styles}
-      defaultOrderBy={['market_cap_rank']}
-    />
+    <>
+      {isCoinInfoModalOpen &&
+        createPortal(
+          <CoinInfoModal
+            isOpen={isCoinInfoModalOpen}
+            onClose={() => setIsCoinInfoModalOpen(false)}
+            row={row}
+          />,
+          document.body
+        )}
+      <Table
+        numberOfDynamicRows={4}
+        tableData={tableData}
+        coins={coins}
+        onRowClick={handleRowClick}
+        rowStyles={styles}
+        defaultOrderBy={['market_cap_rank']}
+      />
+    </>
   );
 }
 

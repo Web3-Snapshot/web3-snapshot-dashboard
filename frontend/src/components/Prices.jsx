@@ -8,25 +8,6 @@ import Table from './Table';
 import { renderCell, renderCellOverlay } from './CellOverlay';
 import CoinInfoModal from './CoinInfoModal';
 
-const COIN_INFO_PROPS = [
-  'id',
-  'name',
-  'symbol',
-  'image_thumb',
-  'categories',
-  'genesis_date',
-  'total_value_locked',
-  'homepage',
-  'blockchain_site',
-  'hashing_algorithm',
-  'coingecko_score',
-  'developer_score',
-  'community_score',
-  'liquidity_score',
-  'public_interest_score',
-  'description',
-];
-
 // TODO:
 // This url will be used to fetch data for all coins on the 1 Jan 2020, and
 // display the difference in %:
@@ -97,13 +78,9 @@ function Prices() {
     },
   ];
 
-  function handleRowClick(evt, row, cell) {
+  function handleRowClick(_, row) {
     setRow(row);
     setIsCoinInfoModalOpen(true);
-  }
-
-  function filterCoinInfoProps(obj) {
-    return Object.fromEntries(Object.entries(obj).filter(([key]) => COIN_INFO_PROPS.includes(key)));
   }
 
   return (
@@ -113,16 +90,16 @@ function Prices() {
           <CoinInfoModal
             isOpen={isCoinInfoModalOpen}
             onClose={() => setIsCoinInfoModalOpen(false)}
-            row={filterCoinInfoProps(row)}
+            row={row}
           />,
           document.body
         )}
       <Table
         tableData={tableData}
         coins={coins}
+        onRowClick={handleRowClick}
         rowStyles={styles}
         defaultOrderBy={['market_cap_rank']}
-        onRowClick={handleRowClick}
       />
     </>
   );
