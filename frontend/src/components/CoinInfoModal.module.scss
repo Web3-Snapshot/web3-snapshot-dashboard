@@ -14,11 +14,12 @@
   margin-right: auto;
   margin-top: 10rem;
   padding: 1rem 4rem;
-  overflow-y: auto;
   width: 50%;
-  height: 75%;
+  min-height: 500px;
+  max-height: 600px;
   background-color: $grey4;
   color: white;
+  border-radius: 12px;
 }
 
 .dialogContent {
@@ -28,29 +29,44 @@
 }
 
 .dialogHeader {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: [symbol] 3rem [name] 1fr;
+  grid-template-rows: [first-row] 3.8rem [second-row] 1.2rem;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
-/* Override the default styles for the IconAndCurrencyCell (p and img) */
-.dialogHeader p {
-  font-size: 24px;
+.coinName {
+  grid-column: name;
+  grid-row: first-row / second-row;
+}
+
+.coinSybmol {
+  grid-column: symbol;
+  grid-row: first-row / second-row;
 }
 
 .dialogHeader img {
-  margin-right: 1rem;
   height: 35px;
 }
 
-.dialogPropertyPair {
-  display: flex;
-  margin-top: 1rem;
+.dialogBody {
+  height: 70%;
+  margin: 0 auto;
 }
 
-.dialogPropertyPair > div:nth-child(1) {
-  margin-right: 1rem;
+.dialogBody > div {
+  margin-bottom: 2rem;
 }
 
 .coinDescription {
   color: #c2c2c2;
+}
+
+.homepageLink a {
+  text-decoration: underline;
+}
+
+.scrollbarView {
+  height: 20vh;
 }

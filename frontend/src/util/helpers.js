@@ -36,7 +36,7 @@ export function capitalize(string) {
   return `${string.slice(0, 1).toUpperCase()}${string.slice(1)}`;
 }
 
-export function convertSnakeCaseToStringRrepresentation(string) {
+export function convertSnakeCaseToStringRepresentation(string) {
   return string.split('_').reduce((acc, curr) => {
     acc += ` ${capitalize(curr)}`;
     return acc;
