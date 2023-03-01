@@ -1,15 +1,20 @@
 import React, { useRef } from 'react';
+import { Markup } from 'interweave';
+import { CgClose } from 'react-icons/cg';
+import { Link } from 'react-router-dom';
+
 import styles from './CoinInfoModal.module.scss';
 import { capitalize } from '../util/helpers';
-import { Markup } from 'interweave';
-import { Link } from 'react-router-dom';
 import { Scrollbars } from 'react-custom-scrollbars';
+import { useBreakpoints } from 'react-breakpoints-hook';
+import { BREAKPOINTS } from '../constants';
 
 function CoinInfoModal({ onClose, row }) {
   const homepage = useRef(null);
   homepage.current = row.homepage.split(',')[0];
   const icon = useRef(null);
   icon.current = row.image_thumb;
+  let { mobile } = useBreakpoints(BREAKPOINTS);
 
   function handleBackdropClick(evt) {
     evt.stopPropagation();
@@ -23,6 +28,7 @@ function CoinInfoModal({ onClose, row }) {
         onClick={(evt) => {
           evt.stopPropagation();
         }}>
+        {mobile && <CgClose onClick={handleBackdropClick}></CgClose>}
         {icon.current && (
           <div className={styles.dialogContent}>
             <div className={styles.dialogHeader}>
