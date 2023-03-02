@@ -8,9 +8,11 @@ import { formatLongNumbers } from '../util/helpers';
 import styles from './Tokenomics.module.scss';
 import Table from './Table';
 import { useBreakpoints } from 'react-breakpoints-hook';
+import { useScrollLock } from '../custom-hooks/useScrollLock';
 import { BREAKPOINTS } from '../constants';
 
 function Tokenomics() {
+  const { lockScroll, unlockScroll } = useScrollLock();
   let { ss, mobile, tablet } = useBreakpoints(BREAKPOINTS);
   const { coins } = useOutletContext();
   const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
@@ -81,20 +83,22 @@ function Tokenomics() {
     },
   ];
 
-  function handleRowClick(evt, row) {
+  function handleRowClick(_, row) {
     setRow(row);
+    lockScroll();
     setIsCoinInfoModalOpen(true);
+  }
+
+  function handleClose() {
+    unlockScroll();
+    setIsCoinInfoModalOpen(false);
   }
 
   return (
     <>
       {isCoinInfoModalOpen &&
         createPortal(
-          <CoinInfoModal
-            isOpen={isCoinInfoModalOpen}
-            onClose={() => setIsCoinInfoModalOpen(false)}
-            row={row}
-          />,
+          <CoinInfoModal isOpen={isCoinInfoModalOpen} onClose={handleClose} row={row} />,
           document.body
         )}
       <Table

@@ -7,15 +7,16 @@
   left: 0;
   height: 100%;
   width: 100%;
-  background: rgba(40, 40, 40, 0.6);
+  background: rgba(20, 20, 20, 0.6);
 }
 
 .dialogRoot {
-  margin-left: auto;
-  margin-right: auto;
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  width: 50%;
   margin-top: 10rem;
   padding: 1rem 4rem;
-  width: 50%;
   min-height: 500px;
   max-height: 600px;
   background-color: $grey4;
@@ -23,13 +24,23 @@
   border-radius: 12px;
 }
 
+@media #{media-query(sm)}, #{media-query(md)} {
+  .dialogRoot {
+    padding: 1rem 1.5rem;
+    left: 18%;
+    right: 18%;
+    width: 64%;
+  }
+}
+
 @media #{media-query(xs)}, #{media-query(ss)} {
   .dialogRoot {
     max-height: unset;
+    left: 0;
+    right: 0;
     height: 100vh;
     width: 100%;
     margin-top: 0;
-    padding: 4rem 4rem;
   }
 }
 
@@ -77,7 +88,14 @@
 }
 
 .coinDescription {
+  text-align: justify;
   color: #c2c2c2;
+}
+
+@media #{media-query(ss)}, #{media-query(xs)}, #{media-query(sm)}, #{media-query(md)} {
+  .coinDescription > span {
+    font-size: 12px;
+  }
 }
 
 .homepageLink a {
@@ -86,4 +104,11 @@
 
 .scrollbarView {
   height: 20vh;
+}
+
+.closeIcon {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.4rem;
+  cursor: pointer;
 }

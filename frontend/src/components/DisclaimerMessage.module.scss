@@ -1,6 +1,11 @@
 @import '../colors.scss';
 
+.disclaimer {
+  text-align: center;
+}
+
 .disclaimer p {
+  line-height: 8px;
   font-size: 12px;
   color: $grey5;
   margin-top: 0.5rem;

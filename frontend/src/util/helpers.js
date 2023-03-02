@@ -42,3 +42,11 @@ export function convertSnakeCaseToStringRepresentation(string) {
     return acc;
   }, '');
 }
+
+export function removeTags(str) {
+  if (str === null || str === '') {
+    return false;
+  }
+
+  return str.toString().replace(/(<([^>]+)>)/gi, '');
+}
