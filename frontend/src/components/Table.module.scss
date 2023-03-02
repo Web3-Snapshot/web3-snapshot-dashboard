@@ -57,7 +57,7 @@
 }
 
 .data {
-  opacity: 0.95;
+  opacity: 0.9;
 }
 
 .data > div:first-child {
@@ -119,6 +119,10 @@
   min-height: 9.4rem;
 }
 
+.cardContainer:hover {
+  cursor: pointer;
+}
+
 @media #{media-query(xs)}, #{media-query(ss)} {
   .cardContainer {
     padding: 2px 0.2rem;
@@ -143,11 +147,7 @@ img {
   .cardHeader {
     gap: 2px;
     margin-bottom: 0;
-  }
-}
-@media (max-width: 400px) {
-  .cardHeader {
-    white-space: nowrap;
+    margin-top: 8px;
   }
 }
 
@@ -159,21 +159,6 @@ img {
 .cardBody {
   display: flex;
   align-items: center;
-}
-
-@media #{media-query(sm)}, #{media-query(md)} {
-  .cardBody {
-    align-items: flex-end;
-  }
-}
-
-@media #{media-query(xs)}, #{media-query(ss)} {
-  .cardBody {
-    display: flex;
-    flex-wrap: wrap-reverse;
-    align-items: flex-start;
-    font-size: 11px;
-  }
 }
 
 .cardHeader div:nth-child(n + 1):nth-child(-n + 2) .cardHeaderCellLabel {

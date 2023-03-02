@@ -4,17 +4,14 @@ import { CgClose } from 'react-icons/cg';
 import { Link } from 'react-router-dom';
 
 import styles from './CoinInfoModal.module.scss';
-import { capitalize } from '../util/helpers';
+import { capitalize, removeTags } from '../util/helpers';
 import { Scrollbars } from 'react-custom-scrollbars';
-import { useBreakpoints } from 'react-breakpoints-hook';
-import { BREAKPOINTS } from '../constants';
 
 function CoinInfoModal({ onClose, row }) {
   const homepage = useRef(null);
   homepage.current = row.homepage.split(',')[0];
   const icon = useRef(null);
   icon.current = row.image_thumb;
-  let { mobile } = useBreakpoints(BREAKPOINTS);
 
   function handleBackdropClick(evt) {
     evt.stopPropagation();
@@ -28,7 +25,7 @@ function CoinInfoModal({ onClose, row }) {
         onClick={(evt) => {
           evt.stopPropagation();
         }}>
-        {mobile && <CgClose onClick={handleBackdropClick}></CgClose>}
+        <CgClose className={styles.closeIcon} onClick={handleBackdropClick}></CgClose>
         {icon.current && (
           <div className={styles.dialogContent}>
             <div className={styles.dialogHeader}>
@@ -47,9 +44,9 @@ function CoinInfoModal({ onClose, row }) {
                 autoHeightMin={300} // min-height and max-height must be set lower
                 autoHeightMax={400} // than the height of the dialogRoot
               >
-                <p className={styles.coinDescription}>
-                  <Markup content={row.description}></Markup>
-                </p>
+                <div className={styles.coinDescription}>
+                  <Markup content={removeTags(row.description)}></Markup>
+                </div>
               </Scrollbars>
               <div className={styles.homepageLink}>
                 <Link to={homepage.current} target="_blank">
