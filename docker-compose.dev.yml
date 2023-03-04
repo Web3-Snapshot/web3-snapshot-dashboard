@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+  db:
+    container_name: web3_database_dev
+    build:
+      context: ./database
+    volumes:
+      - ${PWD}/database/main.py:/app/main.py
+      - database:/app/instance
+
+  backend:
+    container_name: web3_backend_dev
+    build:
+      context: ./backend
+      target: debug
+    stdin_open: true
+    tty: true
+    ports:
+      - 5000:5000
+      - 5678:5678
+    volumes:
+      - ${PWD}/backend:/app
+      - database:/app/instance
+    restart: always
+    depends_on:
+      - db
+  frontend:
+    container_name: web3_frontend_dev
+    build:
+      context: ./frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - /app/node_modules
+      - ${PWD}/frontend:/app
+    restart: always
+    depends_on:
+      - backend
+    links:
+      - 'backend'
+
+  interactive_db:
+    container_name: web3_interactive_db_dev
+    tty: true
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: ./interactive_db/Dockerfile
+    volumes:
+      - ${PWD}/backend/server:/app/server
+      - ${PWD}/backend/util:/app/util
+      - ${PWD}/database:/app/database
+      - ${PWD}/interactive_db/.ipython:/app/.ipython
+      - /app/.ipython/profile_default/pid
+      - /app/.ipython/profile_default/security
+      - database:/app/instance
+    environment:
+      - IPYTHONDIR=/app/.ipython
+
+volumes:
+  database:
