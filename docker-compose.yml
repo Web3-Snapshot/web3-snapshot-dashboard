@@ -2,60 +2,51 @@ version: '3.9'
 
 services:
   db:
-    container_name: web3_database
+    container_name: web3_database_prod
     build:
       context: ./database
     volumes:
       - ${PWD}/database/main.py:/app/main.py
       - database:/app/instance
 
-  backend:
-    container_name: web3_backend
+  nginx:
+    container_name: web3_nginx_prod
     build:
-      context: ./backend
-      target: debug
-    stdin_open: true # comment out for build.target:prod
-    tty: true # comment out for build.target:prod
+      context: ./nginx
     ports:
-      - 5000:5000
-      - 5678:5678
-    volumes:
-      - ${PWD}/backend:/app
-      - database:/app/instance
-    restart: always
-    depends_on:
-      - db
-  frontend:
-    container_name: web3_frontend
-    build:
-      context: ./frontend
-    ports:
-      - '3000:3000'
-    volumes:
-      - ${PWD}/frontend:/app
+      - '80:80'
+      - '443:443'
     restart: always
     depends_on:
       - backend
     links:
       - 'backend'
 
-  interactive_db:
-    container_name: web3_interactive_db
-    tty: true
-    stdin_open: true
+  backend:
+    container_name: web3_backend_prod
     build:
-      context: .
-      dockerfile: ./interactive_db/Dockerfile
+      context: ./backend
+      target: prod
     volumes:
-      - ${PWD}/backend/server:/app/server
-      - ${PWD}/backend/util:/app/util
-      - ${PWD}/database:/app/database
-      - ${PWD}/interactive_db/.ipython:/app/.ipython
-      - /app/.ipython/profile_default/pid
-      - /app/.ipython/profile_default/security
+      # - ${PWD}/backend:/app
       - database:/app/instance
-    environment:
-      - IPYTHONDIR=/app/.ipython
+    restart: always
+    depends_on:
+      - db
+  frontend:
+    container_name: web3_frontend_prod
+    build:
+      context: ./frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - /app/node_modules
+      - ${PWD}/frontend:/app
+    restart: always
+    depends_on:
+      - backend
+    links:
+      - 'backend'
 
 volumes:
   database:
