@@ -20,7 +20,7 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: web3_snapshot_dashboard
-          environment_name: Web3snapshotdashboard-env
+          environment_name: Web3snapshotdashboard-env-1
           version_label: ${{ github.sha }}
           existing_bucket_name: elasticbeanstalk-eu-central-1-560410572733
           region: eu-central-1
