@@ -1,22 +1,19 @@
-import sqlite3
 from os import environ
-from pprint import pprint
+from pathlib import Path
+import sqlite3
 
-from server import create_app
 from server.db import dict_factory
 
-
-def fetchall(result):
-    return pprint(result)
-
+DATABASE_PATH = "./instance/db.sqlite"
 
 env = environ.get("ENV") or "development"
 
-app = create_app("config.development")
+if Path(DATABASE_PATH).exists():
+    conn = sqlite3.connect(DATABASE_PATH)
+    conn.row_factory = dict_factory
+    print("Database connection established (debugging).")
+else:
+    raise FileNotFoundError("Database file not found.")
 
-
-db = sqlite3.connect(app.config["DATABASE_URI"])
-db.row_factory = dict_factory
-
-cur = db.cursor()
+cur = conn.cursor()
 print("\nCursor (cur) ready.")
