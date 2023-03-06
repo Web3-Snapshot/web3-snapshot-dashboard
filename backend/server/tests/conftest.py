@@ -1,5 +1,6 @@
-import pytest
 import sqlite3
+
+import pytest
 from flask import Flask, g
 from server import create_app
 from server.db import dict_factory

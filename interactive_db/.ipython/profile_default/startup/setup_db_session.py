@@ -1,6 +1,6 @@
+import sqlite3
 from os import environ
 from pathlib import Path
-import sqlite3
 
 from server.db import dict_factory
 
