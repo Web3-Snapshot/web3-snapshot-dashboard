@@ -22,14 +22,6 @@ def _connect(app):
         raise FileNotFoundError("Database file not found.")
 
 
-# def init_db(app):
-#     with app.app_context():
-#         conn = _connect(app)
-#         with app.open_resource(ROOT_PATH / "db/schema.sql", mode="r") as f:
-#             conn.cursor().executescript(f.read())
-#         conn.commit()
-
-
 def get_db(app):
     conn = getattr(g, "db", None)
     if conn is None:
