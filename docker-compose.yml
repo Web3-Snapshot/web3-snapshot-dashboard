@@ -30,7 +30,6 @@ services:
       context: ./backend
       target: prod
     volumes:
-      # - ${PWD}/backend:/app
       - database:/app/instance
     restart: always
     depends_on:
