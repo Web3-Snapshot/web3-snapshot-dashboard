@@ -23,7 +23,7 @@ URL1 = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=ma
 URL2 = f"https://api.coingecko.com/api/v3/coins"
 
 DB_PATH = "./instance/db.sqlite"
-SCHEMA_PATH = "./db/schema.sql"
+SCHEMA_PATH = "./schema.sql"
 
 
 def setup_database(db_path):
