@@ -6,9 +6,9 @@ COPY ./requirements.txt /app/requirements.txt
 
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-COPY crontab /etc/cron.d/crontab
+COPY . .
 
-ADD . /app
+COPY crontab /etc/cron.d/crontab
 
 RUN crontab /etc/cron.d/crontab
 

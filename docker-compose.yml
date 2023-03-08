@@ -6,7 +6,6 @@ services:
     build:
       context: ./database
     volumes:
-      - ${PWD}/database/main.py:/app/main.py
       - database:/app/instance
 
   nginx:
@@ -42,9 +41,6 @@ services:
       context: ./frontend
     ports:
       - '3000:3000'
-    volumes:
-      - /app/node_modules
-      - ${PWD}/frontend:/app
     restart: always
     depends_on:
       - backend

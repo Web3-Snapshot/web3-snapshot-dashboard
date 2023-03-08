@@ -26,8 +26,8 @@ DB_PATH = "./instance/db.sqlite"
 SCHEMA_PATH = "./db/schema.sql"
 
 
-def setup_database(database):
-    conn = sqlite3.connect(database, uri=True)
+def setup_database(db_path):
+    conn = sqlite3.connect(db_path, uri=True)
     cur = conn.cursor()
 
     with open(SCHEMA_PATH) as f:
@@ -48,7 +48,7 @@ def create_connection(db_path):
 
     conn = None
     try:
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(db_path, uri=True)
     except Exception as err:
         print(err)
 
