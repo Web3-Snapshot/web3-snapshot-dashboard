@@ -29,6 +29,9 @@ services:
     build:
       context: ./backend
       target: prod
+    environment:
+      - FLASK_DEBUG=production
+      - SECRET_KEY=${SECRET_KEY}
     volumes:
       - database:/app/instance
     restart: always
