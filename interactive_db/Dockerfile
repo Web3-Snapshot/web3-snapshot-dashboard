@@ -13,5 +13,3 @@ COPY ./database/requirements.txt /app/requirements.database.txt
 RUN pip install -r /app/requirements.database.txt
 
 COPY ./backend/config/development.py /app/config/development.py
-
-ENTRYPOINT [ "ipython" ]

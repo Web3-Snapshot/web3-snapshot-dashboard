@@ -1,7 +1,9 @@
+import sqlite3
+
 import pytest
 from flask import Flask, g
 from server import create_app
-from server.db import get_db
+from server.db import dict_factory
 
 SCHEMA = """
             CREATE TABLE IF NOT EXISTS coins
@@ -26,34 +28,26 @@ SCHEMA = """
         """
 
 
-def create_db(db):
-    cur = db.cursor()
-    cur.execute(SCHEMA)
-    db.commit()
-
-
-def clear_db(app):
-    with app.app_context():
-        db = get_db()
-        db.cursor().execute(
-            """
-                    DELETE FROM coins;
-                """
-        )
-        db.commit()
-
-
 @pytest.fixture(scope="module")
 def app():
     app = create_app(config_location="config.testing")
+    yield app
+
+
+@pytest.fixture(scope="function")
+def db_connection(app):
     with app.app_context():
-        db = get_db()
-        g._db = db
-        create_db(db)
-        yield app
+        conn = sqlite3.connect(app.config["DATABASE_URI"], uri=True)
+        conn.row_factory = dict_factory
+        cur = conn.cursor()
+        cur.execute(SCHEMA)
+        conn.commit()
+        g.db = conn
+        yield conn
+
+    conn.close()
 
 
 @pytest.fixture(scope="function")
 def client(app: Flask):
     yield app.test_client()
-    clear_db(app)

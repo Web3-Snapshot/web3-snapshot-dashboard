@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.7'
 
 services:
   db:
@@ -8,12 +8,14 @@ services:
     volumes:
       - ${PWD}/database/main.py:/app/main.py
       - database:/app/instance
+      - ${PWD}/backend/db/schema.sql:/app/db/schema.sql
 
   backend:
     container_name: web3_backend_dev
     build:
       context: ./backend
-      target: debug
+      # target: debug
+      target: prod
     stdin_open: true
     tty: true
     ports:
@@ -25,6 +27,7 @@ services:
     restart: always
     depends_on:
       - db
+
   frontend:
     container_name: web3_frontend_dev
     build:
@@ -42,14 +45,13 @@ services:
 
   interactive_db:
     container_name: web3_interactive_db_dev
-    tty: true
-    stdin_open: true
     build:
       context: .
       dockerfile: ./interactive_db/Dockerfile
     volumes:
       - ${PWD}/backend/server:/app/server
       - ${PWD}/backend/util:/app/util
+      - ${PWD}/backend/db/schema.sql:/app/db/schema.sql
       - ${PWD}/database:/app/database
       - ${PWD}/interactive_db/.ipython:/app/.ipython
       - /app/.ipython/profile_default/pid
@@ -57,6 +59,9 @@ services:
       - database:/app/instance
     environment:
       - IPYTHONDIR=/app/.ipython
+    depends_on:
+      - backend
+      - db
 
 volumes:
   database:

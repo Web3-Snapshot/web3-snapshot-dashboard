@@ -1,5 +1,7 @@
 import sqlite3
+from pathlib import Path
 
+from config.development import ROOT_PATH
 from flask import current_app, g
 
 
@@ -10,27 +12,21 @@ def dict_factory(cursor, row):
     return d
 
 
-def init_db(app):
-    with app.app_context():
-        db = get_db()
-        with app.open_resource("schema.sql", mode="r") as f:
-            db.cursor().executescript(f.read())
-        db.commit()
+def _connect(app):
+    if Path(app.config["DATABASE_URI"]).exists():
+        conn = sqlite3.connect(app.config["DATABASE_URI"], uri=True)
+        conn.row_factory = dict_factory
+        g.db = conn
+        return conn
+    else:
+        raise FileNotFoundError("Database file not found.")
 
 
-def query_db(query, args=(), one=False):
-    cur = get_db().execute(query, args)
-    rv = cur.fetchall()
-    cur.close()
-    return (rv[0] if rv else None) if one else rv
-
-
-def get_db():
-    db = getattr(g, "_database", None)
-    if db is None:
-        db = g._database = sqlite3.connect(current_app.config["DATABASE_URI"], uri=True)
-        db.row_factory = dict_factory
-    return db
+def get_db(app):
+    conn = getattr(g, "db", None)
+    if conn is None:
+        conn = _connect(app)
+    return conn
 
 
 def close_connection(exception=None):

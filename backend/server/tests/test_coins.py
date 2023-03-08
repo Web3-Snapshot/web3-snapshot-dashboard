@@ -25,8 +25,7 @@ def seed_coin(db):
             ath_change_percentage
             )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-
-                """,
+        """,
         [
             "test_id",
             "test_name",
@@ -49,9 +48,8 @@ def seed_coin(db):
     db.commit()
 
 
-def test_get_coins(client):
-    db = g._db
-    seed_coin(db)
+def test_get_coins(client, db_connection):
+    seed_coin(db_connection)
 
     response = client.get("/api/coins")
 
