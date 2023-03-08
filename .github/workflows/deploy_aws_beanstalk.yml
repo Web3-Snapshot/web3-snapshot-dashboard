@@ -2,7 +2,7 @@ name: Deploy Web3 Snapshot to AWS Beanstalk
 on:
   push:
     branches:
-      - 'testing'
+      - 'main'
 
 jobs:
   deploy:
