@@ -30,8 +30,9 @@ def setup_database(db_path):
     conn = sqlite3.connect(db_path, uri=True)
     cur = conn.cursor()
 
-    with open(SCHEMA_PATH) as f:
-        cur.execute(f)
+    with open(SCHEMA_PATH, "r") as sql_file:
+        sql_script = sql_file.read()
+        cur.executescript(sql_script)
 
     conn.commit()
 
