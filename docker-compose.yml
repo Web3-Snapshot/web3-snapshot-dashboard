@@ -11,8 +11,7 @@ services:
 
   nginx:
     container_name: web3_nginx_prod
-    build:
-      context: ./nginx
+    image: nginx:latest
     ports:
       - '80:80'
       - '443:443'
