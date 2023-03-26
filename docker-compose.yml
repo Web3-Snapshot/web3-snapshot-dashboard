@@ -25,12 +25,6 @@ services:
       - certbot_www:/var/www/certbot/:ro
       - certbot_conf:/etc/nginx/ssl/:ro
 
-  certbot:
-    image: certbot/certbot:latest
-    volumes:
-      - certbot_www:/var/www/certbot/:rw
-      - certbot_conf:/etc/letsencrypt/:rw
-
   backend:
     container_name: web3_backend_prod
     build:
@@ -56,6 +50,11 @@ services:
       - backend
     links:
       - 'backend'
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - certbot_www:/var/www/certbot/:rw
+      - certbot_conf:/etc/letsencrypt/:rw
 
   nginx-80:
     image: nginx:latest
