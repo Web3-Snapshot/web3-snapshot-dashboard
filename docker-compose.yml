@@ -60,6 +60,7 @@ services:
     image: nginx:latest
     ports:
       - 80:80
+      - 443:443
     volumes:
       - ./nginx/conf/initial/:/etc/nginx/conf.d/:ro
       - certbot_www:/var/www/certbot/:ro
