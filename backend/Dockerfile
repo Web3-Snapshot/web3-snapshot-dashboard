@@ -22,4 +22,4 @@ FROM base as prod
 
 COPY . .
 
-CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:5000", "server:create_app()"]
+CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:5000", "server:create_app('config.production')"]
