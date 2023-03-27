@@ -11,8 +11,7 @@ services:
 
   nginx:
     container_name: web3_nginx_prod
-    build:
-      context: ./nginx
+    image: nginx:latest
     ports:
       - '80:80'
       - '443:443'
@@ -21,6 +20,10 @@ services:
       - backend
     links:
       - 'backend'
+    volumes:
+      - ./nginx/conf/:/etc/nginx/conf.d/:ro
+      - certbot_www:/var/www/certbot/:ro
+      - certbot_conf:/etc/nginx/ssl/:ro
 
   backend:
     container_name: web3_backend_prod
@@ -47,6 +50,23 @@ services:
       - backend
     links:
       - 'backend'
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - certbot_www:/var/www/certbot/:rw
+      - certbot_conf:/etc/letsencrypt/:rw
+
+  nginx-80:
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/conf/initial/:/etc/nginx/conf.d/:ro
+      - certbot_www:/var/www/certbot/:ro
+      - certbot_conf:/etc/nginx/ssl/:ro
 
 volumes:
   database:
+  certbot_www:
+  certbot_conf:
