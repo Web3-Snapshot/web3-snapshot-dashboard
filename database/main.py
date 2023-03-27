@@ -23,15 +23,16 @@ URL1 = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=ma
 URL2 = f"https://api.coingecko.com/api/v3/coins"
 
 DB_PATH = "./instance/db.sqlite"
-SCHEMA_PATH = "./db/schema.sql"
+SCHEMA_PATH = "./schema.sql"
 
 
-def setup_database(database):
-    conn = sqlite3.connect(database, uri=True)
+def setup_database(db_path):
+    conn = sqlite3.connect(db_path, uri=True)
     cur = conn.cursor()
 
-    with open(SCHEMA_PATH) as f:
-        cur.execute(f)
+    with open(SCHEMA_PATH, "r") as sql_file:
+        sql_script = sql_file.read()
+        cur.executescript(sql_script)
 
     conn.commit()
 
@@ -48,7 +49,7 @@ def create_connection(db_path):
 
     conn = None
     try:
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(db_path, uri=True)
     except Exception as err:
         print(err)
 

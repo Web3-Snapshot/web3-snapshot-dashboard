@@ -4,8 +4,10 @@ WORKDIR /app
 
 COPY package.json yarn.lock /app/
 
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile && yarn cache clean
 
 EXPOSE 3000
+
+COPY . .
 
 CMD ["yarn", "start"]

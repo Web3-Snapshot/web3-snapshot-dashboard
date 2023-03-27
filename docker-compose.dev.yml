@@ -14,8 +14,7 @@ services:
     container_name: web3_backend_dev
     build:
       context: ./backend
-      # target: debug
-      target: prod
+      target: debug
     stdin_open: true
     tty: true
     ports:
@@ -51,7 +50,7 @@ services:
     volumes:
       - ${PWD}/backend/server:/app/server
       - ${PWD}/backend/util:/app/util
-      - ${PWD}/backend/db/schema.sql:/app/db/schema.sql
+      - ${PWD}/database/schema.sql:/app/schema.sql
       - ${PWD}/database:/app/database
       - ${PWD}/interactive_db/.ipython:/app/.ipython
       - /app/.ipython/profile_default/pid
