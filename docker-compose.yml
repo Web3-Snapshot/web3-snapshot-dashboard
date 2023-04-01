@@ -8,22 +8,6 @@ services:
     volumes:
       - database:/app/instance
 
-  nginx:
-    container_name: web3_nginx_prod
-    image: nginx:latest
-    ports:
-      - '80:80'
-      - '443:443'
-    restart: always
-    depends_on:
-      - backend
-    links:
-      - 'backend'
-    volumes:
-      - ./nginx/conf/:/etc/nginx/conf.d/:ro
-      - certbot_www:/var/www/certbot/:ro
-      - certbot_conf:/etc/nginx/ssl/:ro
-
   backend:
     container_name: web3_backend_prod
     build:
@@ -37,33 +21,22 @@ services:
     restart: always
     depends_on:
       - db
+
   frontend:
     container_name: web3_frontend_prod
     build:
       context: ./frontend
     ports:
-      - '3000:3000'
+      - 80:80
+      - 443:443
     restart: always
     depends_on:
       - backend
     links:
-      - 'backend'
-  certbot:
-    image: certbot/certbot:latest
+      - backend
     volumes:
-      - certbot_www:/var/www/certbot/:rw
-      - certbot_conf:/etc/letsencrypt/:rw
-
-  nginx-80:
-    image: nginx:latest
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - ./nginx/conf/initial/:/etc/nginx/conf.d/:ro
       - certbot_www:/var/www/certbot/:ro
       - certbot_conf:/etc/nginx/ssl/:ro
-
 volumes:
   database:
   certbot_www:
