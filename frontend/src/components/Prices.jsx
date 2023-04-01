@@ -7,6 +7,7 @@ import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
 import Table from './Table';
 import { renderCell, renderCellOverlay } from './CellOverlay';
 import CoinInfoModal from './CoinInfoModal';
+import { useScrollLock } from '../custom-hooks/useScrollLock';
 
 // TODO:
 // This url will be used to fetch data for all coins on the 1 Jan 2020, and
@@ -14,6 +15,7 @@ import CoinInfoModal from './CoinInfoModal';
 // https://api.coingecko.com/api/v3/coins/bitcoin/history?date=1-1-2020
 
 function Prices() {
+  const { lockScroll, unlockScroll } = useScrollLock();
   const { coins } = useOutletContext();
   const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
   const [row, setRow] = useState();
@@ -80,18 +82,20 @@ function Prices() {
 
   function handleRowClick(_, row) {
     setRow(row);
+    lockScroll();
     setIsCoinInfoModalOpen(true);
+  }
+
+  function handleClose() {
+    unlockScroll();
+    setIsCoinInfoModalOpen(false);
   }
 
   return (
     <>
       {isCoinInfoModalOpen &&
         createPortal(
-          <CoinInfoModal
-            isOpen={isCoinInfoModalOpen}
-            onClose={() => setIsCoinInfoModalOpen(false)}
-            row={row}
-          />,
+          <CoinInfoModal isOpen={isCoinInfoModalOpen} onClose={handleClose} row={row} />,
           document.body
         )}
       <Table
