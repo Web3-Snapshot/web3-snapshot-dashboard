@@ -6,6 +6,7 @@ EXPOSE 80
 EXPOSE 443
 
 COPY package.json yarn.lock /app/
+
 RUN yarn install --frozen-lockfile && yarn cache clean
 
 COPY public /app/public/

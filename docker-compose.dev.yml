@@ -31,6 +31,7 @@ services:
     container_name: web3_frontend_dev
     build:
       context: ./frontend
+      dockerfile: Dockerfile.dev
     ports:
       - '3000:3000'
     volumes:
