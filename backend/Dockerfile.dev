@@ -12,4 +12,6 @@ ENV FLASK_APP=server
 
 COPY . .
 
-CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:5000", "server:create_app('config.production')"]
+RUN pip install ptvsd
+
+CMD python -m ptvsd --host 0.0.0.0 --port 5678 --wait --multiprocess -m flask run -h backend -p 5000
