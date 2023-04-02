@@ -14,7 +14,8 @@ services:
     container_name: web3_backend_dev
     build:
       context: ./backend
-      target: debug
+      dockerfile: Dockerfile.dev
+      # target: debug
     stdin_open: true
     tty: true
     ports:
@@ -33,7 +34,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.dev
     ports:
-      - '3000:3000'
+      - 3000:3000
     volumes:
       - /app/node_modules
       - ${PWD}/frontend:/app
@@ -44,7 +45,10 @@ services:
       - 'backend'
 
   interactive_db:
+    init: true
     container_name: web3_interactive_db_dev
+    stdin_open: true
+    tty: true
     build:
       context: .
       dockerfile: ./interactive_db/Dockerfile
