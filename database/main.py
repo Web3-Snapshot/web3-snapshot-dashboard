@@ -170,7 +170,7 @@ def main():
                         [
                             coin_item["id"],
                             coin_item["name"],
-                            coin_item["image"]["thumb"],
+                            coin_item["image"]["large"],
                             coin_item["symbol"],
                             transformListToCleanString(coin_item["links"]["homepage"]),
                             transformListToCleanString(
