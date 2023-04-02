@@ -6,6 +6,7 @@ import axios from 'axios';
 import styles from './Dashboard.module.scss';
 import navbarStyles from '../components/Navbar.module.scss';
 import DisclaimerMessage from '../components/DisclaimerMessage';
+import { useIsIframe } from '../custom-hooks/useIsIframe';
 
 export async function fetchCoins() {
   return axios({
@@ -26,6 +27,7 @@ export async function fetchCoins() {
 
 function Dashboard() {
   const [coins, setCoins] = useState({ data: {}, order: [] });
+  const isIframe = useIsIframe();
 
   useEffect(() => {
     const fetchData = async function () {
@@ -51,22 +53,24 @@ function Dashboard() {
 
   return (
     <div className={styles.root}>
-      <nav className={styles.navigation}>
-        <NavLink to="/prices">
-          {({ isActive }) => (
-            <button className={`${isActive && navbarStyles.active} ${styles.tabNavButton}`}>
-              PRICES
-            </button>
-          )}
-        </NavLink>
-        <NavLink to="/tokenomics">
-          {({ isActive }) => (
-            <button className={`${isActive && navbarStyles.active} ${styles.tabNavButton}`}>
-              TOKENOMICS
-            </button>
-          )}
-        </NavLink>
-      </nav>
+      {!isIframe && (
+        <nav className={styles.navigation}>
+          <NavLink to="/prices">
+            {({ isActive }) => (
+              <button className={`${isActive && navbarStyles.active} ${styles.tabNavButton}`}>
+                PRICES
+              </button>
+            )}
+          </NavLink>
+          <NavLink to="/tokenomics">
+            {({ isActive }) => (
+              <button className={`${isActive && navbarStyles.active} ${styles.tabNavButton}`}>
+                TOKENOMICS
+              </button>
+            )}
+          </NavLink>
+        </nav>
+      )}
       {!isEmpty(coins) && (
         <main>
           <DisclaimerMessage />
