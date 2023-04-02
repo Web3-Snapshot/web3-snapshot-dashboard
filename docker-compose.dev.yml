@@ -15,7 +15,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
-      # target: debug
     stdin_open: true
     tty: true
     ports:
