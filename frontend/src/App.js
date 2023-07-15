@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Prices from './components/Prices';
 import Tokenomics from './components/Tokenomics';
@@ -13,6 +13,9 @@ export async function loader() {
 }
 
 function App() {
+
+
+
   const isIframe = useIsIframe();
   return (
     <>
