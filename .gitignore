@@ -3,6 +3,7 @@
 # React auto-generated files and project specific files
 build/
 
+.devcontainer
 .vscode/
 
 # dependencies
