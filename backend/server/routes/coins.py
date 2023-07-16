@@ -13,7 +13,7 @@ def get_coins():
     cur.execute("""SELECT * FROM coins""")
     items = cur.fetchall()
 
-    # Calcultate MC/FDV which is the ratio MC/FDV
+    # Calculate MC/FDV which is the ratio MC/FDV
     items = compute_extra_columns(items)
 
     processed_items = process_percentages(
