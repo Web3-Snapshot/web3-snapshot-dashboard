@@ -1,16 +1,19 @@
 start:
-	docker compose -f docker-compose.dev.yml up -d
+	docker compose -f docker-compose.$(ENVIRONMENT).yml up -d
 
 stop:
-	docker compose -f docker-compose.dev.yml down
+	docker compose -f docker-compose.$(ENVIRONMENT).yml down
 
 logs:
-	docker compose -f docker-compose.dev.yml logs -f
+	docker compose -f docker-compose.$(ENVIRONMENT).yml logs -f
+
+ps:
+	docker compose -f docker-compose.$(ENVIRONMENT).yml ps
 
 logs-db:
-	docker compose -f docker-compose.dev.yml exec db tail -f /app/cron.log
+	docker compose -f docker-compose.$(ENVIRONMENT).yml exec db tail -f /app/cron.log
 
 isession:
-	docker compose -f docker-compose.dev.yml start interactive_db \
-	&& docker compose -f docker-compose.dev.yml exec interactive_db ipython \
-	&& docker compose -f docker-compose.dev.yml stop interactive_db
+	docker compose -f docker-compose.$(ENVIRONMENT).yml start interactive_db \
+	&& docker compose -f docker-compose.$(ENVIRONMENT).yml exec interactive_db ipython \
+	&& docker compose -f docker-compose.$(ENVIRONMENT).yml stop interactive_db
