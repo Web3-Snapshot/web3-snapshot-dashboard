@@ -12,6 +12,7 @@ services:
 
   backend:
     container_name: web3_backend_dev
+    init: true
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
@@ -29,6 +30,7 @@ services:
 
   frontend:
     container_name: web3_frontend_dev
+    init: true
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
@@ -41,7 +43,7 @@ services:
     depends_on:
       - backend
     links:
-      - 'backend'
+      - backend
 
   interactive_db:
     init: true

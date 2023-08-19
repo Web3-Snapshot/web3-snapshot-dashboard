@@ -12,7 +12,10 @@ build:
 	docker compose -f docker-compose.$(ENVIRONMENT).yml build
 
 connect-frontend:
-	docker compose -f docker-compose.production.yml exec -it frontend /bin/sh
+	docker compose -f docker-compose.$(ENVIRONMENT).yml exec -it frontend /bin/sh
+
+connect-backend:
+	docker compose -f docker-compose.$(ENVIRONMENT).yml exec -it backend /bin/sh
 
 logs:
 	docker compose -f docker-compose.$(ENVIRONMENT).yml logs -f
@@ -32,11 +35,11 @@ start-cert-server:
 	docker compose -f docker-compose.certbot.yml up -d nginx80
 
 stop-cert-server:
-	docker compose -f docker-compose.certbot.yml down 
+	docker compose -f docker-compose.certbot.yml down
 
 get-certificate: start-cert-server
 	docker compose -f docker-compose.certbot.yml run --rm  certbot certonly --webroot \
-		--webroot-path /var/www/certbot/ --dry-run -d www.$(DOMAIN) -d $(DOMAIN) -v                 
+		--webroot-path /var/www/certbot/ --dry-run -d www.$(DOMAIN) -d $(DOMAIN) -v
 
 renew-cert: start-cert-server
 	docker compose -f docker-compose.certbot.yml run --rm  certbot renew --webroot --webroot-path /var/www/certbot/

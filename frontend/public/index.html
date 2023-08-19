@@ -23,17 +23,26 @@
     <div id="root"></div>
   </body>
   <script>
-  var eventList = ["load", "resize"]
-  for(event of eventList) {
-    window.addEventListener(event, function (e) {
-            setTimeout(function determineScrollHeight() {
-                const body = document.body;
-                const html = document.documentElement;
-                let message = Math.max(body.scrollHeight, body.offsetHeight,
-                html.clientHeight, html.scrollHeight, html.offsetHeight);
-                window.top.postMessage(message, "*");
-            }, 500);
-        }, false);
-      }
+    var eventList = ['load', 'resize'];
+    for (event of eventList) {
+      window.addEventListener(
+        event,
+        function (e) {
+          setTimeout(function determineScrollHeight() {
+            const body = document.body;
+            const html = document.documentElement;
+            let message = Math.max(
+              body.scrollHeight,
+              body.offsetHeight,
+              html.clientHeight,
+              html.scrollHeight,
+              html.offsetHeight
+            );
+            window.top.postMessage(message, '*');
+          }, 500);
+        },
+        false
+      );
+    }
   </script>
 </html>
