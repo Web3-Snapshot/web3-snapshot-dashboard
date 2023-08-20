@@ -1,5 +1,8 @@
 [tool.pytest.ini_options]
-filterwarnings = ["ignore:.*distutils.*:DeprecationWarning"]
+filterwarnings = [
+    "ignore:.*distutils.*:DeprecationWarning",
+    "ignore:.*werkzeug.*:DeprecationWarning"
+    ]
 
 [tool.flake8]
 exclude = ".venv"
