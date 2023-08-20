@@ -7,11 +7,16 @@
 # Commands:
 #   start - Starts the application
 #   stop - Stops the application
+#   print-vars - Prints the environment variables
 #   build - Builds the containers
-#   logs - Shows the logs of the application
-#   ps - Shows the running containers
-#   connect-service - Connects to a service
 #   tests - Runs the tests
+#   ps - Shows the running containers
+#   logs - Shows the logs of the application
+#   isession - Starts an interactive session
+#   connect-service - Connects to a service
+#   start-cert-server - Starts the certbot server on port 80
+#   get-certificate - Gets a certificate
+#   renew-certificate - Renews a certificate
 #   help - Shows the help menu
 
 #######################################
@@ -115,7 +120,7 @@ logs() {
 }
 
 tests() {
-    docker compose -f docker-compose."$ENVIRONMENT".yml exec backend pytest tests -vvv
+    start && docker compose -f docker-compose."$ENVIRONMENT".yml exec backend pytest tests -vvv
 }
 
 
@@ -158,16 +163,18 @@ _check_required_variables
 #####      Argument Parsing       #####
 #######################################
 
-# ARG_OPTIONAL_ACTION([start],[],["Start the server"],[start])
-# ARG_OPTIONAL_ACTION([stop],[],["Stop the server"],[stop])
-# ARG_OPTIONAL_ACTION([print-vars],[],["Print variables],[print_vars])
+# ARG_OPTIONAL_ACTION([start],[],[Start the server],[start])
+# ARG_OPTIONAL_ACTION([stop],[],[Stop the server],[stop])
+# ARG_OPTIONAL_ACTION([print-vars],[],[Print variables],[print_vars])
 # ARG_OPTIONAL_ACTION([build],[],[Build containers],[build])
 # ARG_OPTIONAL_ACTION([tests],[],[Run pytests],[tests])
 # ARG_OPTIONAL_ACTION([ps],[],[Print running containers],[ps])
 # ARG_OPTIONAL_ACTION([logs],[],[Tail out logs],[logs])
-# ARG_OPTIONAL_ACTION([run-migrations],[],["Print variables],[run-migrations])
-# ARG_OPTIONAL_ACTION([check-db],[],[Check of database exists],[check-db])
-# ARG_OPTIONAL_SINGLE([connect-service],[],[service to connect to])
+# ARG_OPTIONAL_ACTION([issession],[],[Start an interactive session],[isession])
+# ARG_OPTIONAL_ACTION([start-cert-server],[],[Start the certbot server on port 80],[start-cert-server])
+# ARG_OPTIONAL_ACTION([get-certificate],[],[Get a certbot certificate],[get-certificate])
+# ARG_OPTIONAL_ACTION([renew-certificate],[],[Renew certificate],[renew-certificate])
+# ARG_OPTIONAL_SINGLE([connect-service],[],[Connect to a service],[connect-service])
 #
 # ARG_HELP([The general script's help msg])
 # ARGBASH_GO()
@@ -190,7 +197,7 @@ _arg_connect_service=
 
 print_help() {
     printf '%s\n' "The general script's help msg"
-    printf 'Usage: %s [--start] [--stop] [--print-vars] [--build] [--tests] [--ps] [--logs] [--run-migrations] [--check-db] [--connect-service <arg>] [-h|--help]\n' "$0"
+    printf 'Usage: %s [--start] [--stop] [--print-vars] [--build] [--tests] [--ps] [--logs] [--isession] [--start-cert-server] [--get-certificate] [--renew-certificate] [--connect-service <service>] [-h|--help]\n' "$0"
     printf '\t%s\n' "--start: \"Start the server\""
     printf '\t%s\n' "--stop: \"Stop the server\""
     printf '\t%s\n' "--print-vars: \"Print variables"
@@ -198,6 +205,10 @@ print_help() {
     printf '\t%s\n' "--tests: Run pytests"
     printf '\t%s\n' "--ps: Print running containers"
     printf '\t%s\n' "--logs: Tail out logs"
+    printf '\t%s\n' "--isession: Start an interactive session"
+    printf '\t%s\n' "--start-cert-server: Start the certbot server on port 80"
+    printf '\t%s\n' "--get-certificate: Get a certbot certificate"
+    printf '\t%s\n' "--renew-certificate: Renew certificate"
     printf '\t%s\n' "--connect-service: service to connect to (no default)"
     printf '\t%s\n' "-h, --help: Prints help"
 }
@@ -238,6 +249,9 @@ parse_commandline() {
             isession
             exit 0
             ;;
+        --connect-service=*)
+            _arg_connect_service="${_key##--connect-service=}"
+            ;;
         --start-cert-server)
             start-cert-server
             exit 0
@@ -249,9 +263,6 @@ parse_commandline() {
         --renew-certificate)
             renew-certificate
             exit 0
-            ;;
-        --connect-service=*)
-            _arg_connect_service="${_key##--connect-service=}"
             ;;
         -h | --help)
             print_help
