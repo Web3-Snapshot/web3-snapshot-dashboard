@@ -17,3 +17,4 @@ else:
 
 cur = conn.cursor()
 print("\nCursor (cur) ready.")
+print("Try running `cur.execute('SELECT * FROM coins').fetchall()`")
