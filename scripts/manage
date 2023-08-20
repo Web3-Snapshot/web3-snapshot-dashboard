@@ -1,0 +1,272 @@
+#!/bin/bash
+
+# This shell script is used to manage the application via simple commands
+# targeting the underlying docker setup. It contains various functions to start,
+# stop, and restart the application.
+#
+# Commands:
+#   start - Starts the application
+#   stop - Stops the application
+#   build - Builds the containers
+#   logs - Shows the logs of the application
+#   ps - Shows the running containers
+#   connect-service - Connects to a service
+#   tests - Runs the tests
+#   help - Shows the help menu
+
+#######################################
+#####      Global variables       #####
+#######################################
+
+valid_environments=("production" "testing" "development")
+required_variables=("ENVIRONMENT")
+
+#######################################
+#####      Internal functions     #####
+#######################################
+
+# Define a function to convert a relative path to an absolute path
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
+# This function validates the environment before executing any command.
+_validate_environment() {
+    valid=false
+
+    for i in "${valid_environments[@]}"; do
+        if [[ "$i" == "$ENVIRONMENT" ]]; then
+            valid=true
+            break
+        fi
+    done
+
+    if [ "$valid" = false ]; then
+        echo "Variable ENVIRONMENT must be either production, testing, cypress or development."
+        exit 1
+    fi
+}
+
+_load_env_file() {
+    # Check if the file exists
+    if [ -f "$ENV_FILE" ]; then
+        echo "Found an environment file: $ENV_FILE"
+        # Loop through all the lines in the .env file and export them as environment variables if they are not already set.
+        while read -r line || [[ -n "$line" ]]; do
+            if [[ ! "$line" =~ ^# && ! "$line" =~ ^\s*$ ]]; then
+                var_name=$(echo "$line" | cut -d= -f1)
+                if [[ -z "${!var_name}" ]]; then
+                    echo "Variable ${var_name} has not yet been set. Exporting ${line}"
+                    export "${line?}"
+                else
+                    echo "${var_name} is already set to ${!var_name} from the environment. Skipping..."
+                fi
+            fi
+        done <"$ENV_FILE"
+    fi
+    echo
+}
+
+# This function checks if the required variables are set. The variable names are passed in from the required_vars array.
+_check_required_variables() {
+    for var in "${required_variables[@]}"; do
+        if [ -z "${var}" ]; then
+            echo "Error: Required variable $var is not set."
+            exit 1
+        fi
+    done
+}
+
+######################################
+#####      Exposed functions     #####
+######################################
+start() {
+    echo "Starting containers in $ENVIRONMENT mode"
+    docker compose -f docker-compose."$ENVIRONMENT".yml run backend test -f /app/instance/db.sqlite && echo "DB found." &&
+        FLASK_SETTINGS="config/$ENVIRONMENT.py" \
+            docker compose -f docker-compose."$ENVIRONMENT".yml up -d backend ||
+        echo "Database not found. Run migrations first."
+}
+
+stop() {
+    docker compose -f docker-compose."$ENVIRONMENT".yml down
+}
+
+build() {
+    docker compose -f docker-compose."$ENVIRONMENT".yml build
+}
+
+connect-service() {
+    start && docker compose -f docker-compose."$ENVIRONMENT".yml exec -it "$_service" /bin/sh
+}
+
+ps() {
+    docker compose -f docker-compose."$ENVIRONMENT".yml ps
+}
+
+print_vars() {
+    for i in "${required_variables[@]}"; do
+        echo "$i: ${!i}"
+    done
+}
+
+logs() {
+    docker compose -f docker-compose."$ENVIRONMENT".yml logs -f
+}
+
+tests() {
+    docker compose -f docker-compose."$ENVIRONMENT".yml exec backend pytest tests -vvv
+}
+
+
+isession() {
+    docker compose -f docker-compose."$ENVIRONMENT".yml run isession
+}
+
+start-cert-server() {
+    docker compose -f docker-compose.certbot.yml down && \
+	docker compose -f docker-compose.certbot.yml up -d nginx80
+}
+
+stop-cert-server() {
+	docker compose -f docker-compose.certbot.yml down
+}
+
+get-certificate() {
+	docker compose -f docker-compose.certbot.yml run --rm  certbot certonly --webroot \
+		--webroot-path /var/www/certbot/ --dry-run -d www.$(DOMAIN) -d $(DOMAIN) -v
+}
+
+renew-certificate() {
+	docker compose -f docker-compose.certbot.yml run --rm  certbot renew --webroot --webroot-path /var/www/certbot/
+}
+
+
+## Check for environment variables
+
+# Convert the relative path to an absolute path
+ENV_FILE=$(realpath ".env.$ENVIRONMENT")
+# Call the function to load the environment file
+_load_env_file
+
+# Make sure that the environment maches on of the valid environments
+_validate_environment
+
+_check_required_variables
+
+#######################################
+#####      Argument Parsing       #####
+#######################################
+
+# ARG_OPTIONAL_ACTION([start],[],["Start the server"],[start])
+# ARG_OPTIONAL_ACTION([stop],[],["Stop the server"],[stop])
+# ARG_OPTIONAL_ACTION([print-vars],[],["Print variables],[print_vars])
+# ARG_OPTIONAL_ACTION([build],[],[Build containers],[build])
+# ARG_OPTIONAL_ACTION([tests],[],[Run pytests],[tests])
+# ARG_OPTIONAL_ACTION([ps],[],[Print running containers],[ps])
+# ARG_OPTIONAL_ACTION([logs],[],[Tail out logs],[logs])
+# ARG_OPTIONAL_ACTION([run-migrations],[],["Print variables],[run-migrations])
+# ARG_OPTIONAL_ACTION([check-db],[],[Check of database exists],[check-db])
+# ARG_OPTIONAL_SINGLE([connect-service],[],[service to connect to])
+#
+# ARG_HELP([The general script's help msg])
+# ARGBASH_GO()
+
+die() {
+    local _ret="${2:-1}"
+    test "${_PRINT_HELP:-no}" = yes && print_help >&2
+    echo "$1" >&2
+    exit "${_ret}"
+}
+
+begins_with_short_option() {
+    local first_option all_short_options='h'
+    first_option="${1:0:1}"
+    test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0
+}
+
+# THE DEFAULTS INITIALIZATION - OPTIONALS
+_arg_connect_service=
+
+print_help() {
+    printf '%s\n' "The general script's help msg"
+    printf 'Usage: %s [--start] [--stop] [--print-vars] [--build] [--tests] [--ps] [--logs] [--run-migrations] [--check-db] [--connect-service <arg>] [-h|--help]\n' "$0"
+    printf '\t%s\n' "--start: \"Start the server\""
+    printf '\t%s\n' "--stop: \"Stop the server\""
+    printf '\t%s\n' "--print-vars: \"Print variables"
+    printf '\t%s\n' "--build: Build containers"
+    printf '\t%s\n' "--tests: Run pytests"
+    printf '\t%s\n' "--ps: Print running containers"
+    printf '\t%s\n' "--logs: Tail out logs"
+    printf '\t%s\n' "--connect-service: service to connect to (no default)"
+    printf '\t%s\n' "-h, --help: Prints help"
+}
+
+parse_commandline() {
+    while test $# -gt 0; do
+        _key="$1"
+        case "$_key" in
+        --start)
+            start
+            exit 0
+            ;;
+        --stop)
+            stop
+            exit 0
+            ;;
+        --print-vars)
+            print_vars
+            exit 0
+            ;;
+        --build)
+            build
+            exit 0
+            ;;
+        --tests)
+            tests
+            exit 0
+            ;;
+        --ps)
+            ps
+            exit 0
+            ;;
+        --logs)
+            logs
+            exit 0
+            ;;
+        --isession)
+            isession
+            exit 0
+            ;;
+        --start-cert-server)
+            start-cert-server
+            exit 0
+            ;;
+        --get-certificate)
+            get-certificate
+            exit 0
+            ;;
+        --renew-certificate)
+            renew-certificate
+            exit 0
+            ;;
+        --connect-service=*)
+            _arg_connect_service="${_key##--connect-service=}"
+            ;;
+        -h | --help)
+            print_help
+            exit 0
+            ;;
+        -h*)
+            print_help
+            exit 0
+            ;;
+        *)
+            _PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$1'" 1
+            ;;
+        esac
+        shift
+    done
+}
+
+parse_commandline "$@"
