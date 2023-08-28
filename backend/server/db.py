@@ -1,8 +1,8 @@
 import sqlite3
 from pathlib import Path
 
-from config.development import ROOT_PATH
 from flask import current_app, g
+from server.config.development import ROOT_PATH
 
 
 def dict_factory(cursor, row):

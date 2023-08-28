@@ -3,12 +3,15 @@ version: '3.7'
 services:
   db:
     container_name: web3_database_dev
+    init: true
     build:
       context: ./database
     volumes:
       - ${PWD}/database/main.py:/app/main.py
       - database:/app/instance
       - ${PWD}/backend/db/schema.sql:/app/db/schema.sql
+    networks:
+      - w3s-network
 
   backend:
     container_name: web3_backend_dev
@@ -16,8 +19,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
-    stdin_open: true
-    tty: true
     ports:
       - 5000:5000
       - 5678:5678
@@ -25,8 +26,13 @@ services:
       - ${PWD}/backend:/app
       - database:/app/instance
     restart: always
+    command: flask --app "server:create_app(config_env='server.config.development')" run --no-debugger --no-reload --host=0.0.0.0 --port=5000
+    environment:
+      - DEBUG=${DEBUG:-"off"}
     depends_on:
       - db
+    networks:
+      - w3s-network
 
   frontend:
     container_name: web3_frontend_dev
@@ -42,31 +48,34 @@ services:
     restart: always
     depends_on:
       - backend
-    links:
-      - backend
+    networks:
+      - w3s-network
 
-  interactive_db:
-    init: true
-    container_name: web3_interactive_db_dev
+  isession:
+    container_name: web3_isession
     stdin_open: true
     tty: true
+    command: ipython
     build:
       context: .
-      dockerfile: ./interactive_db/Dockerfile
+      dockerfile: ./isession/Dockerfile
     volumes:
       - ${PWD}/backend/server:/app/server
       - ${PWD}/backend/util:/app/util
       - ${PWD}/database/schema.sql:/app/schema.sql
       - ${PWD}/database:/app/database
-      - ${PWD}/interactive_db/.ipython:/app/.ipython
+      - ${PWD}/isession/.ipython:/app/.ipython
       - /app/.ipython/profile_default/pid
       - /app/.ipython/profile_default/security
       - database:/app/instance
     environment:
       - IPYTHONDIR=/app/.ipython
-    depends_on:
-      - backend
-      - db
+    networks:
+      - w3s-network
 
 volumes:
   database:
+
+
+networks:
+  w3s-network:

@@ -30,7 +30,7 @@ SCHEMA = """
 
 @pytest.fixture(scope="module")
 def app():
-    app = create_app(config_location="config.testing")
+    app = create_app(config_env="server.config.testing")
     yield app
 
 
