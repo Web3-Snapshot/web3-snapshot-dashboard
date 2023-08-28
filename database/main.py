@@ -148,16 +148,29 @@ def main():
                 ]
             )
 
+            # Retrieve the coins that are already stored in the database
             cur = conn.cursor()
             cur.execute("""SELECT id FROM coins""")
 
             stored_coins = [c[0] for c in cur.fetchall()]
+
+            # Compile a list of coins which were recently fetched
             new_coins = [c["id"] for c in coins]
 
+            # Filter out the coins which are not yet stored in the database
             next_batch_coins = [
                 c for c in coins if c["id"] in list(set(new_coins) - set(stored_coins))
             ][:5]
 
+            # filter out the coins whose market cap rank is higher than 100 or
+            # where it is missing altogether
+            next_batch_coins = [
+                c
+                for c in next_batch_coins
+                if c["market_cap_rank"] is not None and c["market_cap_rank"] <= 100
+            ]
+
+            # If there are new coins which we don't have in the database, update these
             if len(next_batch_coins) > 0:
 
                 print("Fetching next batch", [c["name"] for c in next_batch_coins])
