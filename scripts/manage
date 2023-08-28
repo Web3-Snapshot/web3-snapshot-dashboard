@@ -86,10 +86,9 @@ _check_required_variables() {
 #####      Exposed functions     #####
 ######################################
 start() {
-    echo "Starting containers in $ENVIRONMENT mode"
+    echo "Starting containers using environment $ENVIRONMENT"
     docker compose -f docker-compose."$ENVIRONMENT".yml run backend test -f /app/instance/db.sqlite && echo "DB found." &&
-        FLASK_SETTINGS="config/$ENVIRONMENT.py" \
-            docker compose -f docker-compose."$ENVIRONMENT".yml up -d backend ||
+            DEBUG=$_arg_debug docker compose -f docker-compose."$ENVIRONMENT".yml up -d frontend backend db ||
         echo "Database not found. Run migrations first."
 }
 
@@ -98,7 +97,7 @@ stop() {
 }
 
 build() {
-    docker compose -f docker-compose."$ENVIRONMENT".yml build
+    docker compose -f docker-compose."$ENVIRONMENT".yml build --no-cache
 }
 
 connect-service() {
@@ -146,6 +145,17 @@ renew-certificate() {
 	docker compose -f docker-compose.certbot.yml run --rm  certbot renew --webroot --webroot-path /var/www/certbot/
 }
 
+install_backend() {
+    if [[ -z "$_arg_install_backend" ]]; then
+        echo "Error: No package to install."
+        exit 1
+    fi
+
+    rm -rf backend/Pipfile.lock
+    start && docker compose -f docker-compose."$ENVIRONMENT".yml exec backend \
+        pip install "$_arg_install_backend"
+}
+
 
 ## Check for environment variables
 
@@ -167,6 +177,7 @@ _check_required_variables
 # ARG_OPTIONAL_ACTION([stop],[],[Stop the server],[stop])
 # ARG_OPTIONAL_ACTION([print-vars],[],[Print variables],[print_vars])
 # ARG_OPTIONAL_ACTION([build],[],[Build containers],[build])
+# ARG_OPTIONAL_BOOLEAN([debug],[],[Start up the debugging server and attach],[off])
 # ARG_OPTIONAL_ACTION([tests],[],[Run pytests],[tests])
 # ARG_OPTIONAL_ACTION([ps],[],[Print running containers],[ps])
 # ARG_OPTIONAL_ACTION([logs],[],[Tail out logs],[logs])
@@ -175,6 +186,7 @@ _check_required_variables
 # ARG_OPTIONAL_ACTION([get-certificate],[],[Get a certbot certificate],[get-certificate])
 # ARG_OPTIONAL_ACTION([renew-certificate],[],[Renew certificate],[renew-certificate])
 # ARG_OPTIONAL_SINGLE([connect-service],[],[Connect to a service],[connect-service])
+# ARG_OPTIONAL_SINGLE([install-backend],[],[Install backend package])
 #
 # ARG_HELP([The general script's help msg])
 # ARGBASH_GO()
@@ -194,6 +206,7 @@ begins_with_short_option() {
 
 # THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_connect_service=
+_arg_debug="off"
 
 print_help() {
     printf '%s\n' "The general script's help msg"
@@ -202,6 +215,7 @@ print_help() {
     printf '\t%s\n' "--stop: \"Stop the server\""
     printf '\t%s\n' "--print-vars: \"Print variables"
     printf '\t%s\n' "--build: Build containers"
+    printf '\t%s\n' "--debug, --no-debug: Start up the debugging server and attach (off by default)"
     printf '\t%s\n' "--tests: Run pytests"
     printf '\t%s\n' "--ps: Print running containers"
     printf '\t%s\n' "--logs: Tail out logs"
@@ -210,6 +224,7 @@ print_help() {
     printf '\t%s\n' "--get-certificate: Get a certbot certificate"
     printf '\t%s\n' "--renew-certificate: Renew certificate"
     printf '\t%s\n' "--connect-service: service to connect to (no default)"
+    printf '\t%s\n' "--install-backend: Install backend package (no default)"
     printf '\t%s\n' "-h, --help: Prints help"
 }
 
@@ -218,8 +233,7 @@ parse_commandline() {
         _key="$1"
         case "$_key" in
         --start)
-            start
-            exit 0
+            command=start
             ;;
         --stop)
             stop
@@ -232,6 +246,10 @@ parse_commandline() {
         --build)
             build
             exit 0
+            ;;
+        --no-debug|--debug)
+            _arg_debug="on"
+            test "${1:0:5}" = "--no-" && _arg_debug="off"
             ;;
         --tests)
             tests
@@ -249,6 +267,13 @@ parse_commandline() {
             isession
             exit 0
             ;;
+        --connect-service)
+            test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+            _service="$2"
+            echo "Starting up $_service"
+            connect-service _service
+            shift
+            ;;
         --connect-service=*)
             _arg_connect_service="${_key##--connect-service=}"
             ;;
@@ -263,6 +288,15 @@ parse_commandline() {
         --renew-certificate)
             renew-certificate
             exit 0
+            ;;
+        --install-backend)
+            test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+            _arg_install_backend="$2"
+            install_backend "$_arg_install_backend"
+            shift
+            ;;
+        --install-backend=*)
+            _arg_install_backend="${_key##--install-backend=}"
             ;;
         -h | --help)
             print_help
@@ -281,3 +315,20 @@ parse_commandline() {
 }
 
 parse_commandline "$@"
+
+# Commands that depend on the setting of another flag
+if [ "$command" = "build" ]; then
+    if [ -z "$_arg_build" ]; then
+        echo "Error: Target container environment is not set."
+        exit 1
+    fi
+
+    build
+    exit 0
+elif [ "$command" = "start" ]; then
+    if [ "$_arg_debug" = "on" ]; then
+        echo "Starting in debug mode"
+    fi
+    start
+    exit 0
+fi
