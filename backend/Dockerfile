@@ -1,4 +1,4 @@
-FROM python:3.10-alpine as base
+FROM python:3.11-alpine as base
 
 EXPOSE 5000
 
@@ -7,8 +7,6 @@ WORKDIR /app
 COPY ./requirements.txt /app/requirements.txt
 
 RUN pip install --upgrade pip && pip install -r /app/requirements.txt
-
-ENV FLASK_APP=server
 
 COPY . .
 

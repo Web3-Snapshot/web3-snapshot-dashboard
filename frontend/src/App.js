@@ -4,17 +4,13 @@ import Prices from './components/Prices';
 import Tokenomics from './components/Tokenomics';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
-import { fetchCoins } from './pages/Dashboard';
-
-export async function loader() {
-  const coins = await fetchCoins();
-  return { coins };
-}
+import { useIsIframe } from './custom-hooks/useIsIframe';
 
 function App() {
+  const isIframe = useIsIframe();
   return (
     <>
-      <Navbar />
+      {!isIframe && <Navbar />}
       <Routes>
         <Route path="/" element={<Dashboard />}>
           <Route index element={<Navigate to="prices" />} />

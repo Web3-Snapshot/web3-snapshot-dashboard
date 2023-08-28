@@ -2,10 +2,10 @@ from flask import Blueprint, current_app, g
 from server.db import get_db
 from util.helpers import compute_extra_columns, process_percentages
 
-bp = Blueprint("coins", __name__, url_prefix="/coins")
+bp = Blueprint("coins", __name__)
 
 
-@bp.route("", methods=["GET"])
+@bp.route("/coins", methods=["GET"])
 def get_coins():
     conn = get_db(current_app)
     cur = conn.cursor()
@@ -13,7 +13,10 @@ def get_coins():
     cur.execute("""SELECT * FROM coins""")
     items = cur.fetchall()
 
-    # Calcultate MC/FDV which is the ratio MC/FDV
+    if items is None:
+        return {"error": "No coins found"}, 404
+
+    # Calculate MC/FDV which is the ratio MC/FDV
     items = compute_extra_columns(items)
 
     processed_items = process_percentages(

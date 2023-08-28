@@ -8,14 +8,9 @@ import navbarStyles from '../components/Navbar.module.scss';
 import DisclaimerMessage from '../components/DisclaimerMessage';
 import { useIsIframe } from '../custom-hooks/useIsIframe';
 
-export async function fetchCoins() {
-  return axios({
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    url: '/api/coins',
-  })
+async function fetchCoins() {
+  return axios
+    .get('/api/coins')
     .then((res) => {
       console.log(res.data);
       return res.data;
