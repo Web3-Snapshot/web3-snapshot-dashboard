@@ -42,11 +42,9 @@ def create_app(config_env="server.config.development"):
     print(app.config)
 
     from .db import close_connection
-
     app.teardown_appcontext(close_connection)
 
     from server.routes import coins
-
     app.register_blueprint(coins.bp)
 
     return app
