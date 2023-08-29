@@ -8,6 +8,7 @@ services:
       context: ./database
     volumes:
       - ${PWD}/database/main.py:/app/main.py
+      - ${PWD}/database/init_db.py:/app/init_db.py
       - database:/app/instance
       - ${PWD}/backend/db/schema.sql:/app/db/schema.sql
     networks:

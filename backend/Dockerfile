@@ -10,4 +10,4 @@ RUN pip install --upgrade pip && pip install -r /app/requirements.txt
 
 COPY . .
 
-CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:5000", "server:create_app('config.production')"]
+CMD ["gunicorn", "--workers", "4", "--bind", "0.0.0.0:5000", "server:create_app('server.config.production')"]

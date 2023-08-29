@@ -93,7 +93,7 @@ start() {
 }
 
 stop() {
-    docker compose -f docker-compose."$ENVIRONMENT".yml down
+    docker compose -f docker-compose."$ENVIRONMENT".yml down --remove-orphans
 }
 
 build() {
