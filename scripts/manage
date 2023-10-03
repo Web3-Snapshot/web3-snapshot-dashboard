@@ -85,11 +85,20 @@ _check_required_variables() {
 ######################################
 #####      Exposed functions     #####
 ######################################
+check_db() {
+	docker compose -f docker-compose."$ENVIRONMENT".yml run backend /bin/sh -c "test -f /app/instance/${ENVIRONMENT}.db && (exit 0) || (exit 1)"
+	exit_code=$?
+
+	if [[ "$exit_code" = 0 ]]; then
+		echo "Database found"
+	else
+		echo "Database not found. Run migrations first" && exit 1
+	fi
+}
+
 start() {
-    echo "Starting containers using environment $ENVIRONMENT"
-    docker compose -f docker-compose."$ENVIRONMENT".yml run backend test -f /app/instance/db.sqlite && echo "DB found." &&
-            DEBUG=$_arg_debug docker compose -f docker-compose."$ENVIRONMENT".yml up -d frontend backend db ||
-        echo "Database not found. Run migrations first."
+    echo "Starting containers in $ENVIRONMENT environment"
+    check_db && DEBUG=$_arg_debug docker compose -f docker-compose."$ENVIRONMENT".yml up -d frontend backend db
 }
 
 stop() {
@@ -100,8 +109,8 @@ build() {
     docker compose -f docker-compose."$ENVIRONMENT".yml build --no-cache
 }
 
-connect-service() {
-    start && docker compose -f docker-compose."$ENVIRONMENT".yml exec -it "$_service" /bin/sh
+connect_service() {
+	ENVIROMENT=${ENVIRONMENT} docker compose -f docker-compose."$ENVIRONMENT".yml run -it "$_arg_connect_service" /bin/sh
 }
 
 ps() {
@@ -124,10 +133,14 @@ tests() {
 
 
 isession() {
-    docker compose -f docker-compose."$ENVIRONMENT".yml run isession
+    docker compose -f docker-compose."$ENVIRONMENT".yml run --rm isession
 }
 
-start-cert-server() {
+init_db() {
+    docker compose -f docker-compose."$ENVIRONMENT".yml run db /bin/sh -c "python /app/init_db.py"
+}
+
+start_cert_server() {
     docker compose -f docker-compose.certbot.yml down && \
 	docker compose -f docker-compose.certbot.yml up -d nginx80
 }
@@ -136,12 +149,12 @@ stop-cert-server() {
 	docker compose -f docker-compose.certbot.yml down
 }
 
-get-certificate() {
+get_certificate() {
 	docker compose -f docker-compose.certbot.yml run --rm  certbot certonly --webroot \
 		--webroot-path /var/www/certbot/ --dry-run -d www.$(DOMAIN) -d $(DOMAIN) -v
 }
 
-renew-certificate() {
+renew_certificate() {
 	docker compose -f docker-compose.certbot.yml run --rm  certbot renew --webroot --webroot-path /var/www/certbot/
 }
 
@@ -208,25 +221,28 @@ begins_with_short_option() {
 _arg_connect_service=
 _arg_debug="off"
 
-print_help() {
-    printf '%s\n' "The general script's help msg"
-    printf 'Usage: %s [--start] [--stop] [--print-vars] [--build] [--tests] [--ps] [--logs] [--isession] [--start-cert-server] [--get-certificate] [--renew-certificate] [--connect-service <service>] [-h|--help]\n' "$0"
-    printf '\t%s\n' "--start: \"Start the server\""
-    printf '\t%s\n' "--stop: \"Stop the server\""
-    printf '\t%s\n' "--print-vars: \"Print variables"
-    printf '\t%s\n' "--build: Build containers"
-    printf '\t%s\n' "--debug, --no-debug: Start up the debugging server and attach (off by default)"
-    printf '\t%s\n' "--tests: Run pytests"
-    printf '\t%s\n' "--ps: Print running containers"
-    printf '\t%s\n' "--logs: Tail out logs"
-    printf '\t%s\n' "--isession: Start an interactive session"
-    printf '\t%s\n' "--start-cert-server: Start the certbot server on port 80"
-    printf '\t%s\n' "--get-certificate: Get a certbot certificate"
-    printf '\t%s\n' "--renew-certificate: Renew certificate"
-    printf '\t%s\n' "--connect-service: service to connect to (no default)"
-    printf '\t%s\n' "--install-backend: Install backend package (no default)"
-    printf '\t%s\n' "-h, --help: Prints help"
+print_help()
+{
+	printf '%s\n' "The general script's help msg"
+	printf 'Usage: %s [--start] [--stop] [--print-vars] [--build] [--(no-)debug] [--tests] [--ps] [--logs] [--isession] [--init-db] [--start-cert-server] [--get-certificate] [--renew-certificate] [--connect-service <arg>] [--install-backend <arg>] [-h|--help]\n' "$0"
+	printf '\t%s\n' "--start: Start the server"
+	printf '\t%s\n' "--stop: Stop the server"
+	printf '\t%s\n' "--print-vars: Print variables"
+	printf '\t%s\n' "--build: Build containers"
+	printf '\t%s\n' "--debug, --no-debug: Start up the debugging server and attach (off by default)"
+	printf '\t%s\n' "--tests: Run pytests"
+	printf '\t%s\n' "--ps: Print running containers"
+	printf '\t%s\n' "--logs: Tail out logs"
+	printf '\t%s\n' "--isession: Start an interactive session"
+	printf '\t%s\n' "--init-db: Initialize the database"
+	printf '\t%s\n' "--start-cert-server: Start the certbot server on port 80"
+	printf '\t%s\n' "--get-certificate: Get a certbot certificate"
+	printf '\t%s\n' "--renew-certificate: Renew certificate"
+	printf '\t%s\n' "--connect-service: Connect to a service (default: 'connect-service')"
+	printf '\t%s\n' "--install-backend: Install backend package (no default)"
+	printf '\t%s\n' "-h, --help: Prints help"
 }
+
 
 parse_commandline() {
     while test $# -gt 0; do
@@ -269,24 +285,28 @@ parse_commandline() {
             ;;
         --connect-service)
             test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-            _service="$2"
-            echo "Starting up $_service"
-            connect-service _service
+            _arg_connect_service="$2"
+            echo "Starting up $_arg_connect_service"
+            connect_service _service
             shift
             ;;
         --connect-service=*)
             _arg_connect_service="${_key##--connect-service=}"
             ;;
+        --init-db)
+				init_db
+				exit 0
+				;;
         --start-cert-server)
-            start-cert-server
+            start_cert_server
             exit 0
             ;;
         --get-certificate)
-            get-certificate
+            get_certificate
             exit 0
             ;;
         --renew-certificate)
-            renew-certificate
+            renew_certificate
             exit 0
             ;;
         --install-backend)
