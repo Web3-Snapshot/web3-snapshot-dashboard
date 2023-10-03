@@ -1,9 +1,67 @@
 import sqlite3
 from datetime import datetime
 from functools import reduce
+from os import environ
 from pathlib import Path
 
 import requests
+
+COINS = 100
+URL1 = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page={COINS}&page=1&sparkline=false&price_change_percentage=1h%2C%2024h%2C%207d%2C%2030d%2C%20200d%2C%201y%2C%203y"
+URL2 = f"https://api.coingecko.com/api/v3/coins"
+
+DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
+SCHEMA_PATH = "./schema.sql"
+BASE_URL = "https://api.coingecko.com/api/v3/coins/markets"
+
+INSERT_FIELDS = [
+    "id",
+    "symbol",
+    "name",
+    "image",
+    "current_price",
+    "market_cap",
+    "market_cap_rank",
+    "fully_diluted_valuation",
+    "total_volume",
+    "high_24h",
+    "low_24h",
+    "price_change_24h",
+    "price_change_percentage_24h",
+    "market_cap_change_24h",
+    "market_cap_change_percentage_24h",
+    "circulating_supply",
+    "total_supply",
+    "max_supply",
+    "ath",
+    "ath_change_percentage",
+    "ath_date",
+    "atl",
+    "atl_change_percentage",
+    "atl_date",
+    # "roi",
+    "last_updated",
+    "price_change_percentage_1h_in_currency",
+    "price_change_percentage_24h_in_currency",
+    "price_change_percentage_7d_in_currency",
+    "price_change_percentage_14d_in_currency",
+    "price_change_percentage_30d_in_currency",
+    "price_change_percentage_200d_in_currency",
+    "price_change_percentage_1y_in_currency",
+]
+
+
+def get_coins(pages=100):
+    payload = {
+        "price_change_percentage": "1h,24h,7d,14d,30d,200d,1y",
+        "locale": "en",
+        "per_page": pages,
+        "page": 1,
+        "sparkline": False,
+        "vs_currency": "usd",
+        "order": "market_cap_desc",
+    }
+    return requests.get(BASE_URL, params=payload)
 
 
 def deep_get(dictionary, keys, default=None):
@@ -16,14 +74,6 @@ def deep_get(dictionary, keys, default=None):
 
 def transformListToCleanString(list_item):
     return ", ".join([item for item in list_item if item])
-
-
-COINS = 100
-URL1 = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page={COINS}&page=1&sparkline=false&price_change_percentage=1h%2C%2024h%2C%207d%2C%2030d%2C%20200d%2C%201y%2C%203y"
-URL2 = f"https://api.coingecko.com/api/v3/coins"
-
-DB_PATH = "./instance/db.sqlite"
-SCHEMA_PATH = "./schema.sql"
 
 
 def setup_database(db_path):
@@ -56,40 +106,11 @@ def create_connection(db_path):
     return conn
 
 
-INSERT_SQL = """
-    INSERT INTO coins (
-        id,
-        name,
-        image_thumb,
-        symbol,
-        homepage,
-        blockchain_site,
-        categories,
-        market_cap_rank,
-        market_cap_usd,
-        fully_diluted_valuation_usd,
-        circulating_supply,
-        total_supply,
-        max_supply,
-        current_price,
-        total_value_locked,
-        price_change_percentage_24h,
-        price_change_percentage_7d,
-        price_change_percentage_30d,
-        price_change_percentage_1y,
-        ath_change_percentage,
-        total_volume,
-        description,
-        genesis_date,
-        hashing_algorithm,
-        coingecko_score,
-        developer_score,
-        community_score,
-        liquidity_score,
-        public_interest_score,
-        timestamp
+UPSERT_SQL = f"""
+    INSERT OR REPLACE INTO coins (
+        {", ".join(INSERT_FIELDS)}
         )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES ({", ".join(["?" for _ in INSERT_FIELDS])})
     """
 
 UPDATE_SQL = """
@@ -107,10 +128,10 @@ UPDATE_SQL = """
         max_supply=?,
         current_price=?,
         total_value_locked=?,
-        price_change_percentage_24h=?,
-        price_change_percentage_7d=?,
-        price_change_percentage_30d=?,
-        price_change_percentage_1y=?,
+        price_change_percentage_24h_in_currency=?,
+        price_change_percentage_7d_in_currency=?,
+        price_change_percentage_30d_in_currency=?,
+        price_change_percentage_1y_in_currency=?,
         ath_change_percentage=?,
         total_volume=?,
         description=?,
@@ -128,15 +149,16 @@ UPDATE_SQL = """
 
 
 def main():
-
     if not Path(DB_PATH).exists():
         setup_database(DB_PATH)
 
     conn = create_connection(DB_PATH)
 
     with conn:
+        cur = conn.cursor()
         try:
-            response = requests.get(URL1)
+            print("##############################################")
+            response = get_coins(100)  # Get the top 100 coins
             coins = response.json()
             print(
                 [
@@ -148,143 +170,10 @@ def main():
                 ]
             )
 
-            # Retrieve the coins that are already stored in the database
-            cur = conn.cursor()
-            cur.execute("""SELECT id FROM coins""")
+            for coin in coins:
+                cur.execute(UPSERT_SQL, [coin[prop] for prop in INSERT_FIELDS])
 
-            stored_coins = [c[0] for c in cur.fetchall()]
-
-            # Compile a list of coins which were recently fetched
-            new_coins = [c["id"] for c in coins]
-
-            # Filter out the coins which are not yet stored in the database
-            next_batch_coins = [
-                c for c in coins if c["id"] in list(set(new_coins) - set(stored_coins))
-            ][:5]
-
-            # filter out the coins whose market cap rank is higher than 100 or
-            # where it is missing altogether
-            next_batch_coins = [
-                c
-                for c in next_batch_coins
-                if c["market_cap_rank"] and c["market_cap_rank"] <= 100
-            ]
-
-            # If there are new coins which we don't have in the database, update these
-            if len(next_batch_coins) > 0:
-
-                print("Fetching next batch", [c["name"] for c in next_batch_coins])
-
-                for coin in next_batch_coins:
-                    coin_item = requests.get(f"{URL2}/{coin['id']}").json()
-
-                    cur.execute(
-                        INSERT_SQL,
-                        [
-                            coin_item["id"],
-                            coin_item["name"],
-                            coin_item["image"]["large"],
-                            coin_item["symbol"],
-                            transformListToCleanString(coin_item["links"]["homepage"]),
-                            transformListToCleanString(
-                                coin_item["links"]["blockchain_site"]
-                            ),
-                            transformListToCleanString(coin_item["categories"]),
-                            coin_item["market_cap_rank"],
-                            coin_item["market_data"]["market_cap"]["usd"],
-                            coin_item["market_data"]["fully_diluted_valuation"].get(
-                                "usd"
-                            ),
-                            coin_item["market_data"]["circulating_supply"],
-                            coin_item["market_data"]["total_supply"],
-                            coin_item["market_data"]["max_supply"],
-                            coin_item["market_data"]["current_price"]["usd"],
-                            deep_get(
-                                coin_item["market_data"], "total_value_locked.usd"
-                            ),
-                            coin_item["market_data"]["price_change_percentage_24h"],
-                            coin_item["market_data"]["price_change_percentage_7d"],
-                            coin_item["market_data"]["price_change_percentage_30d"],
-                            coin_item["market_data"]["price_change_percentage_1y"],
-                            coin_item["market_data"]["ath_change_percentage"]["usd"],
-                            coin_item["market_data"]["total_volume"]["usd"],
-                            coin_item["description"]["en"],
-                            coin_item["genesis_date"],
-                            coin_item["hashing_algorithm"],
-                            coin_item["coingecko_score"],
-                            coin_item["developer_score"],
-                            coin_item["community_score"],
-                            coin_item["liquidity_score"],
-                            coin_item["public_interest_score"],
-                            datetime.timestamp(datetime.now()),
-                        ],
-                    )
-
-                conn.commit()
-            else:
-
-                cur.execute(
-                    """
-                    SELECT
-                        id, timestamp, market_cap_rank
-                    FROM
-                        coins
-                    ORDER BY
-                        timestamp ASC, market_cap_rank ASC
-                    LIMIT 5
-                    """
-                )
-
-                update_batch_coins = [d[0] for d in [c for c in cur.fetchall()]]
-
-                print(
-                    "Updating next batch",
-                    update_batch_coins,
-                )
-
-                for coin in update_batch_coins:
-                    coin_item = requests.get(f"{URL2}/{coin}").json()
-
-                    cur.execute(
-                        UPDATE_SQL,
-                        [
-                            transformListToCleanString(coin_item["links"]["homepage"]),
-                            transformListToCleanString(
-                                coin_item["links"]["blockchain_site"]
-                            ),
-                            transformListToCleanString(coin_item["categories"]),
-                            coin_item["market_cap_rank"],
-                            coin_item["market_data"]["market_cap"]["usd"],
-                            coin_item["market_data"]["fully_diluted_valuation"].get(
-                                "usd"
-                            ),
-                            coin_item["market_data"]["circulating_supply"],
-                            coin_item["market_data"]["total_supply"],
-                            coin_item["market_data"]["max_supply"],
-                            coin_item["market_data"]["current_price"]["usd"],
-                            deep_get(
-                                coin_item["market_data"], "total_value_locked.usd"
-                            ),
-                            coin_item["market_data"]["price_change_percentage_24h"],
-                            coin_item["market_data"]["price_change_percentage_7d"],
-                            coin_item["market_data"]["price_change_percentage_30d"],
-                            coin_item["market_data"]["price_change_percentage_1y"],
-                            coin_item["market_data"]["ath_change_percentage"]["usd"],
-                            coin_item["market_data"]["total_volume"]["usd"],
-                            coin_item["description"]["en"],
-                            coin_item["genesis_date"],
-                            coin_item["hashing_algorithm"],
-                            coin_item["coingecko_score"],
-                            coin_item["developer_score"],
-                            coin_item["community_score"],
-                            coin_item["liquidity_score"],
-                            coin_item["public_interest_score"],
-                            datetime.timestamp(datetime.now()),
-                            coin_item["id"],
-                        ],
-                    )
-
-                conn.commit()
+            conn.commit()
 
         except Exception as err:
             print("Something went wrong inside the main function")
