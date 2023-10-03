@@ -48,11 +48,11 @@ def compute_extra_columns(objs: List):
 
     for obj in objects:
         if (
-            obj.get("market_cap_usd") is not None
-            and obj.get("fully_diluted_valuation_usd") is not None
+            obj.get("market_cap") is not None
+            and obj.get("fully_diluted_valuation") is not None
         ):
             obj["mc_fdv_ratio"] = round(
-                obj["market_cap_usd"] / obj["fully_diluted_valuation_usd"], 3
+                obj["market_cap"] / obj["fully_diluted_valuation"], 3
             )
         else:
             obj["mc_fdv_ratio"] = None
