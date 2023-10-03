@@ -32,14 +32,14 @@ function Tokenomics() {
     {
       id: 'market_cap_usd',
       label: ss ? 'M. Cap' : 'Market Cap',
-      render: (obj) => `$${formatLongNumbers(obj.market_cap_usd)}`,
+      render: (obj) => `$${formatLongNumbers(obj.market_cap)}`,
     },
     {
       id: 'fully_diluted_valuation_usd',
       label: mobile || tablet ? 'FD' : 'Fully Diluted',
       render: (obj) =>
-        `${obj.fully_diluted_valuation_usd ? '$' : ''}${formatLongNumbers(
-          obj.fully_diluted_valuation_usd
+        `${obj.fully_diluted_valuation ? '$' : ''}${formatLongNumbers(
+          obj.fully_diluted_valuation
         )}`,
     },
     {

@@ -38,38 +38,48 @@ function Prices() {
       renderOverlay: (obj) => renderCellOverlay(obj.current_price_relative, obj.current_price),
     },
     {
-      id: 'price_change_percentage_24h',
+      id: 'price_change_percentage_24h_in_currency',
       label: '1 Day',
-      render: (obj) => renderCell(obj.price_change_percentage_24h, (val) => `${val.toFixed(2)}%`),
+      render: (obj) =>
+        renderCell(obj.price_change_percentage_24h_in_currency, (val) => `${val.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(
           obj.price_change_percentage_24h_relative,
-          obj.price_change_percentage_24h
+          obj.price_change_percentage_24h_in_currency
         ),
     },
     {
-      id: 'price_change_percentage_7d',
+      id: 'price_change_percentage_7d_in_currency',
       label: '7 Days',
-      render: (obj) => renderCell(obj.price_change_percentage_7d, (val) => `${val.toFixed(2)}%`),
+      render: (obj) =>
+        renderCell(obj.price_change_percentage_7d_in_currency, (val) => `${val.toFixed(2)}%`),
       renderOverlay: (obj) =>
-        renderCellOverlay(obj.price_change_percentage_7d_relative, obj.price_change_percentage_7d),
+        renderCellOverlay(
+          obj.price_change_percentage_7d_relative,
+          obj.price_change_percentage_7d_in_currency
+        ),
     },
     {
-      id: 'price_change_percentage_30d',
+      id: 'price_change_percentage_30d_in_currency',
       label: '30 Days',
-      render: (obj) => renderCell(obj.price_change_percentage_30d, (val) => `${val.toFixed(2)}%`),
+      render: (obj) =>
+        renderCell(obj.price_change_percentage_30d_in_currency, (val) => `${val.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(
           obj.price_change_percentage_30d_relative,
-          obj.price_change_percentage_30d
+          obj.price_change_percentage_30d_in_currency
         ),
     },
     {
-      id: 'price_change_percentage_1y',
+      id: 'price_change_percentage_1y_in_currency',
       label: '1 Year',
-      render: (obj) => renderCell(obj.price_change_percentage_1y, (val) => `${val.toFixed(2)}%`),
+      render: (obj) =>
+        renderCell(obj.price_change_percentage_1y_in_currency, (val) => `${val.toFixed(2)}%`),
       renderOverlay: (obj) =>
-        renderCellOverlay(obj.price_change_percentage_1y_relative, obj.price_change_percentage_1y),
+        renderCellOverlay(
+          obj.price_change_percentage_1y_relative,
+          obj.price_change_percentage_1y_in_currency
+        ),
     },
     {
       id: 'ath_change_percentage',

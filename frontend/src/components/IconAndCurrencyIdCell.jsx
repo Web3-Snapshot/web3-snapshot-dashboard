@@ -8,7 +8,7 @@ function IconAndCurrencyIdCell({ obj }) {
 
   return (
     <div className={styles.iconRoot}>
-      <img src={obj.image_thumb} alt="coin" />
+      <img src={obj.image} alt="coin" />
       <div>
         <span>{`${obj.symbol.toUpperCase()}`}</span>
         <span>{`${capitalize(obj.id)}`}</span>
