@@ -4,9 +4,7 @@ from pathlib import Path
 
 from server.db import dict_factory
 
-DATABASE_PATH = "./instance/db.sqlite"
-
-env = environ.get("ENV") or "development"
+DATABASE_PATH = f"/app/instance/{environ.get('ENVIRONMENT')}.db"
 
 if Path(DATABASE_PATH).exists():
     conn = sqlite3.connect(DATABASE_PATH)
