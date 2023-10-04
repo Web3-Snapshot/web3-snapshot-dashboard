@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, g
+from flask import Blueprint, current_app  # pylint: disable=import-error
 from server.db import get_db
 from util.helpers import compute_extra_columns, process_percentages
 

@@ -43,18 +43,24 @@ function DisclaimerMessage() {
   }
 
   useEffect(() => {
-    async function getTimestamp() {
-      fetchTimestamp()
-        .then((res) => {
-          setTimestamp(dayjs(res.updated_at).format('YYYY-MM-DD - HH:mm:ss'));
-        })
-        .catch((err) => {
-          console.log('Could not fetch timestamp');
-        });
+    const sse = new EventSource('/api/tracking/timestamp');
+
+    function handleStream(evt) {
+      setTimestamp(dayjs(JSON.parse(evt.data).updated_at).format('YYYY-MM-DD - HH:mm:ss'));
     }
 
-    getTimestamp();
-  }, []);
+    sse.onmessage = (evt) => {
+      handleStream(evt);
+    };
+
+    sse.onerror = () => {
+      sse.close();
+    };
+
+    return () => {
+      sse.close();
+    };
+  });
 
   return <div className={styles.disclaimer}>{mobile ? smallScreenText() : largeScreenText()}</div>;
 }
