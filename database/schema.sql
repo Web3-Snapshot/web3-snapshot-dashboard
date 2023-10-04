@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS coins (
-    id										VARCHAR(20) not NULL PRIMARY KEY,
+    market_cap_rank							INTEGER PRIMARY KEY,
+    id										VARCHAR(20) NOT NULL,
     symbol									TEXT,
     name									VARCHAR(50),
     image	      							TEXT,
     current_price							REAL,
     market_cap  							INTEGER,
-    market_cap_rank							INTEGER,
     fully_diluted_valuation     			REAL,
     total_volume 							REAL,
     high_24h                 			    REAL,
@@ -45,5 +45,10 @@ CREATE TABLE IF NOT EXISTS coins (
     homepage 					            TEXT,
     blockchain_site				            TEXT,
     categories					            TEXT,
-    timestamp 					            DATE DEFAULT (datetime('now','localtime'))
+    updated_at                              TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS tracking (
+    id                                      INTEGER PRIMARY KEY,
+    updated_at 					            TEXT NOT NULL
+)

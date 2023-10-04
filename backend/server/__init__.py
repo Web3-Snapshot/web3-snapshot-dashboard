@@ -47,4 +47,8 @@ def create_app(config_env="server.config.development"):
 
     app.register_blueprint(coins.bp)
 
+    from server.routes import tracking
+
+    app.register_blueprint(tracking.bp)
+
     return app

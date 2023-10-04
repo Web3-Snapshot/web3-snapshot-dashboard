@@ -4,20 +4,20 @@ from functools import reduce
 from os import environ
 from pathlib import Path
 
-import requests
+import requests  # type: ignore
 
 DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
 SCHEMA_PATH = "./schema.sql"
 BASE_URL = "https://api.coingecko.com/api/v3/coins"
 
 INSERT_FIELDS = [
+    "market_cap_rank",
     "id",
     "symbol",
     "name",
     "image",
     "current_price",
     "market_cap",
-    "market_cap_rank",
     "fully_diluted_valuation",
     "total_volume",
     "high_24h",
@@ -44,6 +44,7 @@ INSERT_FIELDS = [
     "price_change_percentage_30d_in_currency",
     "price_change_percentage_200d_in_currency",
     "price_change_percentage_1y_in_currency",
+    "updated_at",
 ]
 
 
@@ -138,7 +139,7 @@ UPDATE_SQL = """
         community_score=?,
         liquidity_score=?,
         public_interest_score=?,
-        timestamp=?
+        updated_at=?
     WHERE
         id = ?
     """
@@ -167,8 +168,19 @@ def main():
             )
 
             for coin in coins:
-                cur.execute(UPSERT_SQL, [coin[prop] for prop in INSERT_FIELDS])
+                cur.execute(
+                    UPSERT_SQL,
+                    [
+                        coin[prop]
+                        if prop != "updated_at"
+                        else datetime.utcnow().isoformat()
+                        for prop in INSERT_FIELDS
+                    ],
+                )
 
+            cur.execute(
+                f"""INSERT OR REPLACE INTO tracking (id,updated_at) VALUES (1,'{datetime.utcnow().isoformat()}')"""
+            )
             conn.commit()
 
         except Exception as err:
