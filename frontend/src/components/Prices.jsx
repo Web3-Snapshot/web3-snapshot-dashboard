@@ -44,7 +44,7 @@ function Prices() {
         renderCell(obj.price_change_percentage_24h_in_currency, (val) => `${val.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(
-          obj.price_change_percentage_24h_relative,
+          obj.price_change_percentage_24h_in_currency_relative,
           obj.price_change_percentage_24h_in_currency
         ),
     },
@@ -55,7 +55,7 @@ function Prices() {
         renderCell(obj.price_change_percentage_7d_in_currency, (val) => `${val.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(
-          obj.price_change_percentage_7d_relative,
+          obj.price_change_percentage_7d_in_currency_relative,
           obj.price_change_percentage_7d_in_currency
         ),
     },
@@ -66,7 +66,7 @@ function Prices() {
         renderCell(obj.price_change_percentage_30d_in_currency, (val) => `${val.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(
-          obj.price_change_percentage_30d_relative,
+          obj.price_change_percentage_30d_in_currency_relative,
           obj.price_change_percentage_30d_in_currency
         ),
     },
@@ -77,7 +77,7 @@ function Prices() {
         renderCell(obj.price_change_percentage_1y_in_currency, (val) => `${val.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(
-          obj.price_change_percentage_1y_relative,
+          obj.price_change_percentage_1y_in_currency_relative,
           obj.price_change_percentage_1y_in_currency
         ),
     },
