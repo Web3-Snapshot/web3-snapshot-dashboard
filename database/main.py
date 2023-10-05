@@ -167,7 +167,7 @@ def main():
             next_batch_coins = [
                 c
                 for c in next_batch_coins
-                if c["market_cap_rank"] is not None and c["market_cap_rank"] <= 100
+                if c["market_cap_rank"] and c["market_cap_rank"] <= 100
             ]
 
             # If there are new coins which we don't have in the database, update these
