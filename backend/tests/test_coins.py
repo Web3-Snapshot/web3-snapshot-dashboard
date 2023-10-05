@@ -10,8 +10,6 @@ from server.routes.coins import event_stream
 @contextmanager
 def mock_events():
     with mock.patch(
-        # NOTE: For example, if your function is found in app/views/translations.py,
-        # then this import path would be 'app.views.translations.event_stream'
         "server.routes.coins.event_stream",
         partial(event_stream, single=True),
     ):
