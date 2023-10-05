@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import styles from './Table.module.scss';
 import Row from './Row';
@@ -41,6 +41,7 @@ function Card({ tableData, onCardClick, coin }) {
     </div>
   );
 }
+
 function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
   const [orderedCoins, setOrderedCoins] = useState(coins.order);
   const [order, setOrder] = useState('asc');
@@ -51,6 +52,28 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
     setOrder(order === 'asc' ? 'desc' : 'asc');
     setOrderBy([cellId]);
   }
+
+  const renderRow = useCallback(
+    (tableData, row, styles, onRowClick) => {
+      return <Row tableData={tableData} row={row} styles={styles} onRowClick={onRowClick} />;
+    },
+    [tableData]
+  );
+
+  const renderHeaderRow = useCallback(
+    (tableData, styles, sortHandler, order, orderBy) => {
+      return (
+        <HeaderRow
+          headers={tableData}
+          styles={styles}
+          sortHandler={sortHandler}
+          order={order}
+          orderBy={orderBy}
+        />
+      );
+    },
+    [tableData]
+  );
 
   useEffect(() => {
     if (coins.order.length > 0) {
@@ -63,22 +86,11 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
       {desktop ? (
         <>
           <div className={`${rowStyles.row} ${styles.header}`}>
-            <HeaderRow
-              headers={tableData}
-              styles={styles}
-              sortHandler={handleSort}
-              order={order}
-              orderBy={orderBy}
-            />
+            {renderHeaderRow(tableData, styles, handleSort, order, orderBy)}
           </div>
           {orderedCoins.map((coinGuid) => (
             <div key={coinGuid} className={`${rowStyles.row} ${styles.data}`}>
-              <Row
-                tableData={tableData}
-                row={coins.data[coinGuid]}
-                styles={styles}
-                onRowClick={onRowClick}
-              />
+              {renderRow(tableData, coins.data[coinGuid], styles, onRowClick)}
             </div>
           ))}
         </>

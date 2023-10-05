@@ -1,3 +1,5 @@
+import { v4 as uuid } from 'uuid';
+
 // Formatting of displayed text
 export function formatLongNumbers(value) {
   if (!value || value === '0') {
@@ -49,4 +51,16 @@ export function removeTags(str) {
   }
 
   return str.toString().replace(/(<([^>]+)>)/gi, '');
+}
+
+export function normalizeResponse(json) {
+  return json.reduce(
+    (acc, curr) => {
+      const guid = uuid();
+      acc.data = { ...acc.data, [guid]: curr };
+      acc.order.push(guid);
+      return acc;
+    },
+    { data: {}, order: [] }
+  );
 }
