@@ -224,7 +224,7 @@ _arg_debug="off"
 print_help()
 {
 	printf '%s\n' "The general script's help msg"
-	printf 'Usage: %s [--start] [--stop] [--print-vars] [--build] [--(no-)debug] [--tests] [--ps] [--logs] [--isession] [--init-db] [--start-cert-server] [--get-certificate] [--renew-certificate] [--connect-service <arg>] [--install-backend <arg>] [-h|--help]\n' "$0"
+	printf 'Usage: %s [--start] [--stop] [--print-vars] [--build] [--(no-)debug] [--tests] [--ps] [--logs] [--check-db] [--isession] [--init-db] [--start-cert-server] [--get-certificate] [--renew-certificate] [--connect-service <arg>] [--install-backend <arg>] [-h|--help]\n' "$0"
 	printf '\t%s\n' "--start: Start the server"
 	printf '\t%s\n' "--stop: Stop the server"
 	printf '\t%s\n' "--print-vars: Print variables"
@@ -233,6 +233,7 @@ print_help()
 	printf '\t%s\n' "--tests: Run pytests"
 	printf '\t%s\n' "--ps: Print running containers"
 	printf '\t%s\n' "--logs: Tail out logs"
+    printf '\t%s\n' "--check-db: Check of database exists" 
 	printf '\t%s\n' "--isession: Start an interactive session"
 	printf '\t%s\n' "--init-db: Initialize the database"
 	printf '\t%s\n' "--start-cert-server: Start the certbot server on port 80"
@@ -279,6 +280,10 @@ parse_commandline() {
             logs
             exit 0
             ;;
+        --check-db)
+			check_db
+			exit 0
+			;;
         --isession)
             isession
             exit 0

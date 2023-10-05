@@ -20,11 +20,12 @@ services:
       context: ./backend
     environment:
       - FLASK_DEBUG=production
-      - SECRET_KEY
+    env_file: ./backend/.env
     volumes:
       - database:/app/instance
       - ${PWD}/database/schema.sql:/app/schema.sql
     restart: always
+    # command: gunicorn --workers 4 --bind "0.0.0.0:5000" -k gevent "server:create_app('server.config.production')"
     depends_on:
       - db
     networks:
@@ -53,6 +54,7 @@ volumes:
   database:
   certbot_www:
   certbot_conf:
+
 
 networks:
   w3s-nw:

@@ -8,7 +8,7 @@ COPY Pipfile.lock Pipfile /app/
 
 RUN pipenv install --deploy --system
 
-COPY ./schema.sql /app/schema.sql
+COPY ./schema.sql ./init_db.py main.py /app/
 
 COPY crontab /etc/cron.d/crontab
 
