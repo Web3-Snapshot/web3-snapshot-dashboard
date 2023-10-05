@@ -7,13 +7,13 @@ services:
     restart: always
     build:
       context: ./database
-    volumes:
-      - database:/app/instance
-      - ${PWD}/database:/app
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
+    volumes:
+      - database:/app/instance
+      # - ${PWD}/database:/app
     networks:
-      - w3s-network
+      - w3s_development-nw
 
   backend:
     container_name: web3_backend_dev
@@ -21,21 +21,21 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
+    environment:
+      - DEBUG=${DEBUG}
     ports:
       - 5000:5000
       - 5678:5678
     volumes:
-      - ${PWD}/backend:/app
       - database:/app/instance
+      - ${PWD}/backend:/app
       - ${PWD}/database/schema.sql:/app/schema.sql
     restart: always
     command: flask --app "server:create_app(config_env='server.config.development')" run --no-debugger --no-reload --host=0.0.0.0 --port=5000
-    environment:
-      - DEBUG=${DEBUG}
     depends_on:
       - db
     networks:
-      - w3s-network
+      - w3s_development-nw
 
   frontend:
     container_name: web3_frontend_dev
@@ -45,14 +45,14 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - 3000:3000
-    volumes:
-      - /app/node_modules
-      - ${PWD}/frontend:/app
     restart: always
     depends_on:
       - backend
+    volumes:
+      - /app/node_modules
+      - ${PWD}/frontend:/app
     networks:
-      - w3s-network
+      - w3s_development-nw
 
   isession:
     container_name: web3_isession
@@ -75,11 +75,11 @@ services:
       - IPYTHONDIR=/app/.ipython
       - ENVIRONMENT=${ENVIRONMENT}
     networks:
-      - w3s-network
+      - w3s_development-nw
 
 volumes:
   database:
 
 
 networks:
-  w3s-network:
+  w3s_development-nw:

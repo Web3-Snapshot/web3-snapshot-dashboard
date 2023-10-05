@@ -3,11 +3,16 @@ version: '3.7'
 services:
   db:
     container_name: web3_database_prod
+    init: true
+    restart: always
     build:
       context: ./database
-    restart: always
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
     volumes:
       - database:/app/instance
+    networks:
+      - w3s-inner-nw
 
   backend:
     container_name: web3_backend_prod
@@ -18,9 +23,13 @@ services:
       - SECRET_KEY
     volumes:
       - database:/app/instance
+      - ${PWD}/database/schema.sql:/app/schema.sql
     restart: always
     depends_on:
       - db
+    networks:
+      - w3s-inner-nw
+      - w3s-nw
 
   frontend:
     container_name: web3_frontend_prod
@@ -37,7 +46,14 @@ services:
     volumes:
       - certbot_www:/var/www/certbot/:ro
       - certbot_conf:/etc/nginx/ssl/:ro
+    networks:
+      - w3s-nw
+
 volumes:
   database:
   certbot_www:
   certbot_conf:
+
+networks:
+  w3s-nw:
+  w3s-inner-nw:
