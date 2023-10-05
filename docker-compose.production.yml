@@ -5,6 +5,7 @@ services:
     container_name: web3_database_prod
     build:
       context: ./database
+    restart: always
     volumes:
       - database:/app/instance
 

@@ -4,6 +4,7 @@ services:
   db:
     container_name: web3_database_dev
     init: true
+    restart: always
     build:
       context: ./database
     volumes:
