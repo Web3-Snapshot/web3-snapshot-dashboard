@@ -1,3 +1,4 @@
+# pylint: disable=import-error
 import json
 from time import sleep
 
@@ -22,4 +23,4 @@ def event_stream(cur):
 def get_tracking_stream():
     conn = get_db(current_app)
     cur = conn.cursor()
-    return Response(event_stream(cur), mimetype="text/event-stream")
+    return Response(event_stream(cur), mimetype="text/event-stream"), 200
