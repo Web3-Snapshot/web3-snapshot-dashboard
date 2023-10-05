@@ -19,13 +19,13 @@ async function fetchTimestamp() {
 
 function DisclaimerMessage() {
   let { mobile } = useBreakpoints(BREAKPOINTS);
-  const [timestamp, setTimestamp] = useState('');
+  const [updatedAt, setUpdatedAt] = useState('');
 
   function largeScreenText() {
     return (
       <p>
         <span>
-          +++ <strong>Under Development: v1.1</strong> ::: Last update: ${timestamp} +++
+          +++ <strong>Under Development: v1.1</strong> ::: Last update: <span>{updatedAt}</span> +++
         </span>
       </p>
     );
@@ -37,7 +37,7 @@ function DisclaimerMessage() {
         <p>
           <strong>+++ Under Development: v1.1 +++</strong>
         </p>
-        <p>{`Last update: ${timestamp}`}</p>
+        <p>{`Last update: ${updatedAt}`}</p>
       </>
     );
   }
@@ -46,7 +46,7 @@ function DisclaimerMessage() {
     const sse = new EventSource('/api/tracking/timestamp');
 
     function handleStream(evt) {
-      setTimestamp(dayjs(JSON.parse(evt.data).updated_at).format('YYYY-MM-DD - HH:mm:ss'));
+      setUpdatedAt(dayjs(JSON.parse(evt.data).updated_at).format('YYYY-MM-DD - HH:mm:ss'));
     }
 
     sse.onmessage = (evt) => {

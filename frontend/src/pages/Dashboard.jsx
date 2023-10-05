@@ -2,49 +2,46 @@ import React, { useState, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import { isEmpty } from 'lodash';
 import { NavLink, Outlet } from 'react-router-dom';
-import axios from 'axios';
 import styles from './Dashboard.module.scss';
 import navbarStyles from '../components/Navbar.module.scss';
 import DisclaimerMessage from '../components/DisclaimerMessage';
 import { useIsIframe } from '../custom-hooks/useIsIframe';
-
-async function fetchCoins() {
-  return axios
-    .get('/api/coins')
-    .then((res) => {
-      console.log(res.data);
-      return res.data;
-    })
-    .catch((err) => {
-      throw new Error(err);
-    });
-}
 
 function Dashboard() {
   const [coins, setCoins] = useState({ data: {}, order: [] });
   const isIframe = useIsIframe();
 
   useEffect(() => {
-    const fetchData = async function () {
-      fetchCoins().then((res) => {
-        const normalizedRes = res.reduce(
-          (acc, curr) => {
-            const guid = uuid();
-            acc.data = { ...acc.data, [guid]: curr };
-            acc.order.push(guid);
-            return acc;
-          },
-          { data: {}, order: [] }
-        );
-        console.log('normalizedRes', normalizedRes);
-        setCoins(normalizedRes);
-      });
+    const sse = new EventSource('/api/coins');
+
+    function handleStream(evt) {
+      console.log('evt.data', evt.data);
+      const res = JSON.parse(evt.data);
+      const normalizedRes = res.reduce(
+        (acc, curr) => {
+          const guid = uuid();
+          acc.data = { ...acc.data, [guid]: curr };
+          acc.order.push(guid);
+          return acc;
+        },
+        { data: {}, order: [] }
+      );
+      console.log('normalizedRes', normalizedRes);
+      setCoins(normalizedRes);
+    }
+
+    sse.onmessage = (evt) => {
+      handleStream(evt);
     };
 
-    if (isEmpty(coins.data)) {
-      fetchData();
-    }
-  }, [coins]);
+    sse.onerror = () => {
+      sse.close();
+    };
+
+    return () => {
+      sse.close();
+    };
+  });
 
   return (
     <div className={styles.root}>
@@ -66,7 +63,7 @@ function Dashboard() {
           </NavLink>
         </nav>
       )}
-      {!isEmpty(coins) && (
+      {!isEmpty(coins.data) && (
         <main>
           <DisclaimerMessage />
           <Outlet context={{ coins }} />

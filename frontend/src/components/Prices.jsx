@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 
@@ -34,14 +34,14 @@ function Prices() {
     {
       id: 'current_price',
       label: 'Price',
-      render: (obj) => `$${obj.current_price.toLocaleString()}`,
-      renderOverlay: (obj) => renderCellOverlay(obj.current_price_relative, obj.current_price),
+      render: (obj) => `$${obj.current_price?.toLocaleString()}`,
+      derOverlay: (obj) => renderCellOverlay(obj.current_price_relative, obj.current_price),
     },
     {
       id: 'price_change_percentage_24h_in_currency',
       label: '1 Day',
       render: (obj) =>
-        renderCell(obj.price_change_percentage_24h_in_currency, (val) => `${val.toFixed(2)}%`),
+        renderCell(obj.price_change_percentage_24h_in_currency, (val) => `${val?.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(
           obj.price_change_percentage_24h_in_currency_relative,
@@ -52,7 +52,7 @@ function Prices() {
       id: 'price_change_percentage_7d_in_currency',
       label: '7 Days',
       render: (obj) =>
-        renderCell(obj.price_change_percentage_7d_in_currency, (val) => `${val.toFixed(2)}%`),
+        renderCell(obj.price_change_percentage_7d_in_currency, (val) => `${val?.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(
           obj.price_change_percentage_7d_in_currency_relative,
@@ -63,7 +63,7 @@ function Prices() {
       id: 'price_change_percentage_30d_in_currency',
       label: '30 Days',
       render: (obj) =>
-        renderCell(obj.price_change_percentage_30d_in_currency, (val) => `${val.toFixed(2)}%`),
+        renderCell(obj.price_change_percentage_30d_in_currency, (val) => `${val?.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(
           obj.price_change_percentage_30d_in_currency_relative,
@@ -74,7 +74,7 @@ function Prices() {
       id: 'price_change_percentage_1y_in_currency',
       label: '1 Year',
       render: (obj) =>
-        renderCell(obj.price_change_percentage_1y_in_currency, (val) => `${val.toFixed(2)}%`),
+        renderCell(obj.price_change_percentage_1y_in_currency, (val) => `${val?.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(
           obj.price_change_percentage_1y_in_currency_relative,
@@ -84,22 +84,25 @@ function Prices() {
     {
       id: 'ath_change_percentage',
       label: 'ATH',
-      render: (obj) => renderCell(obj.ath_change_percentage, (val) => `${val.toFixed(2)}%`),
+      render: (obj) => renderCell(obj.ath_change_percentage, (val) => `${val?.toFixed(2)}%`),
       renderOverlay: (obj) =>
         renderCellOverlay(obj.ath_change_percentage_relative, obj.ath_change_percentage),
     },
   ];
 
-  function handleRowClick(_, row) {
-    setRow(row);
-    lockScroll();
-    setIsCoinInfoModalOpen(true);
-  }
+  const handleRowClick = useCallback(
+    (_, row) => {
+      setRow(row);
+      lockScroll();
+      setIsCoinInfoModalOpen(true);
+    },
+    [lockScroll]
+  );
 
-  function handleClose() {
+  const handleClose = useCallback(() => {
     unlockScroll();
     setIsCoinInfoModalOpen(false);
-  }
+  }, [unlockScroll]);
 
   return (
     <>
