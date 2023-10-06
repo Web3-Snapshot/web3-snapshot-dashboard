@@ -28,6 +28,9 @@ function comparator(a, b, order, orderBy) {
 }
 
 export function objectSort(obj, order, orderBy) {
+  if (!obj || !obj.data || !obj.order) {
+    return [];
+  }
   const dataObj = obj.data;
   return Object.entries(dataObj)
     .sort(([_, av], [__, bv]) => comparator(av, bv, order, orderBy))
