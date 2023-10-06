@@ -4,7 +4,7 @@ from functools import reduce
 from os import environ
 from pathlib import Path
 
-import requests  # type: ignore
+import requests
 
 DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
 SCHEMA_PATH = "./schema.sql"
