@@ -8,7 +8,6 @@ import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
 import { objectSort } from '../util/helpers';
 import GroupingHeader from './GroupingHeader';
-import { memo } from 'react';
 
 function Card({ tableData, onCardClick, coin }) {
   const location = useLocation();
@@ -49,6 +48,10 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
   let { desktop } = useBreakpoints(BREAKPOINTS);
+  const labelsAndIds = useMemo(
+    () => tableData.map((item) => ({ label: item.label, id: item.id })),
+    []
+  );
 
   const handleSort = useCallback(
     (_, cellId) => {
@@ -58,47 +61,36 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
     [order]
   );
 
-  const renderRow = useCallback(
-    (tableData, row, styles, onRowClick) => {
-      return <Row tableData={tableData} row={row} styles={styles} onRowClick={onRowClick} />;
-    },
-    [tableData]
-  );
+  const renderRow = useCallback((tableData, row, styles, onRowClick) => {
+    return <Row tableData={tableData} row={row} styles={styles} onRowClick={onRowClick} />;
+  }, []);
 
-  const renderHeaderRow = useCallback(
-    (tableData, styles, sortHandler, order, orderBy) => {
-      return (
-        <HeaderRow
-          headers={tableData}
-          styles={styles}
-          sortHandler={sortHandler}
-          order={order}
-          orderBy={orderBy}
-        />
-      );
-    },
-    [tableData]
-  );
+  const renderHeaderRow = useCallback((labelsAndIds, styles, handleSort, order, orderBy) => {
+    return (
+      <HeaderRow
+        headers={labelsAndIds}
+        styles={styles}
+        sortHandler={handleSort}
+        order={order}
+        orderBy={orderBy}
+      />
+    );
+  }, []);
 
   const memoizedHeaderRow = useMemo(
-    () => renderHeaderRow(tableData, styles, handleSort, order, orderBy),
-    [tableData, styles, handleSort, order, orderBy]
+    () => renderHeaderRow(labelsAndIds, styles, handleSort, order, orderBy),
+    [order, orderBy]
   );
 
   useEffect(() => {
-    if (coins.order.length > 0) {
-      setOrderedCoins(objectSort(coins, order, orderBy));
-    }
-  }, [order, orderBy, coins]);
+    setOrderedCoins(objectSort(coins, order, orderBy));
+  }, [coins, order, orderBy]);
 
   return (
     <div className={styles.container}>
       {desktop ? (
         <>
-          <div className={`${rowStyles.row} ${styles.header}`}>
-            {/* {renderHeaderRow(tableData, styles, handleSort, order, orderBy)} */}
-            {memoizedHeaderRow}
-          </div>
+          <div className={`${rowStyles.row} ${styles.header}`}>{memoizedHeaderRow}</div>
           {orderedCoins.map((coinGuid) => (
             <div key={coinGuid} className={`${rowStyles.row} ${styles.data}`}>
               {!isEmpty(coins.data[coinGuid]) &&
