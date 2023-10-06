@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { isEmpty } from 'lodash';
 import styles from './Table.module.scss';
 import Row from './Row';
 import HeaderRow from './HeaderRow';
@@ -7,6 +8,7 @@ import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
 import { objectSort } from '../util/helpers';
 import GroupingHeader from './GroupingHeader';
+import { memo } from 'react';
 
 function Card({ tableData, onCardClick, coin }) {
   const location = useLocation();
@@ -48,10 +50,13 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
   let { desktop } = useBreakpoints(BREAKPOINTS);
 
-  function handleSort(_, cellId) {
-    setOrder(order === 'asc' ? 'desc' : 'asc');
-    setOrderBy([cellId]);
-  }
+  const handleSort = useCallback(
+    (_, cellId) => {
+      setOrder(order === 'asc' ? 'desc' : 'asc');
+      setOrderBy([cellId]);
+    },
+    [order]
+  );
 
   const renderRow = useCallback(
     (tableData, row, styles, onRowClick) => {
@@ -75,6 +80,11 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
     [tableData]
   );
 
+  const memoizedHeaderRow = useMemo(
+    () => renderHeaderRow(tableData, styles, handleSort, order, orderBy),
+    [tableData, styles, handleSort, order, orderBy]
+  );
+
   useEffect(() => {
     if (coins.order.length > 0) {
       setOrderedCoins(objectSort(coins, order, orderBy));
@@ -86,11 +96,13 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
       {desktop ? (
         <>
           <div className={`${rowStyles.row} ${styles.header}`}>
-            {renderHeaderRow(tableData, styles, handleSort, order, orderBy)}
+            {/* {renderHeaderRow(tableData, styles, handleSort, order, orderBy)} */}
+            {memoizedHeaderRow}
           </div>
           {orderedCoins.map((coinGuid) => (
             <div key={coinGuid} className={`${rowStyles.row} ${styles.data}`}>
-              {renderRow(tableData, coins.data[coinGuid], styles, onRowClick)}
+              {!isEmpty(coins.data[coinGuid]) &&
+                renderRow(tableData, coins.data[coinGuid], styles, onRowClick)}
             </div>
           ))}
         </>

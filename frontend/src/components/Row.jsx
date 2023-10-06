@@ -19,7 +19,7 @@ const Row = ({ tableData, row, styles, onRowClick }) => {
 };
 
 Row.defaultProps = {
-  row: [],
+  row: {},
 };
 
 export default Row;
