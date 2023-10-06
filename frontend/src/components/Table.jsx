@@ -61,9 +61,12 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
     [order]
   );
 
-  const renderRow = useCallback((tableData, row, styles, onRowClick) => {
-    return <Row tableData={tableData} row={row} styles={styles} onRowClick={onRowClick} />;
-  }, []);
+  const renderRow = useCallback(
+    (tableData, row, styles, onRowClick) => {
+      return <Row tableData={tableData} row={row} styles={styles} onRowClick={onRowClick} />;
+    },
+    [tableData]
+  );
 
   const renderHeaderRow = useCallback((labelsAndIds, styles, handleSort, order, orderBy) => {
     return (
@@ -79,7 +82,7 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
 
   const memoizedHeaderRow = useMemo(
     () => renderHeaderRow(labelsAndIds, styles, handleSort, order, orderBy),
-    [order, orderBy]
+    [labelsAndIds, order, orderBy]
   );
 
   useEffect(() => {

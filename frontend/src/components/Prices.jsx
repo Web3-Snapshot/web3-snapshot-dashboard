@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 
@@ -19,7 +19,7 @@ function Prices() {
   const { coins } = useOutletContext();
   const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
   const [row, setRow] = useState();
-  const defaultOrderByProp = useMemo(() => ['market_cap_rank'], []);
+  const defaultOrderByProp = useRef(['market_cap_rank']);
 
   const tableData = useMemo(
     () => [
@@ -120,7 +120,7 @@ function Prices() {
         coins={coins}
         onRowClick={handleRowClick}
         rowStyles={styles}
-        defaultOrderBy={defaultOrderByProp}
+        defaultOrderBy={defaultOrderByProp.current}
       />
     </>
   );
