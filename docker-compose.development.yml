@@ -11,7 +11,7 @@ services:
       - ENVIRONMENT=${ENVIRONMENT}
     volumes:
       - database:/app/instance
-      # - ${PWD}/database:/app
+      - ${PWD}/database:/app
     networks:
       - w3s_development-nw
 

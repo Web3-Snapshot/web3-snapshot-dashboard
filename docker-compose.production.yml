@@ -25,7 +25,6 @@ services:
       - database:/app/instance
       - ${PWD}/database/schema.sql:/app/schema.sql
     restart: always
-    # command: gunicorn --workers 4 --bind "0.0.0.0:5000" -k gevent "server:create_app('server.config.production')"
     depends_on:
       - db
     networks:
