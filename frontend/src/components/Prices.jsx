@@ -98,7 +98,7 @@ function Prices() {
     (_, row) => {
       setRow(row);
       lockScroll();
-      setIsCoinInfoModalOpen(true);
+      // setIsCoinInfoModalOpen(true);
     },
     [lockScroll]
   );

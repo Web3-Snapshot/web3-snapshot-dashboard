@@ -86,7 +86,7 @@ function Tokenomics() {
   function handleRowClick(_, row) {
     setRow(row);
     lockScroll();
-    setIsCoinInfoModalOpen(true);
+    // setIsCoinInfoModalOpen(true);
   }
 
   function handleClose() {
