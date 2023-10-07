@@ -5,11 +5,11 @@ import styles from './Table.module.scss';
 import Row from './Row';
 import HeaderRow from './HeaderRow';
 import { useBreakpoints } from 'react-breakpoints-hook';
-import { BREAKPOINTS } from '../constants';
+import { BREAKPOINTS, COINS } from '../constants';
 import { objectSort } from '../util/helpers';
 import GroupingHeader from './GroupingHeader';
 
-function Card({ tableData, onCardClick, coin }) {
+function Card({ tableData, coin, onCardClick }) {
   const location = useLocation();
 
   let { mobile, tablet } = useBreakpoints(BREAKPOINTS);
@@ -48,10 +48,7 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
   let { desktop } = useBreakpoints(BREAKPOINTS);
-  const labelsAndIds = useMemo(
-    () => tableData.map((item) => ({ label: item.label, id: item.id })),
-    []
-  );
+  const labelsAndIds = tableData.map((item) => ({ label: item.label, id: item.id }));
 
   const handleSort = useCallback(
     (_, cellId) => {
@@ -86,7 +83,9 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
   );
 
   useEffect(() => {
-    setOrderedCoins(objectSort(coins, order, orderBy));
+    if (coins.order.length > 0) {
+      setOrderedCoins(objectSort(coins, order, orderBy));
+    }
   }, [coins, order, orderBy]);
 
   return (
@@ -103,14 +102,14 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
         </>
       ) : (
         <>
-          {orderedCoins.map((coinGuid) => (
-            <Card
-              key={coinGuid}
-              tableData={tableData}
-              coin={coins.data[coinGuid]}
-              onCardClick={onRowClick}
-            />
-          ))}
+          {orderedCoins.map((coinGuid) => {
+            const coin = coins.data[coinGuid];
+            return (
+              coin && (
+                <Card key={coinGuid} tableData={tableData} coin={coin} onCardClick={onRowClick} />
+              )
+            );
+          })}
         </>
       )}
     </div>

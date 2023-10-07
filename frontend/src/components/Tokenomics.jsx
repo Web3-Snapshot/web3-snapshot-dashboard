@@ -17,7 +17,7 @@ function Tokenomics() {
   const { coins } = useOutletContext();
   const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
   const [row, setRow] = useState();
-  const defaultOrderByProp = useRef(['market_cap_rank']);
+  const defaultOrderByProp = ['market_cap_rank'];
 
   const tableData = useMemo(
     () => [
@@ -111,7 +111,7 @@ function Tokenomics() {
         coins={coins}
         onRowClick={handleRowClick}
         rowStyles={styles}
-        defaultOrderBy={defaultOrderByProp.current}
+        defaultOrderBy={defaultOrderByProp}
       />
     </>
   );
