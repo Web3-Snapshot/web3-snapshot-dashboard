@@ -93,8 +93,8 @@ function Prices() {
 
   const handleRowClick = useCallback(
     (_, row) => {
-      setRow(row);
-      lockScroll();
+      // setRow(row);
+      // lockScroll();
       // setIsCoinInfoModalOpen(true);
     },
     [lockScroll]
