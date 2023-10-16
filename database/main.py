@@ -107,7 +107,7 @@ UPSERT_SQL = f"""
     INSERT OR REPLACE INTO coins (
         {", ".join(INSERT_FIELDS)}
         )
-    VALUES ({", ".join(["?" for _ in INSERT_FIELDS])});
+    VALUES ({", ".join(["?" for _ in INSERT_FIELDS])})
     """
 
 UPDATE_SQL = """
@@ -178,10 +178,10 @@ def main():
                     ],
                 )
 
-            cur.execute("DELETE FROM coins WHERE market_cap_rank > 100;")
+            cur.execute("DELETE FROM coins WHERE market_cap_rank > 100")
 
             cur.execute(
-                f"""INSERT OR REPLACE INTO tracking (id,updated_at) VALUES (1,'{datetime.utcnow().isoformat()}');"""
+                f"""INSERT OR REPLACE INTO tracking (id,updated_at) VALUES (1,'{datetime.utcnow().isoformat()}')"""
             )
             conn.commit()
 
