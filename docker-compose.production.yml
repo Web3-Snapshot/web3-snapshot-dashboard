@@ -49,6 +49,29 @@ services:
     networks:
       - w3s-nw
 
+  isession:
+    container_name: web3_isession_production
+    stdin_open: true
+    tty: true
+    command: ipython
+    build:
+      context: .
+      dockerfile: ./isession/Dockerfile
+    volumes:
+      - ${PWD}/backend/server:/app/server
+      - ${PWD}/backend/util:/app/util
+      - ${PWD}/database/schema.sql:/app/schema.sql
+      - ${PWD}/database:/app/database
+      - ${PWD}/isession/.ipython:/app/.ipython
+      - /app/.ipython/profile_default/pid
+      - /app/.ipython/profile_default/security
+      - database:/app/instance
+    environment:
+      - IPYTHONDIR=/app/.ipython
+      - ENVIRONMENT=${ENVIRONMENT}
+    networks:
+      - w3s-nw
+
 volumes:
   database:
   certbot_www:
