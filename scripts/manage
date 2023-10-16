@@ -145,7 +145,7 @@ start_cert_server() {
 	docker compose -f docker-compose.certbot.yml up -d nginx80
 }
 
-stop-cert-server() {
+stop_cert_server() {
 	docker compose -f docker-compose.certbot.yml down
 }
 
@@ -196,6 +196,7 @@ _check_required_variables
 # ARG_OPTIONAL_ACTION([logs],[],[Tail out logs],[logs])
 # ARG_OPTIONAL_ACTION([issession],[],[Start an interactive session],[isession])
 # ARG_OPTIONAL_ACTION([start-cert-server],[],[Start the certbot server on port 80],[start-cert-server])
+# ARG_OPTIONAL_ACTION([stop-cert-server],[],[Stop the certbot server],[stop-cert-server])
 # ARG_OPTIONAL_ACTION([get-certificate],[],[Get a certbot certificate],[get-certificate])
 # ARG_OPTIONAL_ACTION([renew-certificate],[],[Renew certificate],[renew-certificate])
 # ARG_OPTIONAL_SINGLE([connect-service],[],[Connect to a service],[connect-service])
@@ -224,7 +225,7 @@ _arg_debug="off"
 print_help()
 {
 	printf '%s\n' "The general script's help msg"
-	printf 'Usage: %s [--start] [--stop] [--print-vars] [--build] [--(no-)debug] [--tests] [--ps] [--logs] [--check-db] [--isession] [--init-db] [--start-cert-server] [--get-certificate] [--renew-certificate] [--connect-service <arg>] [--install-backend <arg>] [-h|--help]\n' "$0"
+	printf 'Usage: %s [--start] [--stop] [--print-vars] [--build] [--(no-)debug] [--tests] [--ps] [--logs] [--check-db] [--isession] [--init-db] [--start-cert-server] [--stop-cert-server] [--get-certificate] [--renew-certificate] [--connect-service <arg>] [--install-backend <arg>] [-h|--help]\n' "$0"
 	printf '\t%s\n' "--start: Start the server"
 	printf '\t%s\n' "--stop: Stop the server"
 	printf '\t%s\n' "--print-vars: Print variables"
@@ -237,6 +238,7 @@ print_help()
 	printf '\t%s\n' "--isession: Start an interactive session"
 	printf '\t%s\n' "--init-db: Initialize the database"
 	printf '\t%s\n' "--start-cert-server: Start the certbot server on port 80"
+	printf '\t%s\n' "--stop-cert-server: Stop the certbot server"
 	printf '\t%s\n' "--get-certificate: Get a certbot certificate"
 	printf '\t%s\n' "--renew-certificate: Renew certificate"
 	printf '\t%s\n' "--connect-service: Connect to a service (default: 'connect-service')"
@@ -304,6 +306,10 @@ parse_commandline() {
 				;;
         --start-cert-server)
             start_cert_server
+            exit 0
+            ;;
+        --stop-cert-server)
+            stop_cert_server
             exit 0
             ;;
         --get-certificate)
