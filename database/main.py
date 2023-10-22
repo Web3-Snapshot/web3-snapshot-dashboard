@@ -4,12 +4,11 @@ from os import environ
 from pathlib import Path
 
 import requests
-
-from database.cache import redis_conn as cache
+from cache import redis_conn
 
 DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
 SCHEMA_PATH = "./schema.sql"
-BASE_URL = "https://api.coingecko.com/api/v3/coins"
+BASE_URL = environ.get("COIN_API_URL")
 
 
 INSERT_FIELDS = [
@@ -60,7 +59,7 @@ def get_coins(pages=100):
         "vs_currency": "usd",
         "order": "market_cap_desc",
     }
-    return requests.get(f"{BASE_URL}/markets", params=payload)
+    return requests.get(f"{BASE_URL}/coins/markets", params=payload)
 
 
 UPSERT_SQL = f"""
@@ -71,7 +70,7 @@ UPSERT_SQL = f"""
     """
 
 
-def main():
+def fetch_and_cache():
     try:
         print("##############################################")
         response = get_coins(100)  # Get the top 100 coins
@@ -86,7 +85,8 @@ def main():
             ]
         )
 
-        cache.set("coins", json.dumps(coins))
+        redis_conn.set("coins:all", json.dumps(coins))
+        redis_conn.publish("coins", json.dumps({"data": "update", "errors": []}))
 
     except Exception as err:
         print("Something went wrong inside the main function")
@@ -94,4 +94,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    fetch_and_cache()

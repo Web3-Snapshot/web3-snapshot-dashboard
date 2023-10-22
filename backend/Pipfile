@@ -9,6 +9,8 @@ gunicorn = ">=21.2.0,<22.0.0"
 pytest = "*"
 python-dotenv = "*"
 gevent = "*"
+rq = ">=1.15.1,<2.0.0"
+redis = ">=5.0.1,<6.0.0"
 
 [dev-packages]
 debugpy = "*"

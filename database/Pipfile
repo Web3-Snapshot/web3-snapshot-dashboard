@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 requests = "*"
 redis = "==5.0.1"
+rq = "==1.15.1"
 
 [dev-packages]
 

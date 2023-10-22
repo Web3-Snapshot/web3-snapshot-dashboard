@@ -10,6 +10,7 @@ services:
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - REDIS_URL=${REDIS_URL}
+      - COIN_API_URL=${COIN_API_URL}
     links:
       - redis
     volumes:
@@ -92,6 +93,7 @@ services:
       - IPYTHONDIR=/app/.ipython
       - ENVIRONMENT=${ENVIRONMENT}
       - REDIS_URL=${REDIS_URL}
+      - COIN_API_URL=${COIN_API_URL}
     links:
       - redis
     networks:
