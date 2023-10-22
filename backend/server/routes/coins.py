@@ -1,55 +1,20 @@
 import json
 
 from flask import Blueprint, Response, current_app
-from server.routes import sleep_func as sleep
-from util.helpers import compute_extra_columns, process_percentages
+
+# from server.routes import sleep_func as sleep
 
 bp = Blueprint("coins", __name__)
 
 
-def process_data_stream(coins):
-    # Calculate MC/FDV which is the ratio MC/FDV
-
-    coins = compute_extra_columns(coins)
-
-    processed_items = process_percentages(
-        coins,
-        [
-            "ath_change_percentage",
-            "price_change_percentage_24h_in_currency",
-            "price_change_percentage_7d_in_currency",
-            "price_change_percentage_30d_in_currency",
-            "price_change_percentage_1y_in_currency",
-            "fully_diluted_valuation",
-        ],
-    )
-
-    return "data:  %s\n\n" % json.dumps(processed_items)
-
-
 @bp.route("/coins", methods=["GET"])
 def get_coins():
-    items = json.loads(current_app.redis_conn.get("coins:all"))
+    coins = json.loads(current_app.redis_conn.get("coins:all"))
 
-    if items is None:
+    if coins is None:
         return {"error": "No coins found"}, 404
 
-    # Calculate MC/FDV which is the ratio MC/FDV
-    items = compute_extra_columns(items)
-
-    processed_items = process_percentages(
-        items,
-        [
-            "ath_change_percentage",
-            "price_change_percentage_24h_in_currency",
-            "price_change_percentage_7d_in_currency",
-            "price_change_percentage_30d_in_currency",
-            "price_change_percentage_1y_in_currency",
-            "fully_diluted_valuation",
-        ],
-    )
-
-    return processed_items, 200
+    return coins, 200
 
 
 def event_stream(redis_conn):
@@ -60,7 +25,7 @@ def event_stream(redis_conn):
         print(message)
         coins = json.loads(redis_conn.get("coins:all"))
 
-        yield process_data_stream(coins)
+        yield "data:  %s\n\n" % json.dumps(coins)
 
 
 @bp.route("/coin-stream", methods=["GET"])

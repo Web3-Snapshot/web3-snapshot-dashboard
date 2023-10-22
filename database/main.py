@@ -5,6 +5,7 @@ from pathlib import Path
 
 import requests
 from cache import redis_conn
+from util.helpers import compute_extra_columns, process_percentages
 
 DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
 SCHEMA_PATH = "./schema.sql"
@@ -70,11 +71,34 @@ UPSERT_SQL = f"""
     """
 
 
+def preprocess_data(coins):
+    # Calculate MC/FDV which is the ratio MC/FDV
+
+    coins = compute_extra_columns(coins)
+
+    processed_items = process_percentages(
+        coins,
+        [
+            "ath_change_percentage",
+            "price_change_percentage_24h_in_currency",
+            "price_change_percentage_7d_in_currency",
+            "price_change_percentage_30d_in_currency",
+            "price_change_percentage_1y_in_currency",
+            "fully_diluted_valuation",
+        ],
+    )
+
+    return processed_items
+
+
 def fetch_and_cache():
     try:
-        print("##############################################")
         response = get_coins(100)  # Get the top 100 coins
-        coins = response.json()
+
+        # Calculate MC/FDV which is the ratio MC/FDV
+        coins = preprocess_data(response.json())
+
+        print("##############################################")
         print(
             [
                 {
