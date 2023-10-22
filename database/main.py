@@ -1,14 +1,16 @@
-import sqlite3
+import json
 from datetime import datetime
-from functools import reduce
 from os import environ
 from pathlib import Path
 
 import requests
 
+from database.cache import redis_conn as cache
+
 DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
 SCHEMA_PATH = "./schema.sql"
 BASE_URL = "https://api.coingecko.com/api/v3/coins"
+
 
 INSERT_FIELDS = [
     "market_cap_rank",
@@ -61,48 +63,6 @@ def get_coins(pages=100):
     return requests.get(f"{BASE_URL}/markets", params=payload)
 
 
-def deep_get(dictionary, keys, default=None):
-    return reduce(
-        lambda d, key: d.get(key, default) if isinstance(d, dict) else default,
-        keys.split("."),
-        dictionary,
-    )
-
-
-def transformListToCleanString(list_item):
-    return ", ".join([item for item in list_item if item])
-
-
-def setup_database(db_path):
-    conn = sqlite3.connect(db_path, uri=True)
-    cur = conn.cursor()
-
-    with open(SCHEMA_PATH, "r") as sql_file:
-        sql_script = sql_file.read()
-        cur.executescript(sql_script)
-
-    conn.commit()
-
-
-def create_connection(db_path):
-    """Create a database connection to the SQLite database
-
-    ARGS:
-        db_file: database file
-
-    RETURNS:
-        Connection object or None
-    """
-
-    conn = None
-    try:
-        conn = sqlite3.connect(db_path, uri=True)
-    except Exception as err:
-        print(err)
-
-    return conn
-
-
 UPSERT_SQL = f"""
     INSERT OR REPLACE INTO coins (
         {", ".join(INSERT_FIELDS)}
@@ -110,84 +70,27 @@ UPSERT_SQL = f"""
     VALUES ({", ".join(["?" for _ in INSERT_FIELDS])})
     """
 
-UPDATE_SQL = """
-    UPDATE
-        coins
-    SET
-        homepage=?,
-        blockchain_site=?,
-        categories=?,
-        market_cap_rank=?,
-        market_cap_usd=?,
-        fully_diluted_valuation_usd=?,
-        circulating_supply=?,
-        total_supply=?,
-        max_supply=?,
-        current_price=?,
-        total_value_locked=?,
-        price_change_percentage_24h_in_currency=?,
-        price_change_percentage_7d_in_currency=?,
-        price_change_percentage_30d_in_currency=?,
-        price_change_percentage_1y_in_currency=?,
-        ath_change_percentage=?,
-        total_volume=?,
-        description=?,
-        genesis_date=?,
-        hashing_algorithm=?,
-        coingecko_score=?,
-        developer_score=?,
-        community_score=?,
-        liquidity_score=?,
-        public_interest_score=?,
-        updated_at=?
-    WHERE
-        id = ?
-    """
-
 
 def main():
-    if not Path(DB_PATH).exists():
-        setup_database(DB_PATH)
+    try:
+        print("##############################################")
+        response = get_coins(100)  # Get the top 100 coins
+        coins = response.json()
+        print(
+            [
+                {
+                    "name": coin["name"],
+                    "market_cap_rank": coin["market_cap_rank"],
+                }
+                for coin in coins
+            ]
+        )
 
-    conn = create_connection(DB_PATH)
+        cache.set("coins", json.dumps(coins))
 
-    with conn:
-        cur = conn.cursor()
-        try:
-            print("##############################################")
-            response = get_coins(100)  # Get the top 100 coins
-            coins = response.json()
-            print(
-                [
-                    {
-                        "name": coin["name"],
-                        "market_cap_rank": coin["market_cap_rank"],
-                    }
-                    for coin in coins
-                ]
-            )
-
-            for coin in coins:
-                cur.execute(
-                    UPSERT_SQL,
-                    [
-                        coin[prop]
-                        if prop != "updated_at"
-                        else datetime.utcnow().isoformat()
-                        for prop in INSERT_FIELDS
-                    ],
-                )
-
-            cur.execute("DELETE FROM coins WHERE market_cap_rank > 100")
-
-            cur.execute(
-                f"""INSERT OR REPLACE INTO tracking (id,updated_at) VALUES (1,'{datetime.utcnow().isoformat()}')"""
-            )
-            conn.commit()
-
-        except Exception as err:
-            print("Something went wrong inside the main function")
-            print(err)
+    except Exception as err:
+        print("Something went wrong inside the main function")
+        print(err)
 
 
 if __name__ == "__main__":

@@ -9,6 +9,9 @@ services:
       context: ./database
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
+      - REDIS_URL=${REDIS_URL}
+    links:
+      - redis
     volumes:
       - database:/app/instance
       - ${PWD}/database:/app
@@ -23,6 +26,7 @@ services:
       dockerfile: Dockerfile.dev
     environment:
       - DEBUG=${DEBUG}
+      - REDIS_URL=${REDIS_URL}
     ports:
       - 5000:5000
       - 5678:5678
@@ -32,6 +36,8 @@ services:
       - ${PWD}/database/schema.sql:/app/schema.sql
     restart: always
     command: flask --app "server:create_app(config_env='server.config.development')" run --no-debugger --no-reload --host=0.0.0.0 --port=5000
+    links:
+      - redis
     depends_on:
       - db
     networks:
@@ -51,6 +57,17 @@ services:
     volumes:
       - /app/node_modules
       - ${PWD}/frontend:/app
+    networks:
+      - w3s_development-nw
+
+  redis:
+    container_name: web3_redis_dev
+    hostname: redis
+    restart: always
+    image: redis:7.2-alpine
+    command: redis-server --save 20 1 --loglevel warning
+    ports:
+      - 6379
     networks:
       - w3s_development-nw
 
@@ -74,6 +91,9 @@ services:
     environment:
       - IPYTHONDIR=/app/.ipython
       - ENVIRONMENT=${ENVIRONMENT}
+      - REDIS_URL=${REDIS_URL}
+    links:
+      - redis
     networks:
       - w3s_development-nw
 
