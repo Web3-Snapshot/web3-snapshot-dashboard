@@ -18,6 +18,15 @@ def get_coins():
 
 
 def event_stream(redis_conn):
+    """Event stream function that listens to a Redis pubsub channel for updates on coin data.
+    When a message is received, it retrieves the latest coin data from Redis and yields it.
+
+    Args:
+        redis_conn (redis.Redis): A Redis connection object.
+
+    Yields:
+        str: A JSON string representing the latest coin data.
+    """
     pubsub = redis_conn.pubsub(ignore_subscribe_messages=True)
     pubsub.subscribe("coins")
 

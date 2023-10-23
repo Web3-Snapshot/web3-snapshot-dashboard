@@ -7,19 +7,18 @@ from server.db import get_db
 bp = Blueprint("tracking", __name__)
 
 
-def event_stream(cur):
+def event_stream(redis_conn):
     """Handle message formatting"""
 
-    while True:
-        cur.execute("""SELECT updated_at FROM tracking LIMIT 1""")
-        payload = cur.fetchone()
-        data = "data:  %s\n\n" % json.dumps(payload)
-        sleep(1)
+    pubsub = redis_conn.pubsub(ignore_subscribe_messages=True)
+    pubsub.subscribe("coins")
+
+    for message in pubsub.listen():
+        data = "data:  %s\n\n" % json.dumps(message["data"])
         yield data
 
 
 @bp.route("/tracking/timestamp", methods=["GET"])
 def get_tracking_stream():
-    conn = get_db(current_app)
-    cur = conn.cursor()
-    return Response(event_stream(cur), mimetype="text/event-stream"), 200
+    redis_conn = current_app.redis_conn
+    return Response(event_stream(redis_conn), mimetype="text/event-stream"), 200
