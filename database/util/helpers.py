@@ -70,3 +70,36 @@ def compute_extra_columns(objs: List):
         res.append(obj)
 
     return res
+
+
+def generate_diff(previous_data, current_data):
+    """Generate the diff between a previous array of objects and a current array of objects"""
+    diff = []
+    relevant_keys = [
+        "market_cap_rank",
+        "current_price",
+        "price_change_percentage_24h_in_currency",
+        "price_change_percentage_7d_in_currency",
+        "price_change_percentage_30d_in_currency",
+        "price_change_percentage_1y_in_currency",
+        "ath_change_percentage",
+        "fully_diluted_valuation",
+        "mc_fdv_ratio",
+        "total_supply",
+        "max_supply",
+        "circ_supply_total_supply_ratio",
+        "total_volume" "",
+    ]
+    for current_item in current_data:
+        previous_item = next(
+            (item for item in previous_data if item["id"] == current_item["id"]),
+            None,
+        )
+        if previous_item is None:
+            diff.append(current_item)
+        else:
+            for key in relevant_keys:
+                if current_item[key] != previous_item[key]:
+                    diff.append(current_item)
+                    break
+    return diff

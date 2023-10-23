@@ -1,11 +1,12 @@
 import json
-from datetime import datetime
+import pprint
+from datetime import datetime, timezone
 from os import environ
 from pathlib import Path
 
 import requests
 from cache import redis_conn
-from util.helpers import compute_extra_columns, process_percentages
+from util.helpers import compute_extra_columns, generate_diff, process_percentages
 
 DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
 SCHEMA_PATH = "./schema.sql"
@@ -98,19 +99,54 @@ def fetch_and_cache():
         # Calculate MC/FDV which is the ratio MC/FDV
         coins = preprocess_data(response.json())
 
-        print("##############################################")
-        print(
-            [
-                {
-                    "name": coin["name"],
-                    "market_cap_rank": coin["market_cap_rank"],
-                }
-                for coin in coins
-            ]
-        )
+        previous_data = redis_conn.get("coins:all")
 
-        redis_conn.set("coins:all", json.dumps(coins))
-        redis_conn.publish("coins", json.dumps({"data": "update", "errors": []}))
+        if previous_data is not None:
+            previous_data = json.loads(previous_data)
+            diff = generate_diff(previous_data, coins)
+        else:
+            diff = coins
+
+        print("**************************************")
+        print(f"Diff: {len(diff)} rows changed")
+        print("**************************************")
+        # pprint.pprint(
+        #     [
+        #         {
+        #             # "name": coin["name"],
+        #             # "market_cap_rank": coin["market_cap_rank"],
+        #             "ath_change_percentage": coin["ath_change_percentage"],
+        #             "price_change_percentage_24h_in_currency: ": coin[
+        #                 "price_change_percentage_24h_in_currency"
+        #             ],
+        #             "price_change_percentage_7d_in_currency: ": coin[
+        #                 "price_change_percentage_7d_in_currency"
+        #             ],
+        #             "price_change_percentage_30d_in_currency: ": coin[
+        #                 "price_change_percentage_30d_in_currency"
+        #             ],
+        #             "price_change_percentage_1y_in_currency: ": coin[
+        #                 "price_change_percentage_1y_in_currency"
+        #             ],
+        #             "fully_diluted_valuation": coin["fully_diluted_valuation"],
+        #         }
+        #         for coin in coins[:4]
+        #     ]
+        # )
+
+        if len(diff) > 0:
+            updated_at = datetime.now(timezone.utc).isoformat()
+            print(f"Updated at: {updated_at}")
+            pub_payload = {
+                "data": {
+                    "changed": len(diff),
+                    "updated_at": updated_at,
+                },
+                "errors": [],
+            }
+
+            redis_conn.publish("coins", json.dumps(pub_payload))
+            redis_conn.set("coins:all", json.dumps(coins))
 
     except Exception as err:
         print("Something went wrong inside the main function")
