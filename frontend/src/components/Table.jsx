@@ -58,13 +58,6 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
     [order]
   );
 
-  const renderRow = useCallback(
-    (tableData, row, styles, onRowClick) => {
-      return <Row tableData={tableData} row={row} styles={styles} onRowClick={onRowClick} />;
-    },
-    [tableData]
-  );
-
   const renderHeaderRow = useCallback((labelsAndIds, styles, handleSort, order, orderBy) => {
     return (
       <HeaderRow
@@ -95,8 +88,14 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
           <div className={`${rowStyles.row} ${styles.header}`}>{memoizedHeaderRow}</div>
           {orderedCoins.map((coinGuid) => (
             <div key={coinGuid} className={`${rowStyles.row} ${styles.data}`}>
-              {!isEmpty(coins.data[coinGuid]) &&
-                renderRow(tableData, coins.data[coinGuid], styles, onRowClick)}
+              {!isEmpty(coins.data[coinGuid]) && (
+                <Row
+                  tableData={tableData}
+                  row={coins.data[coinGuid]}
+                  styles={styles}
+                  onRowClick={onRowClick}
+                />
+              )}
             </div>
           ))}
         </>

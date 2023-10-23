@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 
@@ -8,11 +8,6 @@ import Table from './Table';
 import { renderCell, renderCellOverlay } from './CellOverlay';
 import CoinInfoModal from './CoinInfoModal';
 import { useScrollLock } from '../custom-hooks/useScrollLock';
-
-// TODO:
-// This url will be used to fetch data for all coins on the 1 Jan 2020, and
-// display the difference in %:
-// https://api.coingecko.com/api/v3/coins/bitcoin/history?date=1-1-2020
 
 function Prices() {
   const { lockScroll, unlockScroll } = useScrollLock();

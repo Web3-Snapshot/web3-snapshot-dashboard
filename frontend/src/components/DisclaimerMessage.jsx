@@ -1,14 +1,18 @@
 import styles from './DisclaimerMessage.module.scss';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import axios from 'axios';
 import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
 import { useEffect, useState } from 'react';
 
+dayjs.extend(utc);
+
 async function fetchTimestamp() {
   return axios
     .get('/api/tracking/timestamp')
     .then((res) => {
+      debugger;
       console.log(res.data);
       return res.data;
     })
@@ -46,7 +50,17 @@ function DisclaimerMessage() {
     const sse = new EventSource('/api/tracking/timestamp');
 
     function handleStream(evt) {
-      setUpdatedAt(dayjs(JSON.parse(evt.data).updated_at).format('YYYY-MM-DD - HH:mm:ss'));
+      const parsedData = JSON.parse(JSON.parse(evt.data))?.data?.updated_at;
+      //   JSON.parse(
+      //     ' "{\\"data\\": {\\"changed\\": 98, \\"updated_at\\": \\"2023-10-23T21:55:01.303786+00:00\\"}, \\"errors\\": []}"'
+      //   )
+      // )?.data?.updated_at;
+
+      if (parsedData) {
+        console.log(parsedData);
+        const localTime = dayjs.utc(parsedData).local();
+        setUpdatedAt(localTime.format('YYYY-MM-DD - HH:mm:ss'));
+      }
     }
 
     sse.onmessage = (evt) => {
