@@ -37,7 +37,7 @@ def event_stream(redis_conn):
         print(message)
         coins = redis_conn.get("coins:all")
         if coins is None:
-            continue 
+            continue
 
         yield "data:  %s\n\n" % coins
 
