@@ -9,8 +9,6 @@ on:
 
 jobs:
   lint-all:
-    env:
-      ENVIRONMENT: development
     runs-on: ubuntu-20.04
     steps:
       - name: Check out Git repository
@@ -25,6 +23,8 @@ jobs:
 
   backend-test:
     runs-on: ubuntu-20.04
+    env:
+      ENVIRONMENT: development
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
