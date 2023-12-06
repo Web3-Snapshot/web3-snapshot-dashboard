@@ -9,12 +9,15 @@ bp = Blueprint("coins", __name__)
 
 @bp.route("/coins", methods=["GET"])
 def get_coins():
-    coins = json.loads(current_app.redis_conn.get("coins:all"))
+
+    coins = current_app.redis_conn.get("coins:all")
 
     if coins is None:
         return {"error": "No coins found"}, 404
 
-    return coins, 200
+    parsed_coins = json.loads(coins)
+
+    return parsed_coins, 200
 
 
 def event_stream(redis_conn):
@@ -32,9 +35,11 @@ def event_stream(redis_conn):
 
     for message in pubsub.listen():
         print(message)
-        coins = json.loads(redis_conn.get("coins:all"))
+        coins = redis_conn.get("coins:all")
+        if coins is None:
+            continue 
 
-        yield "data:  %s\n\n" % json.dumps(coins)
+        yield "data:  %s\n\n" % coins
 
 
 @bp.route("/coin-stream", methods=["GET"])

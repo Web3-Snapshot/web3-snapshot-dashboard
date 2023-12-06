@@ -1,6 +1,7 @@
 from os import environ
 from pathlib import Path
 
+ENV = "production"
 TESTING = False
 FLASK_ENV = "production"
 FLASK_DEBUG = 0

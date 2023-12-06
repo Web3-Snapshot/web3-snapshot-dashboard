@@ -9,8 +9,10 @@ services:
       context: ./database
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
-    volumes:
-      - database:/app/instance
+      - REDIS_URL=${REDIS_URL}
+      - COIN_API_URL=${COIN_API_URL}
+    # volumes:
+    #   - database:/app/instance
     networks:
       - w3s-inner-nw
 
@@ -20,6 +22,7 @@ services:
       context: ./backend
     environment:
       - FLASK_DEBUG=production
+      - REDIS_URL=${REDIS_URL}
     env_file: ./backend/.env
     volumes:
       - database:/app/instance
@@ -33,8 +36,9 @@ services:
 
   frontend:
     container_name: web3_frontend_prod
-    build:
-      context: ./frontend
+    # build:
+    #   context: ./frontend
+    image: web3-snapshot-dashboard-frontend:latest
     ports:
       - 80:80
       - 443:443
@@ -43,9 +47,11 @@ services:
       - backend
     links:
       - backend
+    # command: "nginx -g daemon off;"
     volumes:
       - certbot_www:/var/www/certbot/:ro
-      - certbot_conf:/etc/nginx/ssl/:ro
+      # - certbot_conf:/etc/nginx/ssl/:ro
+      - certbot_conf:/etc/nginx/ssl
     networks:
       - w3s-nw
 
@@ -71,6 +77,17 @@ services:
       - ENVIRONMENT=${ENVIRONMENT}
     networks:
       - w3s-nw
+
+  redis:
+    container_name: web3_redis_prod
+    hostname: redis
+    restart: always
+    image: redis:7.2-alpine
+    command: redis-server --save 20 1 --loglevel warning
+    ports:
+      - 6379
+    networks:
+      - w3s-inner-nw
 
 volumes:
   database:

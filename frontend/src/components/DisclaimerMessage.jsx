@@ -39,9 +39,9 @@ function DisclaimerMessage() {
     return (
       <>
         <p>
-          <strong>+++ Under Development: v1.1 +++</strong>
+          <strong>+++ Under Development: v1.2 +++</strong>
         </p>
-        <p>{`Last update: ${updatedAt}`}</p>
+        <p>{`Latest update: ${updatedAt}`}</p>
       </>
     );
   }
