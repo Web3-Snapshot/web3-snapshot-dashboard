@@ -9,6 +9,8 @@ on:
 
 jobs:
   lint-all:
+    env:
+      ENVIRONMENT: development
     runs-on: ubuntu-20.04
     steps:
       - name: Check out Git repository
