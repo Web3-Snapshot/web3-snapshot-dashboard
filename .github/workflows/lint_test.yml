@@ -30,7 +30,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Install dependencies
-        run: manage --build
+        run: ./scripts/manage --build
 
       - name: Run pytest
-        run: manage --tests
+        run: ./scripts/manage --tests
