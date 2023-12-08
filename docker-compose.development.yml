@@ -35,6 +35,7 @@ services:
       - database:/app/instance
       - ${PWD}/backend:/app
       - ${PWD}/database/schema.sql:/app/schema.sql
+      - ${PWD}/database/util:/app/database_util
     restart: always
     command: flask --app "server:create_app(config_env='server.config.development')" run --no-debugger --no-reload --host=0.0.0.0 --port=5000
     links:
