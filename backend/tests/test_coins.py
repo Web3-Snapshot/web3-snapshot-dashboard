@@ -4,6 +4,11 @@ from functools import partial
 from unittest import mock
 
 import pytest
+from database_util.helpers import (
+    compute_extra_columns,
+    generate_diff,
+    process_percentages,
+)
 from server.routes.coins import event_stream
 
 
@@ -55,7 +60,43 @@ INSERT_FIELDS = [
 ]
 
 
-def seed_coin(conn):
+def seed_coin(conn, app):
+    values = [
+        1,
+        "test_id",
+        "test_symbol",
+        "test_name",
+        "test_img_url",
+        0.123,
+        10,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        "test_timestamp_at",
+        1.23,
+        1.23,
+        "test_timestamp_atl",
+        "test_last_updated",
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        "test_updated_at",
+    ]
+
     cur = conn.cursor()
     cur.execute(
         f"""
@@ -64,53 +105,33 @@ def seed_coin(conn):
         )
         VALUES ({", ".join(["?" for _ in INSERT_FIELDS])})
         """,
-        [
-            1,
-            "test_id",
-            "test_symbol",
-            "test_name",
-            "test_img_url",
-            0.123,
-            10,
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            "test_timestamp_at",
-            1.23,
-            1.23,
-            "test_timestamp_atl",
-            "test_last_updated",
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            1.23,
-            "test_updated_at",
-        ],
+        values,
     )
     conn.commit()
 
+    coins = [dict(zip(INSERT_FIELDS, values))]
+    coins = compute_extra_columns(coins)
+    coins = process_percentages(
+        coins,
+        [
+            "ath_change_percentage",
+            "price_change_percentage_24h_in_currency",
+            "price_change_percentage_7d_in_currency",
+            "price_change_percentage_30d_in_currency",
+            "price_change_percentage_1y_in_currency",
+            "fully_diluted_valuation",
+        ],
+    )
+    app.redis_conn.set("coins:all", json.dumps(coins))
 
-def test_get_coins(client, db_connection):
-    seed_coin(db_connection)
+
+def test_get_coins(client, db_connection, app):
+    seed_coin(db_connection, app)
 
     with mock_events():
         response = client.get("/api/coins")
 
-        # We have to remove the "data:  " part from the response before we can parse it
-        assert json.loads(response.data[6:]) == [
+        assert json.loads(response.data) == [
             {
                 "market_cap_rank": 1,
                 "id": "test_id",
@@ -144,19 +165,19 @@ def test_get_coins(client, db_connection):
                 "price_change_percentage_30d_in_currency": 1.23,
                 "price_change_percentage_200d_in_currency": 1.23,
                 "price_change_percentage_1y_in_currency": 1.23,
-                "ath_change_percentage_in_currency": None,
-                "description": None,
-                "total_value_locked": None,
-                "genesis_date": None,
-                "hashing_algorithm": None,
-                "coingecko_score": None,
-                "developer_score": None,
-                "community_score": None,
-                "liquidity_score": None,
-                "public_interest_score": None,
-                "homepage": None,
-                "blockchain_site": None,
-                "categories": None,
+                # "ath_change_percentage_in_currency": None,
+                # "description": None,
+                # "total_value_locked": None,
+                # "genesis_date": None,
+                # "hashing_algorithm": None,
+                # "coingecko_score": None,
+                # "developer_score": None,
+                # "community_score": None,
+                # "liquidity_score": None,
+                # "public_interest_score": None,
+                # "homepage": None,
+                # "blockchain_site": None,
+                # "categories": None,
                 "updated_at": "test_updated_at",
                 "mc_fdv_ratio": 8.13,
                 "circ_supply_total_supply_ratio": 1.0,

@@ -1,6 +1,7 @@
 import sqlite3
 from os import environ
 
+import fakeredis
 import pytest
 from flask import Flask, g
 from server import create_app
@@ -18,6 +19,7 @@ def init_db(cur):
 @pytest.fixture(scope="module")
 def app():
     app = create_app(config_env="server.config.testing")
+    app.redis_conn = fakeredis.FakeStrictRedis()
     yield app
 
 
