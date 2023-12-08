@@ -23,6 +23,8 @@ jobs:
 
   backend-test:
     runs-on: ubuntu-20.04
+    env:
+      ENVIRONMENT: development
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
@@ -30,9 +32,10 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Install dependencies
-        working-directory: backend
-        run: pip install -r requirements.txt
+        run: ./scripts/manage --build development
+
+      - name: Initialize database
+        run: ./scripts/manage --init-db
 
       - name: Run pytest
-        working-directory: backend
-        run: pytest -vv
+        run: ./scripts/manage --tests

@@ -1,80 +1,191 @@
+import json
+from contextlib import contextmanager
+from functools import partial
+from unittest import mock
+
 import pytest
-from flask import g
+from database_util.helpers import (
+    compute_extra_columns,
+    generate_diff,
+    process_percentages,
+)
+from server.routes.coins import event_stream
 
 
-def seed_coin(db):
-    cur = db.cursor()
+@contextmanager
+def mock_events():
+    with mock.patch(
+        "server.routes.coins.event_stream",
+        partial(event_stream, single=True),
+    ):
+        yield
+
+
+# This has to be in sync with the INSERT_FIELDS array in the main.py from the database container
+INSERT_FIELDS = [
+    "market_cap_rank",
+    "id",
+    "symbol",
+    "name",
+    "image",
+    "current_price",
+    "market_cap",
+    "fully_diluted_valuation",
+    "total_volume",
+    "high_24h",
+    "low_24h",
+    "price_change_24h",
+    "price_change_percentage_24h",
+    "market_cap_change_24h",
+    "market_cap_change_percentage_24h",
+    "circulating_supply",
+    "total_supply",
+    "max_supply",
+    "ath",
+    "ath_change_percentage",
+    "ath_date",
+    "atl",
+    "atl_change_percentage",
+    "atl_date",
+    # "roi",
+    "last_updated",
+    "price_change_percentage_1h_in_currency",
+    "price_change_percentage_24h_in_currency",
+    "price_change_percentage_7d_in_currency",
+    "price_change_percentage_14d_in_currency",
+    "price_change_percentage_30d_in_currency",
+    "price_change_percentage_200d_in_currency",
+    "price_change_percentage_1y_in_currency",
+    "updated_at",
+]
+
+
+def seed_coin(conn, app):
+    values = [
+        1,
+        "test_id",
+        "test_symbol",
+        "test_name",
+        "test_img_url",
+        0.123,
+        10,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        "test_timestamp_at",
+        1.23,
+        1.23,
+        "test_timestamp_atl",
+        "test_last_updated",
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        1.23,
+        "test_updated_at",
+    ]
+
+    cur = conn.cursor()
     cur.execute(
-        """
+        f"""
         INSERT INTO coins (
-            id,
-            name,
-            image_thumb,
-            symbol,
-            market_cap_rank,
-            market_cap_usd,
-            fully_diluted_valuation_usd,
-            circulating_supply,
-            total_supply,
-            max_supply,
-            current_price,
-            price_change_percentage_24h,
-            price_change_percentage_7d,
-            price_change_percentage_30d,
-            price_change_percentage_1y,
-            ath_change_percentage
-            )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            {", ".join(INSERT_FIELDS)}
+        )
+        VALUES ({", ".join(["?" for _ in INSERT_FIELDS])})
         """,
+        values,
+    )
+    conn.commit()
+
+    coins = [dict(zip(INSERT_FIELDS, values))]
+    coins = compute_extra_columns(coins)
+    coins = process_percentages(
+        coins,
         [
-            "test_id",
-            "test_name",
-            "test_img_thumb",
-            "test_symbol",
-            0.123,
-            10.3,
-            20.4,
-            34.4,
-            17.4,
-            10032.0,
-            20934.3,
-            20934.0,
-            2390.1,
-            2034.5,
-            10934.0,
-            1003203.0,
+            "ath_change_percentage",
+            "price_change_percentage_24h_in_currency",
+            "price_change_percentage_7d_in_currency",
+            "price_change_percentage_30d_in_currency",
+            "price_change_percentage_1y_in_currency",
+            "fully_diluted_valuation",
         ],
     )
-    db.commit()
+    app.redis_conn.set("coins:all", json.dumps(coins))
 
 
-def test_get_coins(client, db_connection):
-    seed_coin(db_connection)
+def test_get_coins(client, db_connection, app):
+    seed_coin(db_connection, app)
 
-    response = client.get("/api/coins")
+    with mock_events():
+        response = client.get("/api/coins")
 
-    assert response.status_code == 200
-    assert len(response.json) == 1
-    assert all(
-        [
-            True if el in response.json[0] else False
-            for el in [
-                "id",
-                "name",
-                "image_thumb",
-                "symbol",
-                "market_cap_rank",
-                "market_cap_usd",
-                "fully_diluted_valuation_usd",
-                "circulating_supply",
-                "total_supply",
-                "max_supply",
-                "current_price",
-                "price_change_percentage_24h",
-                "price_change_percentage_7d",
-                "price_change_percentage_30d",
-                "price_change_percentage_1y",
-                "ath_change_percentage",
-            ]
+        assert json.loads(response.data) == [
+            {
+                "market_cap_rank": 1,
+                "id": "test_id",
+                "symbol": "test_symbol",
+                "name": "test_name",
+                "image": "test_img_url",
+                "current_price": 0.123,
+                "market_cap": 10,
+                "fully_diluted_valuation": 1.23,
+                "total_volume": 1.23,
+                "high_24h": 1.23,
+                "low_24h": 1.23,
+                "price_change_24h": 1.23,
+                "price_change_percentage_24h": 1.23,
+                "market_cap_change_24h": 1.23,
+                "market_cap_change_percentage_24h": 1.23,
+                "circulating_supply": 1.23,
+                "total_supply": 1.23,
+                "max_supply": 1.23,
+                "ath": 1.23,
+                "ath_change_percentage": 1.23,
+                "ath_date": "test_timestamp_at",
+                "atl": 1.23,
+                "atl_change_percentage": 1.23,
+                "atl_date": "test_timestamp_atl",
+                "last_updated": "test_last_updated",
+                "price_change_percentage_1h_in_currency": 1.23,
+                "price_change_percentage_24h_in_currency": 1.23,
+                "price_change_percentage_7d_in_currency": 1.23,
+                "price_change_percentage_14d_in_currency": 1.23,
+                "price_change_percentage_30d_in_currency": 1.23,
+                "price_change_percentage_200d_in_currency": 1.23,
+                "price_change_percentage_1y_in_currency": 1.23,
+                # "ath_change_percentage_in_currency": None,
+                # "description": None,
+                # "total_value_locked": None,
+                # "genesis_date": None,
+                # "hashing_algorithm": None,
+                # "coingecko_score": None,
+                # "developer_score": None,
+                # "community_score": None,
+                # "liquidity_score": None,
+                # "public_interest_score": None,
+                # "homepage": None,
+                # "blockchain_site": None,
+                # "categories": None,
+                "updated_at": "test_updated_at",
+                "mc_fdv_ratio": 8.13,
+                "circ_supply_total_supply_ratio": 1.0,
+                "ath_change_percentage_relative": 100,
+                "price_change_percentage_24h_in_currency_relative": 100,
+                "price_change_percentage_7d_in_currency_relative": 100,
+                "price_change_percentage_30d_in_currency_relative": 100,
+                "price_change_percentage_1y_in_currency_relative": 100,
+                "fully_diluted_valuation_relative": 100,
+            }
         ]
-    )

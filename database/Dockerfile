@@ -2,11 +2,13 @@ FROM python:3.11-alpine
 
 WORKDIR /app
 
-COPY ./requirements.txt /app/requirements.txt
+RUN pip install --upgrade pip && pip install pipenv
 
-RUN pip install --upgrade pip && pip install -r requirements.txt
+COPY Pipfile.lock Pipfile /app/
 
-COPY . .
+RUN pipenv install --deploy --system --dev
+
+COPY . /app/
 
 COPY crontab /etc/cron.d/crontab
 

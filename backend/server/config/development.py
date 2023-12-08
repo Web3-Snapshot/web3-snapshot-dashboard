@@ -10,5 +10,5 @@ LOGLEVEL = environ.get("LOGLEVEL", "DEBUG")
 SECRET_KEY = "dev"
 
 ROOT_PATH = "/app"
-DATABASE_NAME = "db.sqlite"
+DATABASE_NAME = "development.db"
 DATABASE_URI = f"{ROOT_PATH}/instance/{DATABASE_NAME}"

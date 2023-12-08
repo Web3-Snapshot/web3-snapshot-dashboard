@@ -19,8 +19,4 @@ const HeaderRow = ({ headers, styles, sortHandler, order, orderBy }) => {
   ));
 };
 
-HeaderRow.defaultProps = {
-  row: [],
-};
-
 export default HeaderRow;

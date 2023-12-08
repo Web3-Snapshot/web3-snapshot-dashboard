@@ -3,10 +3,18 @@ version: '3.7'
 services:
   db:
     container_name: web3_database_prod
+    init: true
+    restart: always
     build:
       context: ./database
-    volumes:
-      - database:/app/instance
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - REDIS_URL=${REDIS_URL}
+      - COIN_API_URL=${COIN_API_URL}
+    # volumes:
+    #   - database:/app/instance
+    networks:
+      - w3s-inner-nw
 
   backend:
     container_name: web3_backend_prod
@@ -14,17 +22,23 @@ services:
       context: ./backend
     environment:
       - FLASK_DEBUG=production
-      - SECRET_KEY
+      - REDIS_URL=${REDIS_URL}
+    env_file: ./backend/.env
     volumes:
       - database:/app/instance
+      - ${PWD}/database/schema.sql:/app/schema.sql
     restart: always
     depends_on:
       - db
+    networks:
+      - w3s-inner-nw
+      - w3s-nw
 
   frontend:
     container_name: web3_frontend_prod
-    build:
-      context: ./frontend
+    # build:
+    #   context: ./frontend
+    image: web3-snapshot-dashboard-frontend:latest
     ports:
       - 80:80
       - 443:443
@@ -33,10 +47,54 @@ services:
       - backend
     links:
       - backend
+    # command: "nginx -g daemon off;"
     volumes:
       - certbot_www:/var/www/certbot/:ro
-      - certbot_conf:/etc/nginx/ssl/:ro
+      # - certbot_conf:/etc/nginx/ssl/:ro
+      - certbot_conf:/etc/nginx/ssl
+    networks:
+      - w3s-nw
+
+  isession:
+    container_name: web3_isession_production
+    stdin_open: true
+    tty: true
+    command: ipython
+    build:
+      context: .
+      dockerfile: ./isession/Dockerfile
+    volumes:
+      - ${PWD}/backend/server:/app/server
+      - ${PWD}/backend/util:/app/util
+      - ${PWD}/database/schema.sql:/app/schema.sql
+      - ${PWD}/database:/app/database
+      - ${PWD}/isession/.ipython:/app/.ipython
+      - /app/.ipython/profile_default/pid
+      - /app/.ipython/profile_default/security
+      - database:/app/instance
+    environment:
+      - IPYTHONDIR=/app/.ipython
+      - ENVIRONMENT=${ENVIRONMENT}
+    networks:
+      - w3s-nw
+
+  redis:
+    container_name: web3_redis_prod
+    hostname: redis
+    restart: always
+    image: redis:7.2-alpine
+    command: redis-server --save 20 1 --loglevel warning
+    ports:
+      - 6379
+    networks:
+      - w3s-inner-nw
+
 volumes:
   database:
   certbot_www:
   certbot_conf:
+
+
+networks:
+  w3s-nw:
+  w3s-inner-nw:

@@ -1,3 +1,5 @@
+import { v4 as uuid } from 'uuid';
+
 // Formatting of displayed text
 export function formatLongNumbers(value) {
   if (!value || value === '0') {
@@ -26,6 +28,9 @@ function comparator(a, b, order, orderBy) {
 }
 
 export function objectSort(obj, order, orderBy) {
+  if (!obj || !obj.data || !obj.order) {
+    return [];
+  }
   const dataObj = obj.data;
   return Object.entries(dataObj)
     .sort(([_, av], [__, bv]) => comparator(av, bv, order, orderBy))
@@ -49,4 +54,16 @@ export function removeTags(str) {
   }
 
   return str.toString().replace(/(<([^>]+)>)/gi, '');
+}
+
+export function normalizeResponse(json) {
+  return json.reduce(
+    (acc, curr) => {
+      const guid = uuid();
+      acc.data = { ...acc.data, [guid]: curr };
+      acc.order.push(guid);
+      return acc;
+    },
+    { data: {}, order: [] }
+  );
 }

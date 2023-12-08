@@ -1,36 +1,25 @@
 import sqlite3
+from os import environ
 
+import fakeredis
 import pytest
 from flask import Flask, g
 from server import create_app
 from server.db import dict_factory
 
-SCHEMA = """
-            CREATE TABLE IF NOT EXISTS coins
-            (
-                [id] VARCHAR(20) PRIMARY KEY,
-                [name] VARCHAR(50),
-                [image_thumb] TEXT,
-                [symbol] TEXT,
-                [market_cap_rank] INTEGER,
-                [market_cap_usd] REAL,
-                [fully_diluted_valuation_usd] REAL,
-                [circulating_supply] REAL,
-                [total_supply] REAL,
-                [max_supply] REAL,
-                [current_price] REAL,
-                [price_change_percentage_24h] REAL,
-                [price_change_percentage_7d] REAL,
-                [price_change_percentage_30d] REAL,
-                [price_change_percentage_1y] REAL,
-                [ath_change_percentage] REAL
-            );
-        """
+SCHEMA_PATH = "./schema.sql"
+
+
+def init_db(cur):
+    with open(SCHEMA_PATH, "r") as sql_file:
+        sql_script = sql_file.read()
+        cur.executescript(sql_script)
 
 
 @pytest.fixture(scope="module")
 def app():
     app = create_app(config_env="server.config.testing")
+    app.redis_conn = fakeredis.FakeStrictRedis()
     yield app
 
 
@@ -40,8 +29,7 @@ def db_connection(app):
         conn = sqlite3.connect(app.config["DATABASE_URI"], uri=True)
         conn.row_factory = dict_factory
         cur = conn.cursor()
-        cur.execute(SCHEMA)
-        conn.commit()
+        init_db(cur)
         g.db = conn
         yield conn
 

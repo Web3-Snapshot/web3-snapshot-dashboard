@@ -1,6 +1,7 @@
 import sqlite3
+from os import environ
 
-DB_PATH = "./instance/db.sqlite"
+DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
 SCHEMA_PATH = "./schema.sql"
 
 if __name__ == "__main__":

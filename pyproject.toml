@@ -8,3 +8,6 @@ filterwarnings = [
 exclude = ".venv"
 max-complexity = 10
 max-line-length = 100
+
+[tool.pylint]
+disable = ["import-error"]

@@ -17,6 +17,7 @@ function Tokenomics() {
   const { coins } = useOutletContext();
   const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
   const [row, setRow] = useState();
+  const defaultOrderByProp = ['market_cap_rank'];
 
   const tableData = [
     {
@@ -30,16 +31,16 @@ function Tokenomics() {
       render: (obj) => <IconAndCurrencyIdCell obj={obj} />,
     },
     {
-      id: 'market_cap_usd',
+      id: 'market_cap',
       label: ss ? 'M. Cap' : 'Market Cap',
-      render: (obj) => `$${formatLongNumbers(obj.market_cap_usd)}`,
+      render: (obj) => `$${formatLongNumbers(obj.market_cap)}`,
     },
     {
-      id: 'fully_diluted_valuation_usd',
+      id: 'fully_diluted_valuation',
       label: mobile || tablet ? 'FD' : 'Fully Diluted',
       render: (obj) =>
-        `${obj.fully_diluted_valuation_usd ? '$' : ''}${formatLongNumbers(
-          obj.fully_diluted_valuation_usd
+        `${obj.fully_diluted_valuation ? '$' : ''}${formatLongNumbers(
+          obj.fully_diluted_valuation
         )}`,
     },
     {
@@ -84,9 +85,9 @@ function Tokenomics() {
   ];
 
   function handleRowClick(_, row) {
-    setRow(row);
-    lockScroll();
-    setIsCoinInfoModalOpen(true);
+    // setRow(row);
+    // lockScroll();
+    // setIsCoinInfoModalOpen(true);
   }
 
   function handleClose() {
@@ -107,7 +108,7 @@ function Tokenomics() {
         coins={coins}
         onRowClick={handleRowClick}
         rowStyles={styles}
-        defaultOrderBy={['market_cap_rank']}
+        defaultOrderBy={defaultOrderByProp}
       />
     </>
   );
