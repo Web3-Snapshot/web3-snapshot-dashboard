@@ -15,7 +15,7 @@ def get_coins():
 
     coins = json.loads(coins)
 
-    updated_at = current_app.redis_conn.get("coins:updated_at").decode("utf-8")
+    updated_at = current_app.redis_conn.get("coins:updated_at")
 
     parsed_coins = {"payload": coins, "updated_at": updated_at}
 
