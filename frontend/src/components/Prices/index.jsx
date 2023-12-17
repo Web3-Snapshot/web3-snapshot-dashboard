@@ -23,8 +23,6 @@ function Prices() {
   const setUpdatedAt = usePricesStore((state) => state.setUpdatedAt);
   const coins = usePricesStore(selectRows);
 
-  const initalDataFetchDone = useRef(false);
-
   useEffect(() => {
     const fetchData = async function () {
       fetchCoins().then((res) => {
@@ -35,8 +33,7 @@ function Prices() {
     };
 
     fetchData();
-    initalDataFetchDone.current = true;
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const tableData = [
     {

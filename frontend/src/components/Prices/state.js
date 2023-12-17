@@ -10,9 +10,9 @@ export const usePricesStore = create(
       set((state) => {
         fetchedRows = fetchedRows.map((row) => ({
           id: row.id,
+          symbol: row.symbol,
           image: row.image,
           market_cap_rank: row.market_cap_rank,
-          symbol: row.symbol,
           current_price: row.current_price,
           price_change_percentage_24h_in_currency: row.price_change_percentage_24h_in_currency,
           price_change_percentage_24h_in_currency_relative:
