@@ -86,12 +86,12 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
       {desktop ? (
         <>
           <div className={`${rowStyles.row} ${styles.header}`}>{memoizedHeaderRow}</div>
-          {orderedCoins.map((coinGuid) => (
-            <div key={coinGuid} className={`${rowStyles.row} ${styles.data}`}>
-              {!isEmpty(coins.data[coinGuid]) && (
+          {orderedCoins.map((coinId) => (
+            <div key={coinId} className={`${rowStyles.row} ${styles.data}`}>
+              {!isEmpty(coins.data[coinId]) && (
                 <Row
                   tableData={tableData}
-                  row={coins.data[coinGuid]}
+                  row={coins.data[coinId]}
                   styles={styles}
                   onRowClick={onRowClick}
                 />
@@ -101,11 +101,11 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
         </>
       ) : (
         <>
-          {orderedCoins.map((coinGuid) => {
-            const coin = coins.data[coinGuid];
+          {orderedCoins.map((coinId) => {
+            const coin = coins.data[coinId];
             return (
               coin && (
-                <Card key={coinGuid} tableData={tableData} coin={coin} onCardClick={onRowClick} />
+                <Card key={coinId} tableData={tableData} coin={coin} onCardClick={onRowClick} />
               )
             );
           })}
