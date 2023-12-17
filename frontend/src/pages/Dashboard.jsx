@@ -5,20 +5,22 @@ import navbarStyles from '../components/Navbar.module.scss';
 import DisclaimerMessage from '../components/DisclaimerMessage';
 import { useIsIframe } from '../custom-hooks/useIsIframe';
 import { usePricesStore } from '../components/Prices/state';
+import { useTokenomicsStore } from '../components/Tokenomics/state';
 
 function Dashboard() {
   const isIframe = useIsIframe();
-  const setRows = usePricesStore((state) => state.setRows);
+  const setPricesRows = usePricesStore((state) => state.setRows);
   const setUpdatedAt = usePricesStore((state) => state.setUpdatedAt);
+  const setTokenomicsRows = useTokenomicsStore((state) => state.setRows);
 
   useEffect(() => {
-    // if (!initalDataFetchDone.current) return;
     const sse = new EventSource('/api/coin-stream');
 
     function handleStream(evt) {
       console.log('evt.data', evt.data);
       const res = JSON.parse(evt.data);
-      setRows(res.payload);
+      setPricesRows(res.payload);
+      setTokenomicsRows(res.payload);
       setUpdatedAt(res.updated_at);
     }
 
