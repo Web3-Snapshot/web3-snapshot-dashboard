@@ -9,23 +9,25 @@ bp = Blueprint("coins", __name__)
 
 @bp.route("/coins", methods=["GET"])
 def get_coins():
-
     coins = current_app.redis_conn.get("coins:all")
-
     if coins is None:
         return {"error": "No coins found"}, 404
 
-    parsed_coins = json.loads(coins)
+    coins = json.loads(coins)
+
+    updated_at = current_app.redis_conn.get("coins:updated_at").decode("utf-8")
+
+    parsed_coins = {"payload": coins, "updated_at": updated_at}
 
     return parsed_coins, 200
 
 
-def event_stream(redis_conn):
+def event_stream(redis_conn, single=False):
     """Event stream function that listens to a Redis pubsub channel for updates on coin data.
     When a message is received, it retrieves the latest coin data from Redis and yields it.
 
     Args:
-        redis_conn (redis.Redis): A Redis connection object.
+        pubsub: (Redis.pubsub): A Redis pubsub connection.
 
     Yields:
         str: A JSON string representing the latest coin data.
@@ -36,10 +38,18 @@ def event_stream(redis_conn):
     for message in pubsub.listen():
         print(message)
         coins = redis_conn.get("coins:all")
+        updated_at = redis_conn.get("coins:updated_at")
         if coins is None:
             continue
 
-        yield "data:  %s\n\n" % coins
+        stream_payload = json.dumps(
+            {"payload": json.loads(coins), "updated_at": updated_at}
+        )
+        if single:
+            single = False
+            return "data:  %s\n\n" % stream_payload
+
+        yield "data:  %s\n\n" % stream_payload
 
 
 @bp.route("/coin-stream", methods=["GET"])
