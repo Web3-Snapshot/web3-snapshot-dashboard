@@ -17,7 +17,8 @@ const selectRows = (state) => state.rows;
 function Prices() {
   const { lockScroll, unlockScroll } = useScrollLock();
   const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
-  const [row, setRow] = useState();
+  // const [row, setRow] = useState();
+  const coinId = useRef(null);
   const defaultOrderByProp = ['market_cap_rank'];
   const setRows = usePricesStore((state) => state.setRows);
   const setUpdatedAt = usePricesStore((state) => state.setUpdatedAt);
@@ -108,13 +109,15 @@ function Prices() {
   const handleRowClick = useCallback(
     (_, row) => {
       // setRow(row);
-      // lockScroll();
-      // setIsCoinInfoModalOpen(true);
+      coinId.current = row.id;
+      lockScroll();
+      setIsCoinInfoModalOpen(true);
     },
     [lockScroll]
   );
 
   const handleClose = useCallback(() => {
+    coinId.current = null;
     unlockScroll();
     setIsCoinInfoModalOpen(false);
   }, [unlockScroll]);
@@ -123,7 +126,11 @@ function Prices() {
     <>
       {isCoinInfoModalOpen &&
         createPortal(
-          <CoinInfoModal isOpen={isCoinInfoModalOpen} onClose={handleClose} row={row} />,
+          <CoinInfoModal
+            coinId={coinId.current}
+            isOpen={isCoinInfoModalOpen}
+            onClose={handleClose}
+          />,
           document.body
         )}
       <>
