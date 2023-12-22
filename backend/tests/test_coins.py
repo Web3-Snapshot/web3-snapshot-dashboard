@@ -1,5 +1,6 @@
 import json
 from contextlib import contextmanager
+from datetime import datetime, timezone
 from functools import partial
 from unittest import mock
 
@@ -20,6 +21,8 @@ def mock_events():
     ):
         yield
 
+
+UPDATED_AT = "2022-01-01T00:00:00Z"
 
 # This has to be in sync with the INSERT_FIELDS array in the main.py from the database container
 INSERT_FIELDS = [
@@ -124,6 +127,8 @@ def seed_coin(conn, app):
     )
     app.redis_conn.set("coins:all", json.dumps(coins))
 
+    app.redis_conn.set("coins:updated_at", UPDATED_AT)
+
 
 def test_get_coins(client, db_connection, app):
     seed_coin(db_connection, app)
@@ -131,7 +136,7 @@ def test_get_coins(client, db_connection, app):
     with mock_events():
         response = client.get("/api/coins")
 
-        assert json.loads(response.data) == [
+        assert response.json["payload"] == [
             {
                 "market_cap_rank": 1,
                 "id": "test_id",
@@ -189,3 +194,23 @@ def test_get_coins(client, db_connection, app):
                 "fully_diluted_valuation_relative": 100,
             }
         ]
+        assert response.json["updated_at"] == UPDATED_AT
+
+
+@pytest.mark.skip
+def test_get_coins_stream(client, app):
+    with mock_events():
+        response = client.get(
+            "/api/coin-stream", headers={"Accept": "text/event-stream"}
+        )
+
+        app.redis_conn.publish("coins")
+        # app.redis_conn.set("coins:all", json.dumps([]))
+
+        assert response.status_code == 200
+        assert response.json == {}
+
+        # assert response.content_type == "text/event-stream"
+        # assert response.headers["Cache-Control"] == "no-cache"
+        # assert response.headers["Connection"] == "keep-alive"
+        # assert response.headers["X-Accel-Buffering"] == "no"

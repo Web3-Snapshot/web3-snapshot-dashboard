@@ -147,6 +147,7 @@ def fetch_and_cache():
 
             redis_conn.publish("coins", json.dumps(pub_payload))
             redis_conn.set("coins:all", json.dumps(coins))
+            redis_conn.set("coins:updated_at", updated_at)
 
     except Exception as err:
         print("Something went wrong inside the main function")

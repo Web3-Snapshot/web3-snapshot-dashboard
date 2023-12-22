@@ -38,7 +38,7 @@ services:
     container_name: web3_frontend_prod
     # build:
     #   context: ./frontend
-    image: web3-snapshot-dashboard-frontend:latest
+    image: loxosceles/web3_snapshot_dashboard-frontend:latest
     ports:
       - 80:80
       - 443:443

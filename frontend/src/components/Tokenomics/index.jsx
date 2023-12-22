@@ -1,23 +1,40 @@
-import React, { useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { isEmpty } from 'lodash';
 
-import CoinInfoModal from './CoinInfoModal';
-import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
-import { formatLongNumbers } from '../util/helpers';
-import styles from './Tokenomics.module.scss';
-import Table from './Table';
+import { useTokenomicsStore } from './state';
+import { fetchCoins } from '../../shared/api';
+import IconAndCurrencyIdCell from '../IconAndCurrencyIdCell';
+import Table from '../Table';
 import { useBreakpoints } from 'react-breakpoints-hook';
-import { useScrollLock } from '../custom-hooks/useScrollLock';
-import { BREAKPOINTS } from '../constants';
+import CoinInfoModal from '../CoinInfoModal';
+import { formatLongNumbers } from '../../util/helpers';
+import { useScrollLock } from '../../custom-hooks/useScrollLock';
+import { BREAKPOINTS } from '../../constants';
+
+import styles from './Tokenomics.module.scss';
+
+const selectRows = (state) => state.rows;
 
 function Tokenomics() {
-  const { lockScroll, unlockScroll } = useScrollLock();
   let { ss, mobile, tablet } = useBreakpoints(BREAKPOINTS);
-  const { coins } = useOutletContext();
+  const { lockScroll, unlockScroll } = useScrollLock();
   const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
   const [row, setRow] = useState();
   const defaultOrderByProp = ['market_cap_rank'];
+  const setRows = useTokenomicsStore((state) => state.setRows);
+  const coins = useTokenomicsStore(selectRows);
+
+  useEffect(() => {
+    const fetchData = async function () {
+      fetchCoins().then((res) => {
+        console.log(res.updatedAt);
+        setRows(res.payload);
+      });
+    };
+
+    fetchData();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const tableData = [
     {
@@ -102,14 +119,17 @@ function Tokenomics() {
           <CoinInfoModal isOpen={isCoinInfoModalOpen} onClose={handleClose} row={row} />,
           document.body
         )}
-      <Table
-        numberOfDynamicRows={4}
-        tableData={tableData}
-        coins={coins}
-        onRowClick={handleRowClick}
-        rowStyles={styles}
-        defaultOrderBy={defaultOrderByProp}
-      />
+      <>
+        {!isEmpty(coins) && (
+          <Table
+            tableData={tableData}
+            coins={coins}
+            onRowClick={handleRowClick}
+            rowStyles={styles}
+            defaultOrderBy={defaultOrderByProp}
+          />
+        )}
+      </>
     </>
   );
 }

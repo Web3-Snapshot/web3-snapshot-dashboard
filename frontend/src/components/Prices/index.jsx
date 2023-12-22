@@ -1,20 +1,39 @@
-import { useState, useCallback } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { isEmpty } from 'lodash';
+
+import { usePricesStore } from './state';
+import { fetchCoins } from '../../shared/api';
+import IconAndCurrencyIdCell from '../IconAndCurrencyIdCell';
+import Table from '../Table';
+import { renderCell, renderCellOverlay } from '../CellOverlay';
+import CoinInfoModal from '../CoinInfoModal';
+import { useScrollLock } from '../../custom-hooks/useScrollLock';
 
 import styles from './Prices.module.scss';
-import IconAndCurrencyIdCell from './IconAndCurrencyIdCell';
-import Table from './Table';
-import { renderCell, renderCellOverlay } from './CellOverlay';
-import CoinInfoModal from './CoinInfoModal';
-import { useScrollLock } from '../custom-hooks/useScrollLock';
+
+const selectRows = (state) => state.rows;
 
 function Prices() {
   const { lockScroll, unlockScroll } = useScrollLock();
-  const { coins } = useOutletContext();
   const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
   const [row, setRow] = useState();
   const defaultOrderByProp = ['market_cap_rank'];
+  const setRows = usePricesStore((state) => state.setRows);
+  const setUpdatedAt = usePricesStore((state) => state.setUpdatedAt);
+  const coins = usePricesStore(selectRows);
+
+  useEffect(() => {
+    const fetchData = async function () {
+      fetchCoins().then((res) => {
+        console.log(res.updatedAt);
+        setRows(res.payload);
+        setUpdatedAt(res.updated_at);
+      });
+    };
+
+    fetchData();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const tableData = [
     {
@@ -107,13 +126,17 @@ function Prices() {
           <CoinInfoModal isOpen={isCoinInfoModalOpen} onClose={handleClose} row={row} />,
           document.body
         )}
-      <Table
-        tableData={tableData}
-        coins={coins}
-        onRowClick={handleRowClick}
-        rowStyles={styles}
-        defaultOrderBy={defaultOrderByProp}
-      />
+      <>
+        {!isEmpty(coins) && (
+          <Table
+            tableData={tableData}
+            coins={coins}
+            onRowClick={handleRowClick}
+            rowStyles={styles}
+            defaultOrderBy={defaultOrderByProp}
+          />
+        )}
+      </>
     </>
   );
 }
