@@ -7,6 +7,17 @@ from flask import Blueprint, Response, current_app
 bp = Blueprint("coins", __name__)
 
 
+@bp.route("/coins/<string:coin_id>", methods=["GET"])
+def get_coin(coin_id):
+    coin = current_app.redis_conn.get(f"coins:{coin_id}")
+    if coin is None:
+        return {"error": "No coin found"}, 404
+
+    coin = json.loads(coin)
+
+    return coin, 200
+
+
 @bp.route("/coins", methods=["GET"])
 def get_coins():
     coins = current_app.redis_conn.get("coins:all")
