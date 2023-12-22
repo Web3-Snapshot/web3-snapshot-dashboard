@@ -42,6 +42,7 @@ COIN_DETAIL_FIELDS = {
     "community_data": "community_data",
     "description": "description.en",
     "homepage": "links.homepage",
+    "last_updated": "last_updated",
 }
 
 
@@ -223,7 +224,7 @@ def fetch_and_cache():
         print("Something went wrong inside the main function while fetching coins")
         print(err)
 
-    ### Fetch single coin
+    ### Fetch single coins
     try:
         coin_response = get_single_coin("bitcoin")
 
