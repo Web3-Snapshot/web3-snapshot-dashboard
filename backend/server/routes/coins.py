@@ -2,13 +2,19 @@ import json
 
 from flask import Blueprint, Response, current_app
 
-# from server.routes import sleep_func as sleep
-
 bp = Blueprint("coins", __name__)
 
 
 @bp.route("/coins/<string:coin_id>", methods=["GET"])
 def get_coin(coin_id):
+    """Retrieve information about a specific coin.
+
+    Args:
+        coin_id (str): The ID of the coin.
+
+    Returns:
+        tuple: A tuple containing the coin information and the HTTP status code.
+    """
     coin = current_app.redis_conn.get(f"coins:{coin_id}")
     if coin is None:
         return {"error": "No coin found"}, 404
@@ -20,6 +26,12 @@ def get_coin(coin_id):
 
 @bp.route("/coins", methods=["GET"])
 def get_coins():
+    """Retrieve the list of coins from the Redis cache.
+
+    Returns:
+        A tuple containing the parsed coins and the last updated timestamp.
+        If no coins are found, returns an error message with status code 404.
+    """
     coins = current_app.redis_conn.get("coins:all")
     if coins is None:
         return {"error": "No coins found"}, 404

@@ -135,7 +135,6 @@ connect_service() {
         ENVIROMENT=${ENVIRONMENT} \
             docker compose -f docker-compose."$ENVIRONMENT".yml run --rm -it "$_arg_connect_service" /bin/sh
     fi
-
 }
 
 ps() {
@@ -177,7 +176,6 @@ stop_cert_server() {
 get_certificate() {
     docker compose -f docker-compose.certbot.yml run --rm certbot certonly --webroot \
         --webroot-path /var/www/certbot/ -d ${DOMAIN} -d ${DOMAIN} -v
-    # --webroot-path /var/www/certbot/ --dry-run -d www.${DOMAIN} -d ${DOMAIN} -v
 }
 
 renew_certificate() {

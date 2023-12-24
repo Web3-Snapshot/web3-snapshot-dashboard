@@ -17,7 +17,6 @@ const selectRows = (state) => state.rows;
 function Prices() {
   const { lockScroll, unlockScroll } = useScrollLock();
   const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
-  // const [row, setRow] = useState();
   const coinId = useRef(null);
   const defaultOrderByProp = ['market_cap_rank'];
   const setRows = usePricesStore((state) => state.setRows);
@@ -108,7 +107,6 @@ function Prices() {
 
   const handleRowClick = useCallback(
     (_, row) => {
-      // setRow(row);
       coinId.current = row.id;
       lockScroll();
       setIsCoinInfoModalOpen(true);
