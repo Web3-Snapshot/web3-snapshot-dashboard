@@ -17,15 +17,20 @@ function CoinInfoModal({ coinId, onClose }) {
   const [coin, setCoin] = useState(null);
   const homepage = useRef(null);
   const icon = useRef(null);
-  homepage.current = coin?.homepage[0] || '';
+  homepage.current = coin?.homepage?.[0] || '';
   icon.current = coin?.image.large;
 
   useEffect(() => {
     const fetchData = async function () {
-      fetchCoin(coinId).then((res) => {
-        console.log(res);
-        setCoin(res);
-      });
+      fetchCoin(coinId)
+        .then((res) => {
+          console.log(res);
+          setCoin(res);
+        })
+        .catch((err) => {
+          console.log(err);
+          setCoin(null);
+        });
     };
 
     if (coinId) {
@@ -40,46 +45,56 @@ function CoinInfoModal({ coinId, onClose }) {
 
   return (
     <>
-      {coin && (
-        <div className={styles.backdrop} onClick={handleBackdropClick}>
-          <div
-            className={styles.dialogRoot}
-            onClick={(evt) => {
-              evt.stopPropagation();
-            }}>
-            <CgClose className={styles.closeIcon} onClick={handleBackdropClick}></CgClose>
-            {icon.current && (
-              <div className={styles.dialogContent}>
-                <div className={styles.dialogHeader}>
-                  <img src={icon.current} alt="coin" />
-                  <div className={styles.coinName}>
-                    <h2>{capitalize(coin.id)}</h2>
-                  </div>
-                  <div className={styles.coinSymbol}>
-                    <p>{coin.symbol.toUpperCase()}</p>
-                  </div>
-                </div>
-                <div className={styles.dialogBody}>
-                  <Scrollbars
-                    renderView={(props) => <div {...props} className="scrollbarView" />}
-                    autoHeight
-                    autoHeightMin={modalDimensions.minHeight}
-                    autoHeightMax={modalDimensions.maxHeight}>
-                    <div className={styles.coinDescription}>
-                      <Markup content={removeTags(coin.description)}></Markup>
+      <div className={styles.backdrop} onClick={handleBackdropClick}>
+        <div
+          className={styles.dialogRoot}
+          onClick={(evt) => {
+            evt.stopPropagation();
+          }}>
+          <CgClose className={styles.closeIcon} onClick={handleBackdropClick}></CgClose>
+          {coin ? (
+            <>
+              {icon.current && (
+                <div className={styles.dialogContent}>
+                  <div className={styles.dialogHeader}>
+                    <img src={icon.current} alt="coin" />
+                    <div className={styles.coinName}>
+                      <h2>{capitalize(coin.id)}</h2>
                     </div>
-                  </Scrollbars>
-                  <div className={styles.homepageLink}>
-                    <Link to={homepage.current} target="_blank">
-                      {homepage.current}
-                    </Link>
+                    <div className={styles.coinSymbol}>
+                      <p>{coin.symbol.toUpperCase()}</p>
+                    </div>
+                  </div>
+                  <div className={styles.dialogBody}>
+                    <Scrollbars
+                      renderView={(props) => <div {...props} className="scrollbarView" />}
+                      autoHeight
+                      autoHeightMin={modalDimensions.minHeight}
+                      autoHeightMax={modalDimensions.maxHeight}>
+                      <div className={styles.coinDescription}>
+                        <Markup content={removeTags(coin.description)}></Markup>
+                      </div>
+                    </Scrollbars>
+                    <div className={styles.homepageLink}>
+                      {homepage && (
+                        <Link to={homepage.current} target="_blank">
+                          {homepage.current}
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 </div>
+              )}
+            </>
+          ) : (
+            <div className={styles.dialogContent}>
+              <div className={styles.dialogBody}>
+                <h3>We currently don't have any more specific data for this coin.</h3>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </>
   );
 }
