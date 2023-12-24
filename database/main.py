@@ -19,20 +19,24 @@ which is raised when there are errors during data fetching.
 Note: The module relies on external dependencies such as requests, cache, and util.helpers.
 """
 
-# Rest of the code...
 import json
 import pprint
 from datetime import datetime, timezone
 from os import environ
-from pathlib import Path
 
 import requests
 from cache import redis_conn
-from util.helpers import compute_extra_columns, generate_diff, process_percentages
+from util.helpers import (
+    compute_extra_columns,
+    generate_list_diff,
+    generate_object_diff,
+    process_percentages,
+)
 
 DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
 SCHEMA_PATH = "./schema.sql"
 BASE_URL = environ.get("COIN_API_URL")
+NUMBER_OF_SINGLE_COINS = 2
 
 COIN_DETAIL_FIELDS = {
     "id": "id",
@@ -188,16 +192,16 @@ def fetch_and_cache():
 
     """
     try:
-        response = get_coins(100)  # Get the top 100 coins
+        coins_response = get_coins(100)  # Get the top 100 coins
 
         # Calculate MC/FDV which is the ratio MC/FDV
-        coins = preprocess_data(response.json())
+        coins = preprocess_data(coins_response.json())
 
         previous_data = redis_conn.get("coins:all")
 
         if previous_data is not None:
             previous_data = json.loads(previous_data)
-            diff = generate_diff(previous_data, coins)
+            diff = generate_object_diff(previous_data, coins)
         else:
             diff = coins
 
@@ -226,15 +230,47 @@ def fetch_and_cache():
 
     ### Fetch single coins
     try:
-        coin_response = get_single_coin("bitcoin")
+        coins = json.loads(redis_conn.get("coins:all"))
+        incoming_ids = [coin["id"] for coin in coins]
 
-        if coin_response.status_code != 200:
-            raise DataFetcherException('Coin "bitcoin" not found')
+        rotating_ids = redis_conn.get("coins:ids")
+        if rotating_ids is None:
+            rotating_ids = incoming_ids
+            redis_conn.set("coins:ids", json.dumps(rotating_ids))
 
-        filtered_coin = get_filtered_coin(coin_response.json())
+        # Convert to list
+        rotating_ids = json.loads(rotating_ids)
 
-        redis_conn.set("coins:bitcoin", json.dumps(filtered_coin))
-        print(f"Fetched bitcoin information: {pprint.pprint(filtered_coin)}")
+        # Generate the diff and return the removed and new ids
+        removed_ids, new_ids = generate_list_diff(rotating_ids, incoming_ids)
+        print(f"Removed ids: {removed_ids}")
+        print(f"New ids: {new_ids}")
+
+        # First remove the obsolete ids
+        rotating_ids = [id for id in rotating_ids if id not in removed_ids]
+
+        # Then add the new ids (4 max) to the beginning of the list
+        rotating_ids = new_ids[:4] + rotating_ids
+
+        # Make requests to the first couple of ids
+        for coin_id in rotating_ids[:NUMBER_OF_SINGLE_COINS]:
+            coin_response = get_single_coin(coin_id)
+
+            if coin_response.status_code != 200:
+                raise DataFetcherException(
+                    f'Coin "{coin_id}" not found, {coin_response.json()}'
+                )
+
+            filtered_coin = get_filtered_coin(coin_response.json())
+
+            redis_conn.set(f"coins:{coin_id}", json.dumps(filtered_coin))
+
+            # Remove the first id and add it to the end of the list
+            rotating_ids = (
+                rotating_ids[NUMBER_OF_SINGLE_COINS:]
+                + rotating_ids[:NUMBER_OF_SINGLE_COINS]
+            )
+            redis_conn.set("coins:ids", json.dumps(rotating_ids))
 
     except Exception as err:  # pylint: disable=broad-except
         print(
