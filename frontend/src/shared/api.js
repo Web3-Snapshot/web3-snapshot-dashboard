@@ -11,3 +11,15 @@ export async function fetchCoins() {
       throw new Error(err);
     });
 }
+
+export async function fetchCoin(id) {
+  return axios
+    .get(`/api/coins/${id}`)
+    .then((res) => {
+      console.log(res.data);
+      return res.data;
+    })
+    .catch((err) => {
+      throw new Error(err);
+    });
+}

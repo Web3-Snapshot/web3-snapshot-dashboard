@@ -1,5 +1,9 @@
 import pytest
-from util.helpers import compute_extra_columns, generate_diff, process_percentages
+from util.helpers import (
+    compute_extra_columns,
+    generate_object_diff,
+    process_percentages,
+)
 
 
 @pytest.fixture
@@ -248,7 +252,7 @@ def test_generate_diff_all_equal():
         },
     ]
     expected_diff = []
-    assert generate_diff(previous_data, current_data) == expected_diff
+    assert generate_object_diff(previous_data, current_data) == expected_diff
 
 
 def test_generate_diff_one_different():
@@ -432,4 +436,4 @@ def test_generate_diff_one_different():
             "price_change_percentage_1y_in_currency": 6.360420461311904,
         },
     ]
-    assert generate_diff(previous_data, current_data) == expected_diff
+    assert generate_object_diff(previous_data, current_data) == expected_diff

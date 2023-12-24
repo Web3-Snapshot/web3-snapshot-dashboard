@@ -72,7 +72,7 @@ def compute_extra_columns(objs: List):
     return res
 
 
-def generate_diff(previous_data, current_data):
+def generate_object_diff(previous_data, current_data):
     """Generate the diff between a previous array of objects and a current array of objects"""
     diff = []
     relevant_keys = [
@@ -88,7 +88,7 @@ def generate_diff(previous_data, current_data):
         "total_supply",
         "max_supply",
         "circ_supply_total_supply_ratio",
-        "total_volume" "",
+        "total_volume",
     ]
     for current_item in current_data:
         previous_item = next(
@@ -102,4 +102,28 @@ def generate_diff(previous_data, current_data):
                 if current_item[key] != previous_item[key]:
                     diff.append(current_item)
                     break
+    return diff
+
+
+def generate_list_diff(previous_data, current_data):
+    """Generate the diff between a previous array and a current array.
+
+    Args:
+        previous_data (list): The previous array.
+        current_data (list): The current array.
+
+    Returns:
+        list: The list contains two lists: the first list contains the items
+        that were removed, the second list contains the items that were added.
+    """
+    diff = [[], []]
+
+    for previous_item in previous_data:
+        if previous_item not in current_data:
+            diff[0].append(previous_item)
+
+    for current_item in current_data:
+        if current_item not in previous_data:
+            diff[1].append(current_item)
+
     return diff

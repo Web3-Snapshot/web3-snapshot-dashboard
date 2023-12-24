@@ -11,8 +11,6 @@ services:
       - ENVIRONMENT=${ENVIRONMENT}
       - REDIS_URL=${REDIS_URL}
       - COIN_API_URL=${COIN_API_URL}
-    links:
-      - redis
     volumes:
       - database:/app/instance
       - ${PWD}/database:/app
@@ -38,8 +36,6 @@ services:
       - ${PWD}/database/util:/app/database_util
     restart: always
     command: flask --app "server:create_app(config_env='server.config.development')" run --no-debugger --host=0.0.0.0 --port=5000
-    links:
-      - redis
     depends_on:
       - db
     networks:
@@ -72,6 +68,8 @@ services:
       - 6379
     networks:
       - w3s_development-nw
+    volumes:
+      - cache:/data
 
   isession:
     container_name: web3_isession
@@ -95,14 +93,12 @@ services:
       - ENVIRONMENT=${ENVIRONMENT}
       - REDIS_URL=${REDIS_URL}
       - COIN_API_URL=${COIN_API_URL}
-    links:
-      - redis
     networks:
       - w3s_development-nw
 
 volumes:
   database:
-
+  cache:
 
 networks:
   w3s_development-nw:
