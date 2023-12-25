@@ -36,8 +36,8 @@ services:
 
   frontend:
     container_name: web3_frontend_prod
-    # build:
-    #   context: ./frontend
+    build:
+      context: ./frontend
     image: loxosceles/web3_snapshot_dashboard-frontend:latest
     ports:
       - 80:80
@@ -93,7 +93,6 @@ volumes:
   database:
   certbot_www:
   certbot_conf:
-
 
 networks:
   w3s-nw:
