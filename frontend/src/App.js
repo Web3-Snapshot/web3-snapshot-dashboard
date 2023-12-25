@@ -8,6 +8,13 @@ import { useIsIframe } from './custom-hooks/useIsIframe';
 
 function App() {
   const isIframe = useIsIframe();
+
+  // Remove background if embedded in iframe on external site
+  const bodyElement = document.querySelector('body');
+  if (isIframe) {
+    bodyElement?.style.setProperty('background', 'None');
+  }
+
   return (
     <>
       {!isIframe && <Navbar />}
