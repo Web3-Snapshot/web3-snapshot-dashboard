@@ -16,7 +16,7 @@ The module includes the following functions:
 Additionally, the module defines a custom exception class, DataFetcherException,
 which is raised when there are errors during data fetching.
 
-Note: The module relies on external dependencies such as requests, cache, and util.helpers.
+Note: The module relies on external dependencies such as requests, cache, and utils.helpers.
 """
 
 import json
@@ -25,11 +25,13 @@ from datetime import datetime, timezone
 from os import environ
 
 import requests
-from cache import redis_conn
-from util.helpers import (
+
+from database.core.cache import redis_conn
+from database.utils.helpers import (
     compute_extra_columns,
     generate_list_diff,
     generate_object_diff,
+    normalize_coins,
     process_percentages,
 )
 
@@ -196,14 +198,20 @@ def fetch_and_cache():
 
         # Calculate MC/FDV which is the ratio MC/FDV
         coins = preprocess_data(coins_response.json())
+        normalized_coins, order = normalize_coins(coins)
 
         previous_data = redis_conn.get("coins:all")
 
         if previous_data is not None:
+            # If we have data stored from the run before, we deserialize it
             previous_data = json.loads(previous_data)
-            diff = generate_object_diff(previous_data, coins)
+            # pprint.pprint(previous_data)
+            diff = generate_object_diff(previous_data, normalized_coins)
         else:
-            diff = coins
+            diff = normalized_coins
+
+        print("DEBUG: Diff")
+        print(pprint.pprint(diff["bitcoin"]))
 
         print("**************************************")
         print(f"Diff: {len(diff)} rows changed")
@@ -220,8 +228,11 @@ def fetch_and_cache():
                 "errors": [],
             }
 
+            data, order = normalize_coins(coins)
             redis_conn.publish("coins", json.dumps(pub_payload))
-            redis_conn.set("coins:all", json.dumps(coins))
+
+            redis_conn.set("coins:all", json.dumps(data))
+            redis_conn.set("coins:order", json.dumps(order))
             redis_conn.set("coins:updated_at", updated_at)
 
     except Exception as err:  # pylint: disable=broad-except
@@ -263,7 +274,9 @@ def fetch_and_cache():
 
             filtered_coin = get_filtered_coin(coin_response.json())
 
+            print("DEBUG: Before set")
             redis_conn.set(f"coins:{coin_id}", json.dumps(filtered_coin))
+            print("DEBUG: After set")
 
             # Remove the first id and add it to the end of the list
             rotating_ids = (

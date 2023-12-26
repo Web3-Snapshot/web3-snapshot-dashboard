@@ -1,6 +1,40 @@
 from copy import deepcopy
 from typing import List
 
+PRICES_PROPS = [
+    "id",
+    "symbol",
+    "name",
+    "image",
+    "market_cap_rank",
+    "current_price",
+    "price_change_percentage_24h_in_currency",
+    "price_change_percentage_24h_in_currency_relative",
+    "price_change_percentage_7d_in_currency",
+    "price_change_percentage_7d_in_currency_relative",
+    "price_change_percentage_30d_in_currency",
+    "price_change_percentage_30d_in_currency_relative",
+    "price_change_percentage_1y_in_currency",
+    "price_change_percentage_1y_in_currency_relative",
+    "ath_change_percentage",
+    "ath_change_percentage_relative",
+]
+
+TOKENOMICS_PROPS = [
+    "id",
+    "symbol",
+    "image",
+    "market_cap_rank",
+    "market_cap",
+    "fully_diluted_valuation",
+    "circulating_supply",
+    "circ_supply_total_supply_ratio",
+    "mc_fdv_ratio",
+    "total_supply",
+    "max_supply",
+    "total_volume",
+]
+
 
 def calculate_relative_percentage(key, original_value, d):
     if original_value is None:
@@ -74,34 +108,37 @@ def compute_extra_columns(objs: List):
 
 def generate_object_diff(previous_data, current_data):
     """Generate the diff between a previous array of objects and a current array of objects"""
-    diff = []
-    relevant_keys = [
-        "market_cap_rank",
-        "current_price",
-        "price_change_percentage_24h_in_currency",
-        "price_change_percentage_7d_in_currency",
-        "price_change_percentage_30d_in_currency",
-        "price_change_percentage_1y_in_currency",
-        "ath_change_percentage",
-        "fully_diluted_valuation",
-        "mc_fdv_ratio",
-        "total_supply",
-        "max_supply",
-        "circ_supply_total_supply_ratio",
-        "total_volume",
-    ]
-    for current_item in current_data:
-        previous_item = next(
-            (item for item in previous_data if item["id"] == current_item["id"]),
-            None,
-        )
-        if previous_item is None:
-            diff.append(current_item)
-        else:
-            for key in relevant_keys:
-                if current_item[key] != previous_item[key]:
-                    diff.append(current_item)
+
+    diff = {}
+    relevant_keys = {
+        "prices": [
+            "market_cap_rank",
+            "current_price",
+            "price_change_percentage_1h_in_currency",
+            "price_change_percentage_24h_in_currency",
+            "price_change_percentage_7d_in_currency",
+            "price_change_percentage_30d_in_currency",
+            "price_change_percentage_1y_in_currency",
+            "ath_change_percentage",
+        ],
+        "tokenomics": [
+            "market_cap_rank",
+            "market_cap",
+            "fully_diluted_valuation",
+            "circulating_supply",
+            "total_supply",
+            "max_supply",
+            "total_volume",
+        ],
+    }
+
+    for name, coin in current_data.items():
+        for category, category_data in coin.items():
+            for key in relevant_keys[category]:
+                if category_data[key] != previous_data[name][category][key]:
+                    diff[name] = coin
                     break
+
     return diff
 
 
@@ -127,3 +164,24 @@ def generate_list_diff(previous_data, current_data):
             diff[1].append(current_item)
 
     return diff
+
+
+def normalize_coins(coins):
+    """Normalizes the coins data.
+
+    Args:
+        coins (list): The list of coins.
+
+    Returns:
+        list: The normalized coins data.
+    """
+    data = {}
+    order = []
+    for coin in coins:
+        data[coin["id"]] = {
+            "prices": {k: v for (k, v) in coin.items() if k in PRICES_PROPS},
+            "tokenomics": {k: v for (k, v) in coin.items() if k in TOKENOMICS_PROPS},
+        }
+        order.append(coin["id"])
+
+    return data, order
