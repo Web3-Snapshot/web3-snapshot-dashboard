@@ -9,9 +9,10 @@ import { BREAKPOINTS } from '../constants';
 import { objectSort } from '../utils/helpers';
 import { usePricesStore } from './Prices/state';
 
+const selectOrder = (state) => state.order;
+
 function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
-  // const [orderedIds, setOrderedIds] = useState(coins.order);
-  const orderedIds = usePricesStore((state) => state.order);
+  const orderedIds = usePricesStore(selectOrder);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
   let { desktop } = useBreakpoints(BREAKPOINTS);
@@ -22,7 +23,8 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
       setOrder(order === 'asc' ? 'desc' : 'asc');
       setOrderBy([cellId]);
     },
-    [order]
+    // [order]
+    []
   );
 
   const renderHeaderRow = useCallback((labelsAndIds, styles, handleSort, order, orderBy) => {
@@ -42,12 +44,12 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
   //   [labelsAndIds, order, orderBy]
   // );
 
-  useEffect(() => {
-    // if (coins.order.length > 0) {
-    if (orderedIds.length > 0) {
-      // setOrderedIds(objectSort(coins, order, orderBy));
-    }
-  }, [coins, order, orderBy]);
+  // useEffect(() => {
+  //   // if (coins.order.length > 0) {
+  //   if (orderedIds.length > 0) {
+  //     setOrderedIds(objectSort(coins, order, orderBy));
+  //   }
+  // }, [coins, order, orderBy]);
 
   return (
     <div className={styles.container}>
