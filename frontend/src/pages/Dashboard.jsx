@@ -12,6 +12,7 @@ function Dashboard() {
   const setPricesRows = usePricesStore((state) => state.setRows);
   const setUpdatedAt = usePricesStore((state) => state.setUpdatedAt);
   const setTokenomicsRows = useTokenomicsStore((state) => state.setRows);
+  const setOrder = usePricesStore((state) => state.setOrder);
 
   useEffect(() => {
     const sse = new EventSource('/api/coin-stream');
@@ -19,9 +20,10 @@ function Dashboard() {
     function handleStream(evt) {
       console.log('evt.data', evt.data);
       const res = JSON.parse(evt.data);
-      setPricesRows(res.payload);
-      setTokenomicsRows(res.payload);
+      setPricesRows(res.prices);
+      setTokenomicsRows(res.tokenomics);
       setUpdatedAt(res.updated_at);
+      setOrder(res.order);
     }
 
     sse.onmessage = (evt) => {

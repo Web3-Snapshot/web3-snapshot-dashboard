@@ -20,16 +20,19 @@ function Tokenomics() {
   let { ss, mobile, tablet } = useBreakpoints(BREAKPOINTS);
   const { lockScroll, unlockScroll } = useScrollLock();
   const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
-  const [row, setRow] = useState();
   const defaultOrderByProp = ['market_cap_rank'];
   const setRows = useTokenomicsStore((state) => state.setRows);
+  const setOrder = useTokenomicsStore((state) => state.setOrder);
+  const setUpdatedAt = useTokenomicsStore((state) => state.setUpdatedAt);
   const coins = useTokenomicsStore(selectRows);
 
   useEffect(() => {
     const fetchData = async function () {
       fetchCoins().then((res) => {
-        console.log(res.updatedAt);
-        setRows(res.payload);
+        console.log(res.updated_at);
+        setRows(res.tokenomics);
+        setOrder(res.order);
+        setUpdatedAt(res.updated_at);
       });
     };
 
@@ -116,7 +119,7 @@ function Tokenomics() {
     <>
       {isCoinInfoModalOpen &&
         createPortal(
-          <CoinInfoModal isOpen={isCoinInfoModalOpen} onClose={handleClose} row={row} />,
+          <CoinInfoModal isOpen={isCoinInfoModalOpen} onClose={handleClose} />,
           document.body
         )}
       <>

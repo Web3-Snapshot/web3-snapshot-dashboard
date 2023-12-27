@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
 import { isEmpty } from 'lodash';
 import styles from './Table.module.scss';
 import Row from './Row';
 import HeaderRow from './HeaderRow';
+import Card from './Card';
 import { useBreakpoints } from 'react-breakpoints-hook';
+import { BREAKPOINTS } from '../constants';
 import { objectSort } from '../utils/helpers';
+import { usePricesStore } from './Prices/state';
 
 function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
-  const [orderedCoins, setOrderedCoins] = useState(coins.order);
+  // const [orderedIds, setOrderedIds] = useState(coins.order);
+  const orderedIds = usePricesStore((state) => state.order);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
   let { desktop } = useBreakpoints(BREAKPOINTS);
@@ -34,14 +37,15 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
     );
   }, []);
 
-  const memoizedHeaderRow = useMemo(
-    () => renderHeaderRow(labelsAndIds, styles, handleSort, order, orderBy),
-    [labelsAndIds, order, orderBy]
-  );
+  // const memoizedHeaderRow = useMemo(
+  //   () => renderHeaderRow(labelsAndIds, styles, handleSort, order, orderBy),
+  //   [labelsAndIds, order, orderBy]
+  // );
 
   useEffect(() => {
-    if (coins.order.length > 0) {
-      setOrderedCoins(objectSort(coins, order, orderBy));
+    // if (coins.order.length > 0) {
+    if (orderedIds.length > 0) {
+      // setOrderedIds(objectSort(coins, order, orderBy));
     }
   }, [coins, order, orderBy]);
 
@@ -49,30 +53,38 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
     <div className={styles.container}>
       {desktop ? (
         <>
-          <div className={`${rowStyles.row} ${styles.header}`}>{memoizedHeaderRow}</div>
-          {orderedCoins.map((coinId) => (
+          {/* <div className={`${rowStyles.row} ${styles.header}`}>{memoizedHeaderRow}</div> */}
+          {orderedIds.map((coinId) => (
             <div key={coinId} className={`${rowStyles.row} ${styles.data}`}>
-              {!isEmpty(coins.data[coinId]) && (
-                <Row
-                  tableData={tableData}
-                  row={coins.data[coinId]}
-                  styles={styles}
-                  onRowClick={onRowClick}
-                />
-              )}
+              <Row
+                tableData={tableData}
+                row={coins[coinId]}
+                styles={styles}
+                onRowClick={onRowClick}
+              />
             </div>
           ))}
         </>
       ) : (
         <>
-          {orderedCoins.map((coinId) => {
-            const coin = coins.data[coinId];
-            return (
-              coin && (
-                <Card key={coinId} tableData={tableData} coin={coin} onCardClick={onRowClick} />
-              )
-            );
-          })}
+          {/* <div className={`${rowStyles.row} ${styles.header}`}>{memoizedHeaderRow}</div> */}
+          <div className={`${rowStyles.row} ${styles.header}`}>
+            <HeaderRow
+              headers={labelsAndIds}
+              styles={styles}
+              sortHandler={handleSort}
+              order={order}
+              orderBy={orderBy}
+            />
+          </div>
+          {orderedIds.map((coinId) => (
+            <Card
+              key={coinId}
+              tableData={tableData}
+              coin={coins.data[coinId]}
+              onCardClick={onRowClick}
+            />
+          ))}
         </>
       )}
     </div>
