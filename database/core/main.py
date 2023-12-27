@@ -256,13 +256,11 @@ def fetch_and_cache():
         print(f"Removed ids: {removed_ids}")
         print(f"New ids: {new_ids}")
 
-        print(f"rotating_ids before remove/ add: {rotating_ids}")
         # First remove the obsolete ids
         rotating_ids = [id for id in rotating_ids if id not in removed_ids]
 
         # Then add the new ids (2 max) to the beginning of the list
         rotating_ids = (new_ids + rotating_ids)[:100]
-        print(f"rotating_ids after remove/ add: {rotating_ids}")
 
         # Make requests to the first couple of ids
         for coin_id in rotating_ids[:NUMBER_OF_SINGLE_COINS]:
@@ -278,13 +276,11 @@ def fetch_and_cache():
             redis_conn.set(f"coins:{coin_id}", json.dumps(filtered_coin))
 
         # Remove the first id and add it to the end of the list
-        print(f"rotating_ids length before rotate: {len(rotating_ids)}")
         rotating_ids = (
             rotating_ids[NUMBER_OF_SINGLE_COINS:]
             + rotating_ids[:NUMBER_OF_SINGLE_COINS]
         )
-        print(f"rotating_ids after rotate: {rotating_ids}")
-        print(f"rotating_ids length after rotate: {len(rotating_ids)}")
+        print(f"rotating_ids before save: {rotating_ids}")
         redis_conn.set("coins:ids", json.dumps(rotating_ids))
 
     except Exception as err:  # pylint: disable=broad-except
