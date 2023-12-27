@@ -8,7 +8,7 @@ import IconAndCurrencyIdCell from '../IconAndCurrencyIdCell';
 import Table from '../Table';
 import { useBreakpoints } from 'react-breakpoints-hook';
 import CoinInfoModal from '../CoinInfoModal';
-import { formatLongNumbers } from '../../util/helpers';
+import { formatLongNumbers } from '../../utils/helpers';
 import { useScrollLock } from '../../custom-hooks/useScrollLock';
 import { BREAKPOINTS } from '../../constants';
 

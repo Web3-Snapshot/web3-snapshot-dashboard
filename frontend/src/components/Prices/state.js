@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import zukeeper from 'zukeeper';
-import { normalizeResponse } from '../../util/helpers';
 
 export const usePricesStore = create(
   zukeeper((set) => ({

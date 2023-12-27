@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 import { fetchCoin } from '../shared/api';
 import styles from './CoinInfoModal.module.scss';
-import { capitalize, removeTags } from '../util/helpers';
+import { capitalize, removeTags } from '../utils/helpers';
 import { Scrollbars } from 'react-custom-scrollbars';
 
 const modalDimensions = {
