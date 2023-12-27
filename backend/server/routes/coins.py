@@ -35,12 +35,21 @@ def get_coins():
     coins = current_app.redis_conn.get("coins:all")
     if coins is None:
         return {"error": "No coins found"}, 404
-
     coins = json.loads(coins)
+
+    order = current_app.redis_conn.get("coins:order")
+    if order is None:
+        return {"error": "No sort order found"}, 404
+    order = json.loads(order)
 
     updated_at = current_app.redis_conn.get("coins:updated_at")
 
-    parsed_coins = {"payload": coins, "updated_at": updated_at}
+    parsed_coins = {
+        "prices": coins["prices"],
+        "tokenomics": coins["tokenomics"],
+        "order": order,
+        "updated_at": updated_at,
+    }
 
     return parsed_coins, 200
 

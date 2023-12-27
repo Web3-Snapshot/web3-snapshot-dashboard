@@ -1,13 +1,13 @@
 import json
 from contextlib import contextmanager
-from datetime import datetime, timezone
 from functools import partial
 from unittest import mock
 
 import pytest
-from database_util.helpers import (
+from database_utils.helpers import (
     compute_extra_columns,
-    generate_diff,
+    generate_object_diff,
+    normalize_coins,
     process_percentages,
 )
 from server.routes.coins import event_stream
@@ -100,24 +100,13 @@ def seed_coin(conn, app):
         "test_updated_at",
     ]
 
-    cur = conn.cursor()
-    cur.execute(
-        f"""
-        INSERT INTO coins (
-            {", ".join(INSERT_FIELDS)}
-        )
-        VALUES ({", ".join(["?" for _ in INSERT_FIELDS])})
-        """,
-        values,
-    )
-    conn.commit()
-
     coins = [dict(zip(INSERT_FIELDS, values))]
     coins = compute_extra_columns(coins)
     coins = process_percentages(
         coins,
         [
             "ath_change_percentage",
+            "price_change_percentage_1h_in_currency",
             "price_change_percentage_24h_in_currency",
             "price_change_percentage_7d_in_currency",
             "price_change_percentage_30d_in_currency",
@@ -125,8 +114,10 @@ def seed_coin(conn, app):
             "fully_diluted_valuation",
         ],
     )
-    app.redis_conn.set("coins:all", json.dumps(coins))
 
+    coins, order = normalize_coins(coins)
+    app.redis_conn.set("coins:all", json.dumps(coins))
+    app.redis_conn.set("coins:order", json.dumps(order))
     app.redis_conn.set("coins:updated_at", UPDATED_AT)
 
 
@@ -136,64 +127,47 @@ def test_get_coins(client, db_connection, app):
     with mock_events():
         response = client.get("/api/coins")
 
-        assert response.json["payload"] == [
-            {
-                "market_cap_rank": 1,
-                "id": "test_id",
-                "symbol": "test_symbol",
-                "name": "test_name",
-                "image": "test_img_url",
-                "current_price": 0.123,
-                "market_cap": 10,
-                "fully_diluted_valuation": 1.23,
-                "total_volume": 1.23,
-                "high_24h": 1.23,
-                "low_24h": 1.23,
-                "price_change_24h": 1.23,
-                "price_change_percentage_24h": 1.23,
-                "market_cap_change_24h": 1.23,
-                "market_cap_change_percentage_24h": 1.23,
-                "circulating_supply": 1.23,
-                "total_supply": 1.23,
-                "max_supply": 1.23,
-                "ath": 1.23,
-                "ath_change_percentage": 1.23,
-                "ath_date": "test_timestamp_at",
-                "atl": 1.23,
-                "atl_change_percentage": 1.23,
-                "atl_date": "test_timestamp_atl",
-                "last_updated": "test_last_updated",
-                "price_change_percentage_1h_in_currency": 1.23,
-                "price_change_percentage_24h_in_currency": 1.23,
-                "price_change_percentage_7d_in_currency": 1.23,
-                "price_change_percentage_14d_in_currency": 1.23,
-                "price_change_percentage_30d_in_currency": 1.23,
-                "price_change_percentage_200d_in_currency": 1.23,
-                "price_change_percentage_1y_in_currency": 1.23,
-                # "ath_change_percentage_in_currency": None,
-                # "description": None,
-                # "total_value_locked": None,
-                # "genesis_date": None,
-                # "hashing_algorithm": None,
-                # "coingecko_score": None,
-                # "developer_score": None,
-                # "community_score": None,
-                # "liquidity_score": None,
-                # "public_interest_score": None,
-                # "homepage": None,
-                # "blockchain_site": None,
-                # "categories": None,
-                "updated_at": "test_updated_at",
-                "mc_fdv_ratio": 8.13,
-                "circ_supply_total_supply_ratio": 1.0,
-                "ath_change_percentage_relative": 100,
-                "price_change_percentage_24h_in_currency_relative": 100,
-                "price_change_percentage_7d_in_currency_relative": 100,
-                "price_change_percentage_30d_in_currency_relative": 100,
-                "price_change_percentage_1y_in_currency_relative": 100,
-                "fully_diluted_valuation_relative": 100,
-            }
-        ]
+        assert response.json["payload"] == {
+            "prices": {
+                "test_id": {
+                    "ath_change_percentage": 1.23,
+                    "ath_change_percentage_relative": 100,
+                    "current_price": 0.123,
+                    "id": "test_id",
+                    "image": "test_img_url",
+                    "market_cap_rank": 1,
+                    "name": "test_name",
+                    "price_change_percentage_1h_in_currency": 1.23,
+                    "price_change_percentage_1h_in_currency_relative": 100,
+                    "price_change_percentage_1y_in_currency": 1.23,
+                    "price_change_percentage_1y_in_currency_relative": 100,
+                    "price_change_percentage_24h_in_currency": 1.23,
+                    "price_change_percentage_24h_in_currency_relative": 100,
+                    "price_change_percentage_30d_in_currency": 1.23,
+                    "price_change_percentage_30d_in_currency_relative": 100,
+                    "price_change_percentage_7d_in_currency": 1.23,
+                    "price_change_percentage_7d_in_currency_relative": 100,
+                    "symbol": "test_symbol",
+                }
+            },
+            "tokenomics": {
+                "test_id": {
+                    "circ_supply_total_supply_ratio": 1.0,
+                    "circulating_supply": 1.23,
+                    "fully_diluted_valuation": 1.23,
+                    "id": "test_id",
+                    "image": "test_img_url",
+                    "market_cap": 10,
+                    "market_cap_rank": 1,
+                    "max_supply": 1.23,
+                    "mc_fdv_ratio": 8.13,
+                    "symbol": "test_symbol",
+                    "total_supply": 1.23,
+                    "total_volume": 1.23,
+                },
+            },
+        }
+
         assert response.json["updated_at"] == UPDATED_AT
 
 

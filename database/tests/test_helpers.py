@@ -108,8 +108,8 @@ def test_compute_extra_columns():
 
 def test_generate_diff_all_equal():
     previous_data = current_data = {
-        "bitcoin": {
-            "prices": {
+        "prices": {
+            "bitcoin": {
                 "id": "bitcoin",
                 "symbol": "btc",
                 "name": "Bitcoin",
@@ -122,20 +122,35 @@ def test_generate_diff_all_equal():
                 "price_change_percentage_30d_in_currency": 5.360420461311904,
                 "price_change_percentage_1y_in_currency": 6.360420461311904,
                 "ath_change_percentage": 0.23,
-            },
-            "tokenomics": {
-                "id": "bitcoin",
-                "symbol": "btc",
-                "name": "Bitcoin",
-                "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",
                 "market_cap": 533052722379,
-                "market_cap_rank": 1,
                 "fully_diluted_valuation": 573962971793,
                 "circulating_supply": 19503187,
                 "total_supply": 21000000,
                 "max_supply": 21000000,
                 "total_volume": 14118300117,
             },
+        },
+        "tokenomics": {
+            "bitcoin": {
+                "id": "bitcoin",
+                "symbol": "btc",
+                "name": "Bitcoin",
+                "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",
+                "market_cap_rank": 1,
+                "current_price": 27300,
+                "price_change_percentage_1h_in_currency": -0.1564735720678735,
+                "price_change_percentage_24h_in_currency": -2.248931288518162,
+                "price_change_percentage_7d_in_currency": 4.360420461311904,
+                "price_change_percentage_30d_in_currency": 5.360420461311904,
+                "price_change_percentage_1y_in_currency": 6.360420461311904,
+                "ath_change_percentage": 0.23,
+                "market_cap": 533052722379,
+                "fully_diluted_valuation": 573962971793,
+                "circulating_supply": 19503187,
+                "total_supply": 21000000,
+                "max_supply": 21000000,
+                "total_volume": 14118300117,
+            }
         },
     }
 
@@ -145,8 +160,8 @@ def test_generate_diff_all_equal():
 
 def test_generate_diff_one_different():
     previous_data = {
-        "bitcoin": {
-            "prices": {
+        "prices": {
+            "bitcoin": {
                 "id": "bitcoin",
                 "symbol": "btc",
                 "name": "Bitcoin",
@@ -160,22 +175,7 @@ def test_generate_diff_one_different():
                 "price_change_percentage_1y_in_currency": 6.360420461311904,
                 "ath_change_percentage": 0.23,
             },
-            "tokenomics": {
-                "id": "bitcoin",
-                "symbol": "btc",
-                "name": "Bitcoin",
-                "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",
-                "market_cap": 533052722379,
-                "market_cap_rank": 1,
-                "fully_diluted_valuation": 573962971793,
-                "circulating_supply": 19503187,
-                "total_supply": 21000000,
-                "max_supply": 21000000,
-                "total_volume": 14118300117,
-            },
-        },
-        "etherium": {
-            "prices": {
+            "etherium": {
                 "id": "etherium",
                 "symbol": "eth",
                 "name": "Etherium",
@@ -189,7 +189,22 @@ def test_generate_diff_one_different():
                 "price_change_percentage_1y_in_currency": 6.360420461311904,
                 "ath_change_percentage": 0.23,
             },
-            "tokenomics": {
+        },
+        "tokenomics": {
+            "bitcoin": {
+                "id": "bitcoin",
+                "symbol": "btc",
+                "name": "Bitcoin",
+                "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",
+                "market_cap": 533052722379,
+                "market_cap_rank": 1,
+                "fully_diluted_valuation": 573962971793,
+                "circulating_supply": 19503187,
+                "total_supply": 21000000,
+                "max_supply": 21000000,
+                "total_volume": 14118300117,
+            },
+            "etherium": {
                 "id": "etherium",
                 "symbol": "eth",
                 "name": "Etherium",
@@ -206,8 +221,8 @@ def test_generate_diff_one_different():
     }
 
     current_data = {
-        "bitcoin": {
-            "prices": {
+        "prices": {
+            "bitcoin": {
                 "id": "bitcoin",
                 "symbol": "btc",
                 "name": "Bitcoin",
@@ -221,22 +236,7 @@ def test_generate_diff_one_different():
                 "price_change_percentage_1y_in_currency": 6.360420461311904,
                 "ath_change_percentage": 0.23,
             },
-            "tokenomics": {
-                "id": "bitcoin",
-                "symbol": "btc",
-                "name": "Bitcoin",
-                "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",
-                "market_cap": 533052722379,
-                "market_cap_rank": 1,
-                "fully_diluted_valuation": 573962971793,
-                "circulating_supply": 19503187,
-                "total_supply": 21000000,
-                "max_supply": 21000000,
-                "total_volume": 14118300117,
-            },
-        },
-        "etherium": {
-            "prices": {
+            "etherium": {
                 "id": "etherium",
                 "symbol": "eth",
                 "name": "Etherium",
@@ -250,7 +250,22 @@ def test_generate_diff_one_different():
                 "price_change_percentage_1y_in_currency": 6.360420461311904,
                 "ath_change_percentage": 0.23,
             },
-            "tokenomics": {
+        },
+        "tokenomics": {
+            "bitcoin": {
+                "id": "bitcoin",
+                "symbol": "btc",
+                "name": "Bitcoin",
+                "image": "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",
+                "market_cap": 533052722379,
+                "market_cap_rank": 1,
+                "fully_diluted_valuation": 573962971793,
+                "circulating_supply": 19503187,
+                "total_supply": 21000000,
+                "max_supply": 21000000,
+                "total_volume": 14118300117,
+            },
+            "etherium": {
                 "id": "etherium",
                 "symbol": "eth",
                 "name": "Etherium",
@@ -267,8 +282,8 @@ def test_generate_diff_one_different():
     }
 
     expected_diff = {
-        "bitcoin": {
-            "prices": {
+        "prices": {
+            "bitcoin": {
                 "id": "bitcoin",
                 "symbol": "btc",
                 "name": "Bitcoin",
@@ -281,8 +296,10 @@ def test_generate_diff_one_different():
                 "price_change_percentage_30d_in_currency": 5.360420461311904,
                 "price_change_percentage_1y_in_currency": 6.360420461311904,
                 "ath_change_percentage": 0.23,
-            },
-            "tokenomics": {
+            }
+        },
+        "tokenomics": {
+            "bitcoin": {
                 "id": "bitcoin",
                 "symbol": "btc",
                 "name": "Bitcoin",
@@ -294,7 +311,7 @@ def test_generate_diff_one_different():
                 "total_supply": 21000000,
                 "max_supply": 21000000,
                 "total_volume": 14118300117,
-            },
+            }
         },
     }
 

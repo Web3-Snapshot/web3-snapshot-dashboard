@@ -8,6 +8,8 @@ PRICES_PROPS = [
     "image",
     "market_cap_rank",
     "current_price",
+    "price_change_percentage_1h_in_currency",
+    "price_change_percentage_1h_in_currency_relative",
     "price_change_percentage_24h_in_currency",
     "price_change_percentage_24h_in_currency_relative",
     "price_change_percentage_7d_in_currency",
@@ -107,7 +109,7 @@ def compute_extra_columns(objs: List):
 
 
 def generate_object_diff(previous_data, current_data):
-    """Generate the diff between a previous array of objects and a current array of objects"""
+    """Generate the diff between a previous nested object and a current nested object"""
 
     diff = {}
     relevant_keys = {
@@ -132,11 +134,18 @@ def generate_object_diff(previous_data, current_data):
         ],
     }
 
-    for name, coin in current_data.items():
-        for category, category_data in coin.items():
+    for category, category_data in current_data.items():
+        # prices or tokenomics
+        for coin, coin_data in category_data.items():
+            # bitcoin, etherium, ...
             for key in relevant_keys[category]:
-                if category_data[key] != previous_data[name][category][key]:
-                    diff[name] = coin
+                if coin_data[key] != previous_data[category][coin][key]:
+                    if diff.get("prices") is None:
+                        diff["prices"] = {}
+                    if diff.get("tokenomics") is None:
+                        diff["tokenomics"] = {}
+                    diff["prices"][coin] = current_data["prices"][coin]
+                    diff["tokenomics"][coin] = current_data["tokenomics"][coin]
                     break
 
     return diff
@@ -175,13 +184,17 @@ def normalize_coins(coins):
     Returns:
         list: The normalized coins data.
     """
-    data = {}
+    data = {"prices": {}, "tokenomics": {}}
     order = []
+
     for coin in coins:
-        data[coin["id"]] = {
-            "prices": {k: v for (k, v) in coin.items() if k in PRICES_PROPS},
-            "tokenomics": {k: v for (k, v) in coin.items() if k in TOKENOMICS_PROPS},
+        data["prices"][coin["id"]] = {
+            k: v for (k, v) in coin.items() if k in PRICES_PROPS
         }
+        data["tokenomics"][coin["id"]] = {
+            k: v for (k, v) in coin.items() if k in TOKENOMICS_PROPS
+        }
+
         order.append(coin["id"])
 
     return data, order
