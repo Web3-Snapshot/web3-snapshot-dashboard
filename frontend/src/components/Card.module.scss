@@ -1,0 +1,105 @@
+@import '../breakpoints.scss';
+@import '../global-constants.scss';
+@import '../colors.scss';
+
+// Card container
+
+.cardContainer {
+  display: flex;
+  flex-direction: column;
+  background: $grey0;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  padding-right: 2px;
+}
+
+.cardContainer:hover {
+  cursor: pointer;
+}
+
+@media #{media-query(xs)}, #{media-query(ss)} {
+  .cardContainer {
+    padding: 2px 0.2rem;
+    min-height: 8rem;
+  }
+}
+
+// Card header
+
+.cardHeader {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 16px;
+  margin: 0.5rem;
+}
+
+@media #{media-query(xs)}, #{media-query(ss)} {
+  .cardHeader {
+    gap: 2px;
+    margin-bottom: 0;
+    margin-top: 8px;
+  }
+}
+
+/* This is symbol element in the header of the card */
+.cardHeader div:nth-child(2) {
+  flex-grow: 100;
+}
+
+.cardHeader div:nth-child(n + 1):nth-child(-n + 2) .cardHeaderCellLabel {
+  display: none;
+  font-weight: bold;
+}
+
+.cardHeaderCell {
+  display: flex;
+  padding-left: 0.5rem;
+}
+
+.cardHeaderCellLabel {
+  display: flex;
+  flex-wrap: nowrap;
+  color: #858585;
+  padding-right: 10px;
+  text-align: center;
+}
+
+@media #{media-query(xs)}, #{media-query(ss)} {
+  .cardHeaderCellLabel {
+    font-size: 13px;
+  }
+}
+
+@media #{media-query(xs)}, #{media-query(ss)} {
+  .cardHeaderCellValue {
+    font-size: 13px;
+    margin-right: 0.5rem;
+  }
+}
+
+// Card body
+
+.cardBody {
+  display: flex;
+  align-items: center;
+
+  & div {
+    display: flex;
+    flex: auto;
+    flex-direction: column;
+    row-gap: 4px;
+    width: 28px;
+
+    & div {
+      width: 100%;
+      border: 2px solid $grey0;
+      justify-content: center;
+      display: flex;
+      flex-wrap: wrap;
+      height: 2.2rem;
+      background: rgb(38 38 38 / 30%);
+      align-content: center;
+    }
+  }
+}
