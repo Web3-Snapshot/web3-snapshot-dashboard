@@ -152,16 +152,18 @@ logs() {
 }
 
 tests() {
-    start && docker compose -f docker-compose."$ENVIRONMENT".yml exec backend pytest tests -vvv
+    start && docker compose -f docker-compose."$ENVIRONMENT".yml run --rm backend pytest tests -vvv &&
+        docker compose -f docker-compose."$ENVIRONMENT".yml run --rm db pytest tests -vvv
 }
 
 isession() {
-    docker compose -f docker-compose."$ENVIRONMENT".yml up -d --rm isession &&
+    start &&
+        REDIS_URL=$REDIS_URL docker compose -f docker-compose."$ENVIRONMENT".yml run --service-ports --no-deps --rm -d isession &&
         docker attach $(docker ps -aqf "name=isession")
 }
 
 init_db() {
-    docker compose -f docker-compose."$ENVIRONMENT".yml run --rm db /bin/sh -c "python /app/init_db.py"
+    docker compose -f docker-compose."$ENVIRONMENT".yml run --rm db /bin/sh -c "python /app/core/init_db.py"
 }
 
 start_cert_server() {
@@ -252,12 +254,12 @@ print_help() {
     printf '\t%s\n' "--stop: Stop the server"
     printf '\t%s\n' "--print-vars: Print variables"
     printf '\t%s\n' "--build: Build with docker compose (no default)"
-    printf '\t%s\n' "--build-backend: Build backend container only"
     printf '\t%s\n' "--debug, --no-debug: Start up the debugging server and attach (off by default)"
+    printf '\t%s\n' "--init-db: Initialize the database"
     printf '\t%s\n' "--tests: Run pytests"
     printf '\t%s\n' "--ps: Print running containers"
     printf '\t%s\n' "--logs: Tail out logs"
-    printf '\t%s\n' "--issession: Start an interactive session"
+    printf '\t%s\n' "--isession: Start an interactive session"
     printf '\t%s\n' "--start-cert-server: Start the certbot server on port 80"
     printf '\t%s\n' "--stop-cert-server: Stop the certbot server"
     printf '\t%s\n' "--get-certificate: Get a certbot certificate"
@@ -315,7 +317,7 @@ parse_commandline() {
             ;;
         --isession)
             isession
-            exit 0
+            command=isession
             ;;
         --connect-service)
             test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
@@ -388,5 +390,8 @@ elif [ "$command" = "start" ]; then
         echo "Starting in debug mode"
     fi
     start
+    exit 0
+elif [ "$command" = "isession" ]; then
+    isession
     exit 0
 fi
