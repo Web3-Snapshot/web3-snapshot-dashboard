@@ -19,7 +19,7 @@ def init_db(cur):
 @pytest.fixture(scope="module")
 def app():
     app = create_app(config_env="server.config.testing")
-    app.redis_conn = fakeredis.FakeStrictRedis()
+    app.redis_conn = fakeredis.FakeStrictRedis(decode_responses=True)
     yield app
 
 

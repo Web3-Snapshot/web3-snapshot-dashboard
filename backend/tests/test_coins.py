@@ -1,5 +1,6 @@
 import json
 from contextlib import contextmanager
+from datetime import datetime, timezone
 from functools import partial
 from unittest import mock
 
@@ -22,7 +23,7 @@ def mock_events():
         yield
 
 
-UPDATED_AT = "2022-01-01T00:00:00Z"
+UPDATED_AT = datetime(2022, 1, 1, 0, 0, 0, tzinfo=timezone.utc).isoformat()
 
 # This has to be in sync with the INSERT_FIELDS array in the main.py from the database container
 INSERT_FIELDS = [
@@ -127,7 +128,7 @@ def test_get_coins(client, db_connection, app):
     with mock_events():
         response = client.get("/api/coins")
 
-        assert response.json["payload"] == {
+        assert response.json == {
             "prices": {
                 "test_id": {
                     "ath_change_percentage": 1.23,
@@ -166,9 +167,11 @@ def test_get_coins(client, db_connection, app):
                     "total_volume": 1.23,
                 },
             },
+            "order": ["test_id"],
+            "updated_at": UPDATED_AT,
         }
 
-        assert response.json["updated_at"] == UPDATED_AT
+        assert response.json["updated_at"] == str(UPDATED_AT)
 
 
 @pytest.mark.skip
