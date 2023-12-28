@@ -9,10 +9,11 @@ import { BREAKPOINTS } from '../constants';
 import { objectSort } from '../utils/helper_functions';
 import { usePricesStore } from './Prices/state';
 
-const selectOrder = (state) => state.order;
+const selectOrderedIds = (state) => state.orderedIds;
 
 function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
-  const orderedIds = usePricesStore(selectOrder);
+  const orderedIds = usePricesStore(selectOrderedIds);
+  const setOrderedIds = usePricesStore((state) => state.setOrderedIds);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
   let { desktop } = useBreakpoints(BREAKPOINTS);
@@ -23,8 +24,7 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
       setOrder(order === 'asc' ? 'desc' : 'asc');
       setOrderBy([cellId]);
     },
-    // [order]
-    []
+    [order]
   );
 
   const renderHeaderRow = useCallback((labelsAndIds, styles, handleSort, order, orderBy) => {
