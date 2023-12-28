@@ -21,6 +21,7 @@ Note: The module relies on external dependencies such as requests, cache, and ut
 
 import json
 import pprint
+import traceback
 from datetime import datetime, timezone
 from os import environ
 
@@ -235,6 +236,7 @@ def fetch_and_cache():
     except Exception as err:  # pylint: disable=broad-except
         print("Something went wrong inside the main function while fetching all coins")
         print(err)
+        print(traceback.format_exc())
 
     ### Fetch single coins
     try:
