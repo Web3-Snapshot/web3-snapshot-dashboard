@@ -17,6 +17,7 @@ debugpy = "*"
 black = "*"
 types-requests = "*"
 fakeredis = "*"
+pytest-asyncio = "==0.23.2"
 
 [requires]
 python_version = "3.11"
