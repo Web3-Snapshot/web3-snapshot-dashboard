@@ -86,7 +86,7 @@ _check_required_variables() {
 #####      Exposed functions     #####
 ######################################
 check_db() {
-    docker compose -f docker-compose."$ENVIRONMENT".yml run backend /bin/sh -c "test -f /app/instance/${ENVIRONMENT}.db && (exit 0) || (exit 1)"
+    docker compose -f docker-compose."$ENVIRONMENT".yml run --rm backend /bin/sh -c "test -f /app/instance/${ENVIRONMENT}.db && (exit 0) || (exit 1)"
     exit_code=$?
 
     if [[ "$exit_code" = 0 ]]; then
