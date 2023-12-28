@@ -65,7 +65,6 @@ describe('Sorting', function () {
   it('object sorting descending', () => {
     const expectedResult = ['solana', 'ripple', 'etherium', 'cardano', 'bitcoin'];
     const sortedObj = objectSort(obj, 'desc', ['id']);
-    debugger;
 
     expect(sortedObj).toStrictEqual(expectedResult);
   });
