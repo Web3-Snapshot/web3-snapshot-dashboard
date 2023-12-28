@@ -6,7 +6,7 @@ import HeaderRow from './HeaderRow';
 import Card from './Card';
 import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
-import { objectSort } from '../utils/helpers';
+import { objectSort } from '../utils/helper_functions';
 import { usePricesStore } from './Prices/state';
 
 const selectOrder = (state) => state.order;
