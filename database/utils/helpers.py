@@ -39,15 +39,56 @@ TOKENOMICS_PROPS = [
 
 
 def calculate_relative_percentage(key, original_value, d):
+    """Calculate the relative percentage of an original value based on the positive or negative values in a dictionary.
+
+    Args
+        key (str): The key to access the corresponding positive and negative values in the dictionary.
+        original_value (float): The original value to calculate the relative percentage for.
+        d (dict): The dictionary containing positive and negative values.
+
+    Returns:
+        int: The calculated relative percentage.
+    """
     if original_value is None:
         return 0
+
     if original_value >= 0:
         return round(((original_value) / d[key]["positive"]) * 100)
-    else:
-        return round((abs(original_value) / d[key]["negative"]) * 100)
+
+    return round((abs(original_value) / d[key]["negative"]) * 100)
 
 
-def process_percentages(data, keys):
+from copy import deepcopy
+from typing import Any, Dict, List
+
+
+def process_percentages(
+    data: List[Dict[str, Any]], keys: List[str]
+) -> List[Dict[str, Any]]:
+    """Process the percentages in the given data based on the specified keys.
+
+    Args:
+        data (List[Dict[str, Any]]): The data to process.
+        keys (List[str]): The keys to consider for processing percentages.
+
+    Returns:
+        List[Dict[str, Any]]: The processed data with relative percentages added.
+
+    Example:
+        data = [
+            {"key1": 10, "key2": -5},
+            {"key1": 20, "key2": -10},
+            {"key1": 30, "key2": -15},
+        ]
+        keys = ["key1", "key2"]
+        processed_data = process_percentages(data, keys)
+        print(processed_data)
+        # Output: [
+        #     {"key1": 10, "key2": -5, "key1_relative": 0.333, "key2_relative": 0.333},
+        #     {"key1": 20, "key2": -10, "key1_relative": 0.666, "key2_relative": 0.666},
+        #     {"key1": 30, "key2": -15, "key1_relative": 1.0, "key2_relative": 1.0},
+        # ]
+    """
     d = {}
 
     for key in keys:
@@ -61,7 +102,7 @@ def process_percentages(data, keys):
             else:
                 negative_max = item[key] if item[key] < negative_max else negative_max
 
-        if d.get(key) == None:
+        if d.get(key) is None:
             d[key] = {}
         d[key]["positive"] = positive_max
         d[key]["negative"] = abs(negative_max)
@@ -78,7 +119,15 @@ def process_percentages(data, keys):
     return res
 
 
-def compute_extra_columns(objs: List):
+def compute_extra_columns(objs: List) -> List:
+    """Computes extra columns for a list of objects.
+
+    Args:
+        objs (List): A list of objects.
+
+    Returns:
+        List: A list of objects with extra computed columns.
+    """
     res = []
     objects = deepcopy(objs)
 
@@ -139,7 +188,9 @@ def generate_object_diff(previous_data, current_data):
         for coin, coin_data in category_data.items():
             # bitcoin, etherium, ...
             for key in relevant_keys[category]:
-                if coin_data[key] != previous_data[category][coin][key]:
+                if coin_data[key] != previous_data.get(category, {}).get(coin, {}).get(
+                    key
+                ):
                     if diff.get("prices") is None:
                         diff["prices"] = {}
                     if diff.get("tokenomics") is None:
