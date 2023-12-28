@@ -218,7 +218,13 @@ def fetch_and_cache():
 
         if diff_length > 0:
             updated_at = datetime.now(timezone.utc).isoformat()
-            print(f"Updated at: {updated_at}")
+            data, order = normalize_coins(coins)
+            redis_conn.set("coins:all", json.dumps(data))
+            redis_conn.set("coins:order", json.dumps(order))
+            redis_conn.set("coins:updated_at", updated_at)
+
+            print("order:", order)
+            print("updated_at:", updated_at)
             pub_payload = {
                 "data": {
                     "changed": diff_length,
@@ -227,11 +233,6 @@ def fetch_and_cache():
                 "errors": [],
             }
             redis_conn.publish("coins", json.dumps(pub_payload))
-
-            data, order = normalize_coins(coins)
-            redis_conn.set("coins:all", json.dumps(data))
-            redis_conn.set("coins:order", json.dumps(order))
-            redis_conn.set("coins:updated_at", updated_at)
 
     except Exception as err:  # pylint: disable=broad-except
         print("Something went wrong inside the main function while fetching all coins")
