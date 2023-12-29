@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import List
+from typing import List, Union
 
 PRICES_PROPS = [
     "id",
@@ -89,7 +89,7 @@ def process_percentages(
         #     {"key1": 30, "key2": -15, "key1_relative": 1.0, "key2_relative": 1.0},
         # ]
     """
-    d = {}
+    d: Dict[str, Dict[str, Union[float, int]]] = {}
 
     for key in keys:
         positive_max = 0
