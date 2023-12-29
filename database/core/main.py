@@ -291,6 +291,7 @@ def fetch_and_cache():
             "Something went wrong inside the main function while fetching single coins"
         )
         print(err)
+        print(traceback.format_exc())
 
 
 if __name__ == "__main__":
