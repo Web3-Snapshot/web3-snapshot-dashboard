@@ -10,9 +10,10 @@ import { useTokenomicsStore } from '../components/Tokenomics/state';
 function Dashboard() {
   const isIframe = useIsIframe();
   const setPricesRows = usePricesStore((state) => state.setRows);
-  const setUpdatedAt = usePricesStore((state) => state.setUpdatedAt);
   const setTokenomicsRows = useTokenomicsStore((state) => state.setRows);
-  const setOrder = usePricesStore((state) => state.setOrder);
+  const setUpdatedAt = usePricesStore((state) => state.setUpdatedAt);
+  const setPricesOrderedIds = usePricesStore((state) => state.setOrderedIds);
+  const setTokenomicsOrderedIds = useTokenomicsStore((state) => state.setOrderedIds);
 
   useEffect(() => {
     const sse = new EventSource('/api/coin-stream');
@@ -23,7 +24,8 @@ function Dashboard() {
       setPricesRows(res.prices);
       setTokenomicsRows(res.tokenomics);
       setUpdatedAt(res.updated_at);
-      setOrder(res.order);
+      setPricesOrderedIds(res.order);
+      setTokenomicsOrderedIds(res.order);
     }
 
     sse.onmessage = (evt) => {

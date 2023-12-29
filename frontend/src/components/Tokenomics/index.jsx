@@ -12,8 +12,6 @@ import { formatLongNumbers } from '../../utils/helper_functions';
 import { useScrollLock } from '../../custom-hooks/useScrollLock';
 import { BREAKPOINTS } from '../../constants';
 
-import styles from './Tokenomics.module.scss';
-
 const selectRows = (state) => state.rows;
 
 function Tokenomics() {
@@ -125,10 +123,10 @@ function Tokenomics() {
       <>
         {!isEmpty(coins) && (
           <Table
+            pageId="tokenomics"
             tableData={tableData}
             coins={coins}
             onRowClick={handleRowClick}
-            rowStyles={styles}
             defaultOrderBy={defaultOrderByProp}
           />
         )}

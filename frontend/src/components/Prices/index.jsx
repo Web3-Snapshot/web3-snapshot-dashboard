@@ -10,8 +10,6 @@ import { renderCell, renderCellOverlay } from '../CellOverlay';
 import CoinInfoModal from '../CoinInfoModal';
 import { useScrollLock } from '../../custom-hooks/useScrollLock';
 
-import styles from './Prices.module.scss';
-
 const selectRows = (state) => state.rows;
 
 function Prices() {
@@ -137,10 +135,10 @@ function Prices() {
       <>
         {!isEmpty(coins) && (
           <Table
+            pageId="prices"
             tableData={tableData}
             coins={coins}
             onRowClick={handleRowClick}
-            rowStyles={styles}
             defaultOrderBy={defaultOrderByProp}
           />
         )}

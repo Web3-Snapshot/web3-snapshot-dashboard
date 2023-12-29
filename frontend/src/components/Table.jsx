@@ -11,7 +11,7 @@ import { usePricesStore } from './Prices/state';
 
 const selectOrderedIds = (state) => state.orderedIds;
 
-function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
+function Table({ pageId, tableData, coins, defaultOrderBy, onRowClick }) {
   const orderedIds = usePricesStore(selectOrderedIds);
   const setOrderedIds = usePricesStore((state) => state.setOrderedIds);
   const [order, setOrder] = useState('asc');
@@ -57,7 +57,7 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
         <>
           {/* <div className={`${rowStyles.row} ${styles.header}`}>{memoizedHeaderRow}</div> */}
           {orderedIds.map((coinId) => (
-            <div key={coinId} className={`${rowStyles.row} ${styles.data}`}>
+            <div key={coinId} className={`${styles[pageId]} ${styles.data}`}>
               <Row
                 tableData={tableData}
                 row={coins[coinId]}
@@ -69,8 +69,7 @@ function Table({ tableData, coins, rowStyles, defaultOrderBy, onRowClick }) {
         </>
       ) : (
         <>
-          {/* <div className={`${rowStyles.row} ${styles.header}`}>{memoizedHeaderRow}</div> */}
-          <div className={`${rowStyles.row} ${styles.header}`}>
+          <div className={`${styles[pageId]} ${styles.cardHeader}`}>
             <HeaderRow
               headers={labelsAndIds}
               styles={styles}
