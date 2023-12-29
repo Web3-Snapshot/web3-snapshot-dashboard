@@ -16,7 +16,6 @@ function comparison(a, b) {
   if (b > a) return 1;
   return 0;
 }
-
 function comparator(a, b, order, orderBy) {
   const multiplier = order === 'desc' ? 1 : -1;
   return orderBy.reduce((acc, curr) => {
@@ -26,10 +25,11 @@ function comparator(a, b, order, orderBy) {
 }
 
 export function objectSort(obj, order, orderBy) {
-  if (!obj || !obj.data || !obj.order) {
+  if (!obj) {
     return [];
   }
-  const dataObj = obj.data;
+  const dataObj = obj;
+
   return Object.entries(dataObj)
     .sort(([_, av], [__, bv]) => comparator(av, bv, order, orderBy))
     .reduce((acc, [currk, _]) => [...acc, currk], []);

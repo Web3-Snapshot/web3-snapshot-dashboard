@@ -6,7 +6,7 @@ from pathlib import Path
 import redis
 from server.db import dict_factory
 
-from database.cache import redis_conn as cache
+from database.core.cache import redis_conn as cache
 
 DATABASE_PATH = f"/app/instance/{environ.get('ENVIRONMENT')}.db"
 redis_conn = redis.from_url(environ.get("REDIS_URL"))

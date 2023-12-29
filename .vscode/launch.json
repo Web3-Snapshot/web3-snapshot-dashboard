@@ -1,0 +1,72 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // For the node launch debugger to work, you need to use
+    // actual 'debugger' statements in the code; breakpoints are
+    // not recognized.
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Docker: Lauch jest tests",
+      "remoteRoot": "/app/src",
+      "localRoot": "${workspaceFolder}/frontend",
+      "runtimeArgs": [
+        "--inspect-brk=0.0.0.0:9229",
+        "${workspaceFolder}/frontend/node_modules/.bin/jest",
+        "--config ./jest.config.js",
+        "--watchAll",
+        "--runInBand",
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+    },
+    // The node attach debugger is not working yet with docker compose
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Docker: Debug tests",
+      "address": "0.0.0.0",
+      "port": 9229,
+      "trace": true,
+      "restart": true,
+      "timeout": 10000,
+      "localRoot": "${workspaceFolder}/frontend/src",
+      "remoteRoot": "/app/src",
+      "outFiles": [
+          "${workspaceFolder}/dist/**/*.js"
+      ],
+      "internalConsoleOptions": "neverOpen",
+      "continueOnAttach": true,
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "/app/*": "${workspaceRoot}/frontend/*"
+      }
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Launch Chrome against localhost",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/frontend",
+      "sourceMapPathOverrides": {
+        "/app/*": "${workspaceRoot}/frontend/*"
+      }
+    },
+    {
+      "name": "Python: Remote Attach",
+      "type": "python",
+      "request": "attach",
+      "justMyCode": false,
+      "connect": {
+        "host": "0.0.0.0",
+        "port": 5678
+      },
+      "pathMappings": [
+        {
+          "localRoot": "${workspaceFolder}/backend",
+          "remoteRoot": "/app"
+        }
+      ]
+    },
+  ]
+}

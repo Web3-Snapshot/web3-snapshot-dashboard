@@ -1,5 +1,5 @@
 import styles from './IconAndCurrencyIdCell.module.scss';
-import { capitalize } from '../util/helpers';
+import { capitalize } from '../utils/helper_functions';
 import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
 

@@ -20,6 +20,8 @@
   }
 }
 
+// Header
+
 .header {
   align-content: center;
   font-weight: 600;
@@ -55,6 +57,16 @@
   justify-content: flex-start;
   padding: 4px;
 }
+
+// Card header
+
+.cardHeader {
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  cursor: pointer;
+}
+
+// Data
 
 .data {
   opacity: 0.9;
@@ -92,42 +104,9 @@
   }
 }
 
-.cell {
-  background-color: $grey2;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 2.6rem;
-  text-align: center;
-}
-
 .data:hover {
   opacity: 1;
   cursor: pointer;
-}
-
-.cardContainer {
-  display: flex;
-  flex-direction: column;
-  background: $grey0;
-  border-radius: 8px;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  min-height: 9.4rem;
-}
-
-.cardContainer:hover {
-  cursor: pointer;
-}
-
-@media #{media-query(xs)}, #{media-query(ss)} {
-  .cardContainer {
-    padding: 2px 0.2rem;
-    min-height: 8rem;
-  }
 }
 
 img {
@@ -135,99 +114,57 @@ img {
   margin-right: 10px;
 }
 
-.cardHeader {
-  display: flex;
-  flex-wrap: nowrap;
+/** The following styles are customizations for the different tables **/
+
+// Prices
+
+.prices {
+  display: grid;
+  column-gap: 1px;
+  border-bottom: 1px solid $grey0;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 0.2rem;
+  min-width: fit-content;
 }
 
-@media #{media-query(xs)}, #{media-query(ss)} {
-  .cardHeader {
-    gap: 2px;
-    margin-bottom: 0;
-    margin-top: 8px;
+
+// Prices - table view
+.prices.header, .prices.data {
+  grid-template-columns: $first-column-wide $second-column-wide repeat(6, 1fr);
+}
+
+@media #{media-query(lg)} {
+  .prices.header, .prices.data {
+    grid-template-columns: $first-column-medium $second-column-medium repeat(6, 1fr);
   }
 }
 
-/* This is symbol element in the header of the card */
-.cardHeader div:nth-child(2) {
-  flex-grow: 100;
+// Prices - card view
+.prices.cardHeader {
+  grid-template-columns: repeat(5, 1fr);
 }
 
-.cardBody {
-  display: flex;
+// Tokenomics
+
+.tokenomics {
+  display: grid;
+  column-gap: 1px;
+  border-bottom: 1px solid $grey0;
   align-items: center;
+  min-width: fit-content;
 }
 
-.cardHeader div:nth-child(n + 1):nth-child(-n + 2) .cardHeaderCellLabel {
-  display: none;
-  font-weight: bold;
+// Tokenomics - table view
+.tokenomics.header, .tokenomics.data {
+  grid-template-columns: $first-column-wide $second-column-wide 200px repeat(7, 1fr);
 }
 
-.cardHeaderCell {
-  display: flex;
-  padding-left: 0.5rem;
-}
-
-.cardHeaderCellLabel {
-  display: flex;
-  flex-wrap: nowrap;
-  color: #858585;
-  padding-right: 10px;
-  text-align: center;
-}
-
-@media #{media-query(xs)}, #{media-query(ss)} {
-  .cardHeaderCellLabel {
-    font-size: 13px;
+@media #{media-query(lg)} {
+  .tokenomics.header, .tokenomics.data {
+    grid-template-columns: $first-column-medium $second-column-medium repeat(8, 1fr);
   }
 }
 
-.cardBodyCell {
-  display: flex;
-  flex: auto;
-  flex-direction: column;
-  row-gap: 4px;
-  width: 28px;
-}
-
-.cardBodyCellLabel {
-  color: #858585;
-  align-content: center;
-  text-align: center;
-}
-.cardBodyCellValue {
-  width: 100%;
-  border: 2px solid $grey0;
-  justify-content: center;
-  display: flex;
-  flex-wrap: wrap;
-  height: 2.2rem;
-  background: rgb(38 38 38 / 30%);
-  align-content: center;
-}
-
-@media #{media-query(xs)}, #{media-query(ss)} {
-  .cardHeaderCellValue {
-    font-size: 13px;
-    margin-right: 0.5rem;
-  }
-}
-
-.iconDown {
-  color: $grey5;
-  margin: 2px;
-  padding: 2px;
-}
-
-.iconUp {
-  color: $grey5;
-  margin: 2px;
-  padding: 2px;
-}
-
-.iconActive {
-  color: $white;
+// Tokenomics - card view
+.tokenomics.cardHeader {
+  grid-template-columns: repeat(7, 1fr);
 }

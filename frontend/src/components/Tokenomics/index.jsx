@@ -8,11 +8,9 @@ import IconAndCurrencyIdCell from '../IconAndCurrencyIdCell';
 import Table from '../Table';
 import { useBreakpoints } from 'react-breakpoints-hook';
 import CoinInfoModal from '../CoinInfoModal';
-import { formatLongNumbers } from '../../util/helpers';
+import { formatLongNumbers } from '../../utils/helper_functions';
 import { useScrollLock } from '../../custom-hooks/useScrollLock';
 import { BREAKPOINTS } from '../../constants';
-
-import styles from './Tokenomics.module.scss';
 
 const selectRows = (state) => state.rows;
 
@@ -20,16 +18,19 @@ function Tokenomics() {
   let { ss, mobile, tablet } = useBreakpoints(BREAKPOINTS);
   const { lockScroll, unlockScroll } = useScrollLock();
   const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
-  const [row, setRow] = useState();
   const defaultOrderByProp = ['market_cap_rank'];
   const setRows = useTokenomicsStore((state) => state.setRows);
+  const setOrderedIds = useTokenomicsStore((state) => state.setOrderedIds);
+  const setUpdatedAt = useTokenomicsStore((state) => state.setUpdatedAt);
   const coins = useTokenomicsStore(selectRows);
 
   useEffect(() => {
     const fetchData = async function () {
       fetchCoins().then((res) => {
-        console.log(res.updatedAt);
-        setRows(res.payload);
+        console.log(res.updated_at);
+        setRows(res.tokenomics);
+        setOrderedIds(res.order);
+        setUpdatedAt(res.updated_at);
       });
     };
 
@@ -102,9 +103,8 @@ function Tokenomics() {
   ];
 
   function handleRowClick(_, row) {
-    // setRow(row);
-    // lockScroll();
-    // setIsCoinInfoModalOpen(true);
+    lockScroll();
+    setIsCoinInfoModalOpen(true);
   }
 
   function handleClose() {
@@ -116,16 +116,16 @@ function Tokenomics() {
     <>
       {isCoinInfoModalOpen &&
         createPortal(
-          <CoinInfoModal isOpen={isCoinInfoModalOpen} onClose={handleClose} row={row} />,
+          <CoinInfoModal isOpen={isCoinInfoModalOpen} onClose={handleClose} />,
           document.body
         )}
       <>
         {!isEmpty(coins) && (
           <Table
+            pageId="tokenomics"
             tableData={tableData}
             coins={coins}
             onRowClick={handleRowClick}
-            rowStyles={styles}
             defaultOrderBy={defaultOrderByProp}
           />
         )}

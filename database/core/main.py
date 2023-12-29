@@ -16,20 +16,22 @@ The module includes the following functions:
 Additionally, the module defines a custom exception class, DataFetcherException,
 which is raised when there are errors during data fetching.
 
-Note: The module relies on external dependencies such as requests, cache, and util.helpers.
+Note: The module relies on external dependencies such as requests, cache, and utils.helpers.
 """
 
 import json
 import pprint
+import traceback
 from datetime import datetime, timezone
 from os import environ
 
 import requests
-from cache import redis_conn
-from util.helpers import (
+from core.cache import redis_conn
+from utils.helpers import (
     compute_extra_columns,
     generate_list_diff,
     generate_object_diff,
+    normalize_coins,
     process_percentages,
 )
 
@@ -142,6 +144,7 @@ def preprocess_data(coins):
         coins,
         [
             "ath_change_percentage",
+            "price_change_percentage_1h_in_currency",
             "price_change_percentage_24h_in_currency",
             "price_change_percentage_7d_in_currency",
             "price_change_percentage_30d_in_currency",
@@ -196,42 +199,52 @@ def fetch_and_cache():
 
         # Calculate MC/FDV which is the ratio MC/FDV
         coins = preprocess_data(coins_response.json())
+        normalized_coins, order = normalize_coins(coins)
 
         previous_data = redis_conn.get("coins:all")
 
         if previous_data is not None:
+            # If we have data stored from the run before, we deserialize it
             previous_data = json.loads(previous_data)
-            diff = generate_object_diff(previous_data, coins)
+            diff = generate_object_diff(previous_data, normalized_coins)
         else:
-            diff = coins
+            diff = normalized_coins
 
+        diff_length = diff.get("prices") and len(diff["prices"]) or 0
         print("**************************************")
-        print(f"Diff: {len(diff)} rows changed")
+        print(f"Diff: {diff_length} rows changed")
+        # print(f"Diff: {pprint.pprint(diff)}")
         print("**************************************")
 
-        if len(diff) > 0:
+        if diff_length > 0:
             updated_at = datetime.now(timezone.utc).isoformat()
-            print(f"Updated at: {updated_at}")
+            data, order = normalize_coins(coins)
+            redis_conn.set("coins:all", json.dumps(data))
+            redis_conn.set("coins:order", json.dumps(order))
+            redis_conn.set("coins:updated_at", updated_at)
+
+            print("order:", order)
+            print("updated_at:", updated_at)
             pub_payload = {
                 "data": {
-                    "changed": len(diff),
+                    "changed": diff_length,
                     "updated_at": updated_at,
                 },
                 "errors": [],
             }
-
             redis_conn.publish("coins", json.dumps(pub_payload))
-            redis_conn.set("coins:all", json.dumps(coins))
-            redis_conn.set("coins:updated_at", updated_at)
 
     except Exception as err:  # pylint: disable=broad-except
-        print("Something went wrong inside the main function while fetching coins")
+        print("Something went wrong inside the main function while fetching all coins")
         print(err)
+        print(traceback.format_exc())
 
     ### Fetch single coins
     try:
         coins = json.loads(redis_conn.get("coins:all"))
-        incoming_ids = [coin["id"] for coin in coins]
+        # {prices: {bitcoin: {id: 1, name: "Bitcoin", ...}}, tokenomics:
+        # {bitcoin: {id: 1, ...}, order: [bitcoin, ...], updated_at: ...}
+        incoming_ids = [coin["id"] for coin in coins_response.json()]
 
         rotating_ids = redis_conn.get("coins:ids")
         if rotating_ids is None:
@@ -249,8 +262,8 @@ def fetch_and_cache():
         # First remove the obsolete ids
         rotating_ids = [id for id in rotating_ids if id not in removed_ids]
 
-        # Then add the new ids (4 max) to the beginning of the list
-        rotating_ids = new_ids[:4] + rotating_ids
+        # Then add the new ids (2 max) to the beginning of the list
+        rotating_ids = (new_ids + rotating_ids)[:100]
 
         # Make requests to the first couple of ids
         for coin_id in rotating_ids[:NUMBER_OF_SINGLE_COINS]:
@@ -265,18 +278,20 @@ def fetch_and_cache():
 
             redis_conn.set(f"coins:{coin_id}", json.dumps(filtered_coin))
 
-            # Remove the first id and add it to the end of the list
-            rotating_ids = (
-                rotating_ids[NUMBER_OF_SINGLE_COINS:]
-                + rotating_ids[:NUMBER_OF_SINGLE_COINS]
-            )
-            redis_conn.set("coins:ids", json.dumps(rotating_ids))
+        # Remove the first id and add it to the end of the list
+        rotating_ids = (
+            rotating_ids[NUMBER_OF_SINGLE_COINS:]
+            + rotating_ids[:NUMBER_OF_SINGLE_COINS]
+        )
+        print(f"rotating_ids before save: {rotating_ids}")
+        redis_conn.set("coins:ids", json.dumps(rotating_ids))
 
     except Exception as err:  # pylint: disable=broad-except
         print(
             "Something went wrong inside the main function while fetching single coins"
         )
         print(err)
+        print(traceback.format_exc())
 
 
 if __name__ == "__main__":

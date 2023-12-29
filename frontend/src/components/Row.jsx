@@ -1,6 +1,7 @@
 import React from 'react';
+import styles from './Row.module.scss';
 
-const Row = ({ tableData, row, styles, onRowClick }) => {
+const Row = ({ tableData, row, onRowClick }) => {
   return (
     <>
       {tableData.slice(0, 2).map((cell) => (

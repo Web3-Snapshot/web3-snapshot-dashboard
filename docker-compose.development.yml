@@ -33,9 +33,9 @@ services:
       - database:/app/instance
       - ${PWD}/backend:/app
       - ${PWD}/database/schema.sql:/app/schema.sql
-      - ${PWD}/database/util:/app/database_util
+      - ${PWD}/database/utils:/app/database_utils
     restart: always
-    command: flask --app "server:create_app(config_env='server.config.development')" run --no-debugger --host=0.0.0.0 --port=5000
+    command: flask --app "server:create_app(config_env='server.config.development')" run --no-debugger --reload --host=0.0.0.0 --port=5000
     depends_on:
       - db
     networks:
@@ -49,11 +49,11 @@ services:
       dockerfile: Dockerfile.dev
     ports:
       - 3000:3000
+      - 9229:9229
     restart: always
     depends_on:
       - backend
     volumes:
-      - /app/node_modules
       - ${PWD}/frontend:/app
     networks:
       - w3s_development-nw
@@ -81,9 +81,10 @@ services:
       dockerfile: ./isession/Dockerfile
     volumes:
       - ${PWD}/backend/server:/app/server
-      - ${PWD}/backend/util:/app/util
+      - ${PWD}/backend/utils:/app/utils
       - ${PWD}/database/schema.sql:/app/schema.sql
-      - ${PWD}/database:/app/database
+      - ${PWD}/database/core:/app/database/core
+      - ${PWD}/database/utils:/app/database/utils
       - ${PWD}/isession/.ipython:/app/.ipython
       - /app/.ipython/profile_default/pid
       - /app/.ipython/profile_default/security

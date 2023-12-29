@@ -10,8 +10,6 @@ import { renderCell, renderCellOverlay } from '../CellOverlay';
 import CoinInfoModal from '../CoinInfoModal';
 import { useScrollLock } from '../../custom-hooks/useScrollLock';
 
-import styles from './Prices.module.scss';
-
 const selectRows = (state) => state.rows;
 
 function Prices() {
@@ -20,14 +18,17 @@ function Prices() {
   const coinId = useRef(null);
   const defaultOrderByProp = ['market_cap_rank'];
   const setRows = usePricesStore((state) => state.setRows);
+  const setOrderedIds = usePricesStore((state) => state.setOrderedIds);
   const setUpdatedAt = usePricesStore((state) => state.setUpdatedAt);
   const coins = usePricesStore(selectRows);
 
   useEffect(() => {
     const fetchData = async function () {
       fetchCoins().then((res) => {
-        console.log(res.updatedAt);
-        setRows(res.payload);
+        console.log(res.prices);
+        setRows(res.prices);
+        setOrderedIds(res.order);
+
         setUpdatedAt(res.updated_at);
       });
     };
@@ -134,10 +135,10 @@ function Prices() {
       <>
         {!isEmpty(coins) && (
           <Table
+            pageId="prices"
             tableData={tableData}
             coins={coins}
             onRowClick={handleRowClick}
-            rowStyles={styles}
             defaultOrderBy={defaultOrderByProp}
           />
         )}

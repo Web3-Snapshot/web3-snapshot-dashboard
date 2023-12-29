@@ -1,5 +1,5 @@
 import sqlite3
-from os import environ
+from datetime import datetime, timezone
 
 import fakeredis
 import pytest
@@ -8,6 +8,7 @@ from server import create_app
 from server.db import dict_factory
 
 SCHEMA_PATH = "./schema.sql"
+UPDATED_AT = datetime(2022, 1, 1, 0, 0, 0, tzinfo=timezone.utc).isoformat()
 
 
 def init_db(cur):
@@ -18,9 +19,9 @@ def init_db(cur):
 
 @pytest.fixture(scope="module")
 def app():
-    app = create_app(config_env="server.config.testing")
-    app.redis_conn = fakeredis.FakeStrictRedis()
-    yield app
+    _app = create_app(config_env="server.config.testing")
+    _app.redis_conn = fakeredis.FakeStrictRedis(decode_responses=True)
+    yield _app
 
 
 @pytest.fixture(scope="function")

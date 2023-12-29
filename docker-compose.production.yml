@@ -65,7 +65,7 @@ services:
       dockerfile: ./isession/Dockerfile
     volumes:
       - ${PWD}/backend/server:/app/server
-      - ${PWD}/backend/util:/app/util
+      - ${PWD}/backend/utils:/app/utils
       - ${PWD}/database/schema.sql:/app/schema.sql
       - ${PWD}/database:/app/database
       - ${PWD}/isession/.ipython:/app/.ipython

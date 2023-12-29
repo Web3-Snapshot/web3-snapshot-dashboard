@@ -35,17 +35,26 @@ def get_coins():
     coins = current_app.redis_conn.get("coins:all")
     if coins is None:
         return {"error": "No coins found"}, 404
-
     coins = json.loads(coins)
+
+    order = current_app.redis_conn.get("coins:order")
+    if order is None:
+        return {"error": "No sort order found"}, 404
+    order = json.loads(order)
 
     updated_at = current_app.redis_conn.get("coins:updated_at")
 
-    parsed_coins = {"payload": coins, "updated_at": updated_at}
+    parsed_coins = {
+        "prices": coins["prices"],
+        "tokenomics": coins["tokenomics"],
+        "order": order,
+        "updated_at": updated_at,
+    }
 
     return parsed_coins, 200
 
 
-def event_stream(redis_conn, single=False):
+def event_stream(redis_conn, pubsub, single=False):
     """Event stream function that listens to a Redis pubsub channel for updates on coin data.
     When a message is received, it retrieves the latest coin data from Redis and yields it.
 
@@ -55,28 +64,43 @@ def event_stream(redis_conn, single=False):
     Yields:
         str: A JSON string representing the latest coin data.
     """
-    pubsub = redis_conn.pubsub(ignore_subscribe_messages=True)
-    pubsub.subscribe("coins")
-
     for message in pubsub.listen():
         print(message)
         coins = redis_conn.get("coins:all")
-        updated_at = redis_conn.get("coins:updated_at")
         if coins is None:
-            continue
+            return {"error": "No coins found"}, 404
+        coins = json.loads(coins)
 
-        stream_payload = json.dumps(
-            {"payload": json.loads(coins), "updated_at": updated_at}
-        )
+        order = redis_conn.get("coins:order")
+        if order is None:
+            return {"error": "No sort order found"}, 404
+        order = json.loads(order)
+
+        updated_at = redis_conn.get("coins:updated_at")
+
+        payload = {
+            "prices": coins["prices"],
+            "tokenomics": coins["tokenomics"],
+            "order": order,
+            "updated_at": updated_at,
+        }
+
         if single:
             single = False
-            return "data:  %s\n\n" % stream_payload
+            yield "data: %s\n\n" % json.dumps(payload)
 
-        yield "data:  %s\n\n" % stream_payload
+        yield "data:  %s\n\n" % json.dumps(payload)
 
 
 @bp.route("/coin-stream", methods=["GET"])
 def get_coin_stream():
-    redis_conn = current_app.redis_conn
+    """Get the coin stream.
 
-    return Response(event_stream(redis_conn), mimetype="text/event-stream"), 200
+    Returns:
+        Response: The response containing the coin stream as a text/event-stream.
+    """
+    redis_conn = current_app.redis_conn
+    pubsub = redis_conn.pubsub(ignore_subscribe_messages=True)
+    pubsub.subscribe("coins")
+
+    return Response(event_stream(redis_conn, pubsub), mimetype="text/event-stream"), 200
