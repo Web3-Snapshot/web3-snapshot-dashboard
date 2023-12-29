@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { isEmpty } from 'lodash';
+import React, { useState, useEffect, useCallback } from 'react';
 import styles from './Table.module.scss';
 import Row from './Row';
 import HeaderRow from './HeaderRow';
@@ -18,6 +17,7 @@ function Table({ pageId, tableData, coins, defaultOrderBy, onRowClick }) {
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
   let { desktop } = useBreakpoints(BREAKPOINTS);
   const labelsAndIds = tableData.map((item) => ({ label: item.label, id: item.id }));
+  const labelsAndIdsCard = tableData.slice(3).map((item) => ({ label: item.label, id: item.id }));
 
   const handleSort = useCallback(
     (_, cellId) => {
@@ -27,35 +27,25 @@ function Table({ pageId, tableData, coins, defaultOrderBy, onRowClick }) {
     [order]
   );
 
-  const renderHeaderRow = useCallback((labelsAndIds, styles, handleSort, order, orderBy) => {
-    return (
-      <HeaderRow
-        headers={labelsAndIds}
-        styles={styles}
-        sortHandler={handleSort}
-        order={order}
-        orderBy={orderBy}
-      />
-    );
-  }, []);
-
-  // const memoizedHeaderRow = useMemo(
-  //   () => renderHeaderRow(labelsAndIds, styles, handleSort, order, orderBy),
-  //   [labelsAndIds, order, orderBy]
-  // );
-
-  // useEffect(() => {
-  //   // if (coins.order.length > 0) {
-  //   if (orderedIds.length > 0) {
-  //     setOrderedIds(objectSort(coins, order, orderBy));
-  //   }
-  // }, [coins, order, orderBy]);
+  useEffect(() => {
+    if (orderedIds.length > 0) {
+      setOrderedIds(objectSort(coins, order, orderBy));
+    }
+  }, [coins, order, orderBy]);
 
   return (
     <div className={styles.container}>
       {desktop ? (
         <>
-          {/* <div className={`${rowStyles.row} ${styles.header}`}>{memoizedHeaderRow}</div> */}
+          <div className={`${styles[pageId]} ${styles.header}`}>
+            <HeaderRow
+              headers={labelsAndIds}
+              styles={styles}
+              sortHandler={handleSort}
+              order={order}
+              orderBy={orderBy}
+            />
+          </div>
           {orderedIds.map((coinId) => (
             <div key={coinId} className={`${styles[pageId]} ${styles.data}`}>
               <Row
@@ -71,7 +61,7 @@ function Table({ pageId, tableData, coins, defaultOrderBy, onRowClick }) {
         <>
           <div className={`${styles[pageId]} ${styles.cardHeader}`}>
             <HeaderRow
-              headers={labelsAndIds}
+              headers={labelsAndIdsCard}
               styles={styles}
               sortHandler={handleSort}
               order={order}
@@ -82,7 +72,7 @@ function Table({ pageId, tableData, coins, defaultOrderBy, onRowClick }) {
             <Card
               key={coinId}
               tableData={tableData}
-              coin={coins.data[coinId]}
+              coin={coins[coinId]}
               onCardClick={onRowClick}
             />
           ))}

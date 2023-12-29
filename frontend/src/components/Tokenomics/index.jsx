@@ -20,7 +20,7 @@ function Tokenomics() {
   const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
   const defaultOrderByProp = ['market_cap_rank'];
   const setRows = useTokenomicsStore((state) => state.setRows);
-  const setOrder = useTokenomicsStore((state) => state.setOrder);
+  const setOrderedIds = useTokenomicsStore((state) => state.setOrderedIds);
   const setUpdatedAt = useTokenomicsStore((state) => state.setUpdatedAt);
   const coins = useTokenomicsStore(selectRows);
 
@@ -29,7 +29,7 @@ function Tokenomics() {
       fetchCoins().then((res) => {
         console.log(res.updated_at);
         setRows(res.tokenomics);
-        setOrder(res.order);
+        setOrderedIds(res.order);
         setUpdatedAt(res.updated_at);
       });
     };
@@ -103,9 +103,8 @@ function Tokenomics() {
   ];
 
   function handleRowClick(_, row) {
-    // setRow(row);
-    // lockScroll();
-    // setIsCoinInfoModalOpen(true);
+    lockScroll();
+    setIsCoinInfoModalOpen(true);
   }
 
   function handleClose() {

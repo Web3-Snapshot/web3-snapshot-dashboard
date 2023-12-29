@@ -18,7 +18,7 @@ function Prices() {
   const coinId = useRef(null);
   const defaultOrderByProp = ['market_cap_rank'];
   const setRows = usePricesStore((state) => state.setRows);
-  const setOrder = usePricesStore((state) => state.setOrder);
+  const setOrderedIds = usePricesStore((state) => state.setOrderedIds);
   const setUpdatedAt = usePricesStore((state) => state.setUpdatedAt);
   const coins = usePricesStore(selectRows);
 
@@ -27,7 +27,7 @@ function Prices() {
       fetchCoins().then((res) => {
         console.log(res.prices);
         setRows(res.prices);
-        setOrder(res.order);
+        setOrderedIds(res.order);
 
         setUpdatedAt(res.updated_at);
       });
