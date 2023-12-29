@@ -20,6 +20,8 @@
   }
 }
 
+// Header
+
 .header {
   align-content: center;
   font-weight: 600;
@@ -55,6 +57,16 @@
   justify-content: flex-start;
   padding: 4px;
 }
+
+// Card header
+
+.cardHeader {
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  cursor: pointer;
+}
+
+// Data
 
 .data {
   opacity: 0.9;
@@ -127,4 +139,59 @@ img {
 
 .iconActive {
   color: $white;
+}
+
+/** The following styles are customizations for the different tables **/
+
+// Prices
+
+.prices {
+  display: grid;
+  column-gap: 1px;
+  border-bottom: 1px solid $grey0;
+  align-items: center;
+  min-width: fit-content;
+}
+
+
+// Prices - table view
+.prices.header, .prices.data {
+  grid-template-columns: $first-column-wide $second-column-wide repeat(6, 1fr);
+}
+
+@media #{media-query(lg)} {
+  .prices.header, .prices.data {
+    grid-template-columns: $first-column-medium $second-column-medium repeat(6, 1fr);
+  }
+}
+
+// Prices - card view
+.prices.cardHeader {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+// Tokenomics
+
+.tokenomics {
+  display: grid;
+  column-gap: 1px;
+  border-bottom: 1px solid $grey0;
+  align-items: center;
+  min-width: fit-content;
+}
+
+// Tokenomics - table view
+.tokenomics.header, .tokenomics.data {
+  grid-template-columns: $first-column-wide $second-column-wide 200px repeat(7, 1fr);
+}
+
+@media #{media-query(lg)} {
+  .tokenomics.header, .tokenomics.data {
+    grid-template-columns: $first-column-medium $second-column-medium repeat(8, 1fr);
+  }
+}
+
+// Tokenomics - card view
+.tokenomics.cardHeader {
+  grid-template-columns: repeat(7, 1fr);
 }
