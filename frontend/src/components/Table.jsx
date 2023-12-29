@@ -40,7 +40,6 @@ function Table({ pageId, tableData, coins, defaultOrderBy, onRowClick }) {
           <div className={`${styles[pageId]} ${styles.header}`}>
             <HeaderRow
               headers={labelsAndIds}
-              styles={styles}
               sortHandler={handleSort}
               order={order}
               orderBy={orderBy}
@@ -62,7 +61,6 @@ function Table({ pageId, tableData, coins, defaultOrderBy, onRowClick }) {
           <div className={`${styles[pageId]} ${styles.cardHeader}`}>
             <HeaderRow
               headers={labelsAndIdsCard}
-              styles={styles}
               sortHandler={handleSort}
               order={order}
               orderBy={orderBy}

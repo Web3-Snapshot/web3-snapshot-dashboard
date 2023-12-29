@@ -104,17 +104,6 @@
   }
 }
 
-.cell {
-  background-color: $grey2;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 2.6rem;
-  text-align: center;
-}
-
 .data:hover {
   opacity: 1;
   cursor: pointer;
@@ -125,21 +114,32 @@ img {
   margin-right: 10px;
 }
 
-.iconDown {
-  color: $grey5;
-  margin: 2px;
-  padding: 2px;
-}
+// .cell {
+//   background-color: $grey2;
+//   position: relative;
+//   overflow: hidden;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   height: 2.6rem;
+//   text-align: center;
+// }
 
-.iconUp {
-  color: $grey5;
-  margin: 2px;
-  padding: 2px;
-}
+// .iconDown {
+//   color: $grey5;
+//   margin: 2px;
+//   padding: 2px;
+// }
 
-.iconActive {
-  color: $white;
-}
+// .iconUp {
+//   color: $grey5;
+//   margin: 2px;
+//   padding: 2px;
+// }
+
+// .iconActive {
+//   color: $white;
+// }
 
 /** The following styles are customizations for the different tables **/
 

@@ -1,7 +1,8 @@
 import React from 'react';
 import { FaAngleDown, FaAngleUp } from 'react-icons/fa';
+import styles from './HeaderRow.module.scss';
 
-const HeaderRow = ({ headers, styles, sortHandler, order, orderBy }) => {
+const HeaderRow = ({ headers, sortHandler, order, orderBy }) => {
   return headers.map((cell) => (
     <div key={cell.id} className={styles.cell} onClick={(evt) => sortHandler(evt, cell.id)}>
       <FaAngleDown
@@ -9,7 +10,7 @@ const HeaderRow = ({ headers, styles, sortHandler, order, orderBy }) => {
           order === 'desc' && orderBy.includes(cell.id) && styles.iconActive
         }`}
       />
-      <div className={styles.headerText}>{cell.label}</div>
+      <div>{cell.label}</div>
       <FaAngleUp
         className={`${styles.iconUp} ${
           order === 'asc' && orderBy.includes(cell.id) && styles.iconActive

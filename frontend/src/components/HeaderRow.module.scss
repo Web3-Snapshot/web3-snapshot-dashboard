@@ -1,0 +1,30 @@
+@import '../breakpoints.scss';
+@import '../global-constants.scss';
+@import '../colors.scss';
+
+.cell {
+  display: flex;
+  background-color: $grey2;
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  height: 2.6rem;
+  text-align: center;
+}
+
+.iconDown {
+  color: $grey5;
+  margin: 2px;
+  padding: 2px;
+}
+
+.iconUp {
+  color: $grey5;
+  margin: 2px;
+  padding: 2px;
+}
+
+.iconActive {
+  color: $white;
+}

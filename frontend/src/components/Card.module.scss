@@ -7,10 +7,12 @@
 .cardContainer {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   background: $grey0;
   border-radius: 8px;
   margin-bottom: 1rem;
   padding-right: 2px;
+  min-height: 6.5rem;
 }
 
 .cardContainer:hover {
@@ -82,13 +84,12 @@
 
 .cardBody {
   display: flex;
-  align-items: center;
+  margin-bottom: 4px;
 
   & div {
     display: flex;
     flex: auto;
     flex-direction: column;
-    row-gap: 4px;
     width: 28px;
 
     & div {

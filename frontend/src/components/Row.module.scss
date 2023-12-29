@@ -1,0 +1,12 @@
+@import '../colors.scss';
+
+.cell {
+  background-color: $grey2;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.6rem;
+  text-align: center;
+}
