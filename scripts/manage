@@ -24,7 +24,7 @@
 #######################################
 
 valid_environments=("production" "testing" "development")
-required_variables=("ENVIRONMENT" "REDIS_URL" "COIN_API_URL")
+required_variables=("ENVIRONMENT" "REDIS_URL" "COIN_API_URL" "AWS_ACCOUNT" "AWS_PROFILE" "AWS_REGION")
 
 #######################################
 #####      Internal functions     #####
@@ -125,6 +125,23 @@ build() {
     /bin/sh -c "$docker_command"
 }
 
+deploy() {
+    echo "Deploying to AWS"
+
+    aws sso login --profile $AWS_PROFILE &&
+        (aws ecr get-login-password --region $AWS_REGION --profile $AWS_PROFILE) | docker login --username AWS --password-stdin $AWS_ACCOUNT
+
+    # First, remove the old image
+    docker image rm $AWS_ACCOUNT/$AWS_FRONTEND_REPOSITORY
+
+    # Then, build the new image
+    docker compose -f docker-compose.production.yml build frontend
+
+    docker push "$AWS_ACCOUNT/$AWS_FRONTEND_REPOSITORY:latest"
+    # docker compose -f docker-compose."$ENVIRONMENT".yml down --remove-orphans &&
+    #     docker compose -f docker-compose."$ENVIRONMENT".yml up -d frontend backend db redis
+}
+
 connect_service() {
 
     if [[ "$_arg_connect_service" == 'redis' ]]; then
@@ -215,6 +232,7 @@ _check_required_variables
 # ARG_OPTIONAL_ACTION([stop],[],[Stop the server],[stop])
 # ARG_OPTIONAL_ACTION([print-vars],[],[Print variables],[print_vars])
 # ARG_OPTIONAL_SINGLE([build],[],[Build with docker compose])
+# ARG_OPTIONAL_SINGLE([deploy],[],[Deploy application to server])
 # ARG_OPTIONAL_BOOLEAN([debug],[],[Start up the debugging server and attach],[off])
 # ARG_OPTIONAL_ACTION([tests],[],[Run pytests],[tests])
 # ARG_OPTIONAL_ACTION([ps],[],[Print running containers],[ps])
@@ -246,14 +264,17 @@ begins_with_short_option() {
 # THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_connect_service=
 _arg_debug="off"
+_arg_build=
+_arg_deploy=
 
 print_help() {
     printf '%s\n' "Manage the application via simple commands targeting the underlying docker setup."
-    printf 'Usage: %s [--start] [--stop] [--print-vars] [--build] [--build-backend] [--(no-)debug] [--tests] [--ps] [--logs] [--issession] [--start-cert-server] [--stop-cert-server] [--get-certificate] [--renew-certificate] [--connect-service <arg>] [--install-backend <arg>] [-h|--help]\n' "$0"
+    printf 'Usage: %s [--start] [--stop] [--print-vars] [--build] [--deploy] [--build-backend] [--(no-)debug] [--tests] [--ps] [--logs] [--issession] [--start-cert-server] [--stop-cert-server] [--get-certificate] [--renew-certificate] [--connect-service <arg>] [--install-backend <arg>] [-h|--help]\n' "$0"
     printf '\t%s\n' "--start: Start the server"
     printf '\t%s\n' "--stop: Stop the server"
     printf '\t%s\n' "--print-vars: Print variables"
     printf '\t%s\n' "--build: Build with docker compose (no default)"
+    printf '\t%s\n' "--deploy: Deploy application to remote server (no default)"
     printf '\t%s\n' "--debug, --no-debug: Start up the debugging server and attach (off by default)"
     printf '\t%s\n' "--init-db: Initialize the database"
     printf '\t%s\n' "--tests: Run pytests"
@@ -294,6 +315,17 @@ parse_commandline() {
             ;;
         --build=*)
             _arg_build="${_key##--build=}"
+            ;;
+        --deploy)
+            if [[ "$2" == -* ]]; then
+                die "Missing value for the optional argument '$_key'." 1
+            fi
+            _arg_deploy="$2"
+            command=deploy
+            shift
+            ;;
+        --deploy=*)
+            _arg_deploy="${_key##--deploy=}"
             ;;
         --no-debug | --debug)
             _arg_debug="on"
@@ -384,6 +416,14 @@ if [ "$command" = "build" ]; then
     fi
 
     build
+    exit 0
+elif [ "$command" = "deploy" ]; then
+    if [ -z "$_arg_deploy" ]; then
+        echo "Error: Target container environment is not set."
+        exit 1
+    fi
+
+    deploy
     exit 0
 elif [ "$command" = "start" ]; then
     if [ "$_arg_debug" = "on" ]; then

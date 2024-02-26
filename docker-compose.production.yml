@@ -38,7 +38,8 @@ services:
     container_name: web3_frontend_prod
     build:
       context: ./frontend
-    image: loxosceles/web3_snapshot_dashboard-frontend:latest
+    # image: loxosceles/web3_snapshot_dashboard-frontend:latest
+    image: 560410572733.dkr.ecr.eu-central-1.amazonaws.com/w3s-frontend:latest
     ports:
       - 80:80
       - 443:443
@@ -93,6 +94,7 @@ volumes:
   database:
   certbot_www:
   certbot_conf:
+
 
 networks:
   w3s-nw:
