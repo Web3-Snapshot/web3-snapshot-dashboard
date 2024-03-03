@@ -11,6 +11,7 @@ import CoinInfoModal from '../CoinInfoModal';
 import { useScrollLock } from '../../custom-hooks/useScrollLock';
 
 const selectRows = (state) => state.rows;
+const selectOrderedIds = (state) => state.orderedIds;
 
 function Prices() {
   const { lockScroll, unlockScroll } = useScrollLock();
@@ -21,14 +22,13 @@ function Prices() {
   const setOrderedIds = usePricesStore((state) => state.setOrderedIds);
   const setUpdatedAt = usePricesStore((state) => state.setUpdatedAt);
   const coins = usePricesStore(selectRows);
+  const orderedIds = usePricesStore(selectOrderedIds);
 
   useEffect(() => {
     const fetchData = async function () {
       fetchCoins().then((res) => {
-        console.log(res.prices);
         setRows(res.prices);
         setOrderedIds(res.order);
-
         setUpdatedAt(res.updated_at);
       });
     };
@@ -136,6 +136,8 @@ function Prices() {
         {!isEmpty(coins) && (
           <Table
             pageId="prices"
+            orderedIds={orderedIds}
+            setOrderedIds={setOrderedIds}
             tableData={tableData}
             coins={coins}
             onRowClick={handleRowClick}

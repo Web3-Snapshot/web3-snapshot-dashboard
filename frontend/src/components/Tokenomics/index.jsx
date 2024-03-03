@@ -13,6 +13,7 @@ import { useScrollLock } from '../../custom-hooks/useScrollLock';
 import { BREAKPOINTS } from '../../constants';
 
 const selectRows = (state) => state.rows;
+const selectOrderedIds = (state) => state.orderedIds;
 
 function Tokenomics() {
   let { ss, mobile, tablet } = useBreakpoints(BREAKPOINTS);
@@ -23,16 +24,16 @@ function Tokenomics() {
   const setOrderedIds = useTokenomicsStore((state) => state.setOrderedIds);
   const setUpdatedAt = useTokenomicsStore((state) => state.setUpdatedAt);
   const coins = useTokenomicsStore(selectRows);
+  const orderedIds = useTokenomicsStore(selectOrderedIds);
 
   useEffect(() => {
-    const fetchData = async function () {
+    function fetchData() {
       fetchCoins().then((res) => {
-        console.log(res.updated_at);
         setRows(res.tokenomics);
         setOrderedIds(res.order);
         setUpdatedAt(res.updated_at);
       });
-    };
+    }
 
     fetchData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -123,6 +124,8 @@ function Tokenomics() {
         {!isEmpty(coins) && (
           <Table
             pageId="tokenomics"
+            orderedIds={orderedIds}
+            setOrderedIds={setOrderedIds}
             tableData={tableData}
             coins={coins}
             onRowClick={handleRowClick}
