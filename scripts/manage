@@ -143,8 +143,6 @@ deploy() {
     docker compose -f docker-compose.production.yml build frontend
 
     docker push "$AWS_ACCOUNT/$AWS_FRONTEND_REPOSITORY:latest"
-    # docker compose -f docker-compose."$ENVIRONMENT".yml down --remove-orphans &&
-    #     docker compose -f docker-compose."$ENVIRONMENT".yml up -d frontend backend db redis
 }
 
 connect_service() {
