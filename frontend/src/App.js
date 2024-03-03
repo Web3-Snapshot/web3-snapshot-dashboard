@@ -15,6 +15,28 @@ function App() {
     bodyElement?.style.setProperty('background', 'None');
   }
 
+  const eventList = ['load', 'resize'];
+  for (const event of eventList) {
+    window.addEventListener(
+      event,
+      function (e) {
+        setTimeout(function determineScrollHeight() {
+          const body = document.body;
+          const html = document.documentElement;
+          let message = Math.max(
+            body.scrollHeight,
+            // body.offsetHeight,
+            // html.clientHeight,
+            html.scrollHeight
+            // html.offsetHeight
+          );
+          window.top.postMessage(message, '*');
+        }, 500);
+      },
+      false
+    );
+  }
+
   return (
     <>
       {!isIframe && <Navbar />}
