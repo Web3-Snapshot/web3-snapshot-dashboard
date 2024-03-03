@@ -122,7 +122,12 @@ build() {
         docker_command="$docker_command --no-cache"
     fi
 
-    /bin/sh -c "$docker_command"
+    if [ "$ENVIRONMENT" = "production" ]; then
+        echo "Production build: frontend will be omitted"
+        /bin/sh -c "$docker_command db redis backend"
+    else
+        /bin/sh -c "$docker_command db redis backend frontend"
+    fi
 }
 
 deploy() {
@@ -263,8 +268,8 @@ begins_with_short_option() {
 
 # THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_connect_service=
-_arg_debug="off"
-_arg_build=
+_arg_debug=off
+_arg_build_service=all
 _arg_deploy=
 
 print_help() {
@@ -309,12 +314,12 @@ parse_commandline() {
             if [[ "$2" == -* ]]; then
                 die "Missing value for the optional argument '$_key'." 1
             fi
-            _arg_build="$2"
+            _arg_build_service="$2"
             command=build
             shift
             ;;
         --build=*)
-            _arg_build="${_key##--build=}"
+            _arg_build_service="${_key##--build=}"
             ;;
         --deploy)
             if [[ "$2" == -* ]]; then
@@ -410,7 +415,7 @@ parse_commandline "$@"
 
 # Commands that depend on the setting of another flag
 if [ "$command" = "build" ]; then
-    if [ -z "$_arg_build" ]; then
+    if [ -z "$_arg_build_service" ]; then
         echo "Error: Target container environment is not set."
         exit 1
     fi
