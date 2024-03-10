@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Prices from './components/Prices';
 import Tokenomics from './components/Tokenomics';
@@ -15,27 +15,30 @@ function App() {
     bodyElement?.style.setProperty('background', 'None');
   }
 
-  const eventList = ['load', 'resize'];
-  for (const event of eventList) {
-    window.addEventListener(
-      event,
-      function (e) {
-        setTimeout(function determineScrollHeight() {
-          const body = document.body;
-          const html = document.documentElement;
-          let message = Math.max(
-            body.scrollHeight,
-            // body.offsetHeight,
-            // html.clientHeight,
-            html.scrollHeight
-            // html.offsetHeight
-          );
-          window.top.postMessage(message, '*');
-        }, 500);
-      },
-      false
-    );
-  }
+  useEffect(() => {
+    function handleResize() {
+      setTimeout(function determineScrollHeight() {
+        const body = document.body;
+        const html = document.documentElement;
+        let message = Math.max(
+          body.scrollHeight,
+          // body.offsetHeight,
+          // html.clientHeight,
+          html.scrollHeight
+          // html.offsetHeight
+        );
+        window.top.postMessage(message, '*');
+      }, 500);
+    }
+
+    window.addEventListener('load', handleResize);
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('load', handleResize);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   return (
     <>
