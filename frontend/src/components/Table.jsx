@@ -6,13 +6,16 @@ import Card from './Card';
 import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
 import { objectSort } from '../utils/helper_functions';
-import { usePricesStore } from './Prices/state';
 
-const selectOrderedIds = (state) => state.orderedIds;
-
-function Table({ pageId, tableData, coins, defaultOrderBy, onRowClick }) {
-  const orderedIds = usePricesStore(selectOrderedIds);
-  const setOrderedIds = usePricesStore((state) => state.setOrderedIds);
+function Table({
+  pageId,
+  orderedIds,
+  setOrderedIds,
+  tableData,
+  coins,
+  defaultOrderBy,
+  onRowClick,
+}) {
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState(defaultOrderBy);
   let { desktop } = useBreakpoints(BREAKPOINTS);
@@ -31,7 +34,7 @@ function Table({ pageId, tableData, coins, defaultOrderBy, onRowClick }) {
     if (orderedIds.length > 0) {
       setOrderedIds(objectSort(coins, order, orderBy));
     }
-  }, [coins, order, orderBy]);
+  }, [coins, order, orderBy]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className={styles.container}>

@@ -24,11 +24,10 @@ function CoinInfoModal({ coinId, onClose }) {
     const fetchData = async function () {
       fetchCoin(coinId)
         .then((res) => {
-          console.log(res);
           setCoin(res);
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
           setCoin(null);
         });
     };

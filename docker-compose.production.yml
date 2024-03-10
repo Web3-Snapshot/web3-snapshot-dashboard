@@ -11,8 +11,8 @@ services:
       - ENVIRONMENT=${ENVIRONMENT}
       - REDIS_URL=${REDIS_URL}
       - COIN_API_URL=${COIN_API_URL}
-    # volumes:
-    #   - database:/app/instance
+    volumes:
+      - database:/app/instance
     networks:
       - w3s-inner-nw
 
@@ -38,7 +38,7 @@ services:
     container_name: web3_frontend_prod
     build:
       context: ./frontend
-    image: loxosceles/web3_snapshot_dashboard-frontend:latest
+    image: $AWS_ACCOUNT/$AWS_FRONTEND_REPOSITORY:latest
     ports:
       - 80:80
       - 443:443
@@ -47,10 +47,8 @@ services:
       - backend
     links:
       - backend
-    # command: "nginx -g daemon off;"
     volumes:
       - certbot_www:/var/www/certbot/:ro
-      # - certbot_conf:/etc/nginx/ssl/:ro
       - certbot_conf:/etc/nginx/ssl
     networks:
       - w3s-nw
@@ -93,6 +91,7 @@ volumes:
   database:
   certbot_www:
   certbot_conf:
+
 
 networks:
   w3s-nw:

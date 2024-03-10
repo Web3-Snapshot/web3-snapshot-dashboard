@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { isEmpty } from 'lodash';
 
@@ -13,26 +13,28 @@ import { useScrollLock } from '../../custom-hooks/useScrollLock';
 import { BREAKPOINTS } from '../../constants';
 
 const selectRows = (state) => state.rows;
+const selectOrderedIds = (state) => state.orderedIds;
 
 function Tokenomics() {
   let { ss, mobile, tablet } = useBreakpoints(BREAKPOINTS);
   const { lockScroll, unlockScroll } = useScrollLock();
   const [isCoinInfoModalOpen, setIsCoinInfoModalOpen] = useState(false);
+  const coinId = useRef(null);
   const defaultOrderByProp = ['market_cap_rank'];
   const setRows = useTokenomicsStore((state) => state.setRows);
   const setOrderedIds = useTokenomicsStore((state) => state.setOrderedIds);
   const setUpdatedAt = useTokenomicsStore((state) => state.setUpdatedAt);
   const coins = useTokenomicsStore(selectRows);
+  const orderedIds = useTokenomicsStore(selectOrderedIds);
 
   useEffect(() => {
-    const fetchData = async function () {
+    function fetchData() {
       fetchCoins().then((res) => {
-        console.log(res.updated_at);
         setRows(res.tokenomics);
         setOrderedIds(res.order);
         setUpdatedAt(res.updated_at);
       });
-    };
+    }
 
     fetchData();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -102,27 +104,38 @@ function Tokenomics() {
     },
   ];
 
-  function handleRowClick(_, row) {
-    lockScroll();
-    setIsCoinInfoModalOpen(true);
-  }
+  const handleRowClick = useCallback(
+    (_, row) => {
+      coinId.current = row.id;
+      lockScroll();
+      setIsCoinInfoModalOpen(true);
+    },
+    [lockScroll]
+  );
 
-  function handleClose() {
+  const handleClose = useCallback(() => {
+    coinId.current = null;
     unlockScroll();
     setIsCoinInfoModalOpen(false);
-  }
+  }, [unlockScroll]);
 
   return (
     <>
       {isCoinInfoModalOpen &&
         createPortal(
-          <CoinInfoModal isOpen={isCoinInfoModalOpen} onClose={handleClose} />,
+          <CoinInfoModal
+            coinId={coinId.current}
+            isOpen={isCoinInfoModalOpen}
+            onClose={handleClose}
+          />,
           document.body
         )}
       <>
         {!isEmpty(coins) && (
           <Table
             pageId="tokenomics"
+            orderedIds={orderedIds}
+            setOrderedIds={setOrderedIds}
             tableData={tableData}
             coins={coins}
             onRowClick={handleRowClick}
