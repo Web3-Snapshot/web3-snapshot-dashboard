@@ -17,16 +17,16 @@ function App() {
   }
 
   useEffect(() => {
+    // TODO: This needs more testing. Previously, we checked for a number of
+    // different properties to get the correct height. It seems, however, that
+    // we only need to check for `scrollHeight`. If that turns out to be sufficient,
+    // we can simplify this function.
     function handleResize() {
       setTimeout(function determineScrollHeight() {
         const body = document.body;
-        const html = document.documentElement;
         windowTopMessage.current = Math.max(
           // body.scrollHeight,
           // body.offsetHeight,
-          // html.clientHeight,
-          // html.scrollHeight,
-          // html.offsetHeight
           body.scrollHeight
         );
         console.log('windowTopMessage.current', windowTopMessage.current);
