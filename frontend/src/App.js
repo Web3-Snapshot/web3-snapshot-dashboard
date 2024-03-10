@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Prices from './components/Prices';
 import Tokenomics from './components/Tokenomics';
@@ -8,6 +8,7 @@ import { useIsIframe } from './custom-hooks/useIsIframe';
 
 function App() {
   const isIframe = useIsIframe();
+  const windowTopMessage = useRef(null);
 
   // Remove background if embedded in iframe on external site
   const bodyElement = document.querySelector('body');
@@ -20,14 +21,16 @@ function App() {
       setTimeout(function determineScrollHeight() {
         const body = document.body;
         const html = document.documentElement;
-        let message = Math.max(
-          body.scrollHeight,
+        windowTopMessage.current = Math.max(
+          // body.scrollHeight,
           // body.offsetHeight,
           // html.clientHeight,
-          html.scrollHeight
+          // html.scrollHeight,
           // html.offsetHeight
+          body.scrollHeight
         );
-        window.top.postMessage(message, '*');
+        console.log('windowTopMessage.current', windowTopMessage.current);
+        window.top.postMessage(windowTopMessage.current, '*');
       }, 500);
     }
 
@@ -37,6 +40,7 @@ function App() {
     return () => {
       window.removeEventListener('load', handleResize);
       window.removeEventListener('resize', handleResize);
+      windowTopMessage.current = null;
     };
   }, []);
 
