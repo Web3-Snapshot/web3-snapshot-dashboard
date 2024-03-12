@@ -7,8 +7,9 @@ import Dashboard from './pages/Dashboard';
 import { useIsIframe } from './custom-hooks/useIsIframe';
 
 function App() {
+  const body = document.body;
   const isIframe = useIsIframe();
-  const windowTopMessage = useRef(null);
+  const windowTopMessage = useRef(body.scrollHeight);
 
   // Remove background if embedded in iframe on external site
   const bodyElement = document.querySelector('body');
@@ -23,7 +24,6 @@ function App() {
     // we can simplify this function.
     function handleResize() {
       setTimeout(function determineScrollHeight() {
-        const body = document.body;
         windowTopMessage.current = Math.max(
           // body.scrollHeight,
           // body.offsetHeight,
@@ -40,7 +40,7 @@ function App() {
     return () => {
       window.removeEventListener('load', handleResize);
       window.removeEventListener('resize', handleResize);
-      windowTopMessage.current = null;
+      windowTopMessage.current = body.scrollHeight;
     };
   }, []);
 
