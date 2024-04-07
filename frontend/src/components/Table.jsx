@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import styles from './Table.module.scss';
+import { useLocation } from 'react-router-dom';
+import { useBreakpoints } from 'react-breakpoints-hook';
+
+import { objectSort } from '../utils/helper_functions';
 import Row from './Row';
 import HeaderRow from './HeaderRow';
+import GroupingHeader from './GroupingHeader';
 import Card from './Card';
-import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
-import { objectSort } from '../utils/helper_functions';
+import styles from './Table.module.scss';
 
 function Table({
   pageId,
@@ -21,6 +24,7 @@ function Table({
   let { desktop } = useBreakpoints(BREAKPOINTS);
   const labelsAndIds = tableData.map((item) => ({ label: item.label, id: item.id }));
   const labelsAndIdsCard = tableData.slice(3).map((item) => ({ label: item.label, id: item.id }));
+  const location = useLocation();
 
   const handleSort = useCallback(
     (_, cellId) => {
@@ -61,6 +65,7 @@ function Table({
         </>
       ) : (
         <>
+          <GroupingHeader />
           <div className={`${styles[pageId]} ${styles.cardHeader}`}>
             <HeaderRow
               headers={labelsAndIdsCard}
@@ -69,6 +74,7 @@ function Table({
               orderBy={orderBy}
             />
           </div>
+
           {orderedIds.map((coinId) => (
             <Card
               key={coinId}
