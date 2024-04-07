@@ -57,7 +57,7 @@ function Tokenomics() {
     },
     {
       id: 'fully_diluted_valuation',
-      label: mobile || tablet ? 'FD' : 'Fully Diluted',
+      label: mobile || tablet ? 'FDV' : 'Fully Diluted',
       render: (obj) =>
         `${obj.fully_diluted_valuation ? '$' : ''}${formatLongNumbers(
           obj.fully_diluted_valuation
