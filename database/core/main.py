@@ -20,7 +20,6 @@ Note: The module relies on external dependencies such as requests, cache, and ut
 """
 
 import json
-import pprint
 import traceback
 from datetime import datetime, timezone
 from os import environ
@@ -38,7 +37,11 @@ from utils.helpers import (
 DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
 SCHEMA_PATH = "./schema.sql"
 BASE_URL = environ.get("COINGECKO_API_URL")
-NUMBER_OF_SINGLE_COINS = 2
+API_KEY = environ.get("COINGECKO_API_KEY")
+NUMBER_OF_SINGLE_COINS = 28
+
+# Headers for API requests
+HEADERS = {"x-cg-demo-api-key": API_KEY} if API_KEY else {}
 
 COIN_DETAIL_FIELDS = {
     "id": "id",
@@ -111,7 +114,7 @@ def get_single_coin(coin_id):
     Returns:
         requests.Response: The response object containing the coin information.
     """
-    return requests.get(f"{BASE_URL}/coins/{coin_id}")
+    return requests.get(f"{BASE_URL}/coins/{coin_id}", headers=HEADERS)
 
 
 def get_coins(pages=100):
@@ -132,7 +135,7 @@ def get_coins(pages=100):
         "vs_currency": "usd",
         "order": "market_cap_desc",
     }
-    return requests.get(f"{BASE_URL}/coins/markets", params=payload)
+    return requests.get(f"{BASE_URL}/coins/markets", params=payload, headers=HEADERS)
 
 
 def preprocess_data(coins):
