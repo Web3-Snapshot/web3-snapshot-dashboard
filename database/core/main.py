@@ -37,7 +37,7 @@ from utils.helpers import (
 
 DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
 SCHEMA_PATH = "./schema.sql"
-BASE_URL = environ.get("COIN_API_URL")
+BASE_URL = environ.get("COINGECKO_API_URL")
 NUMBER_OF_SINGLE_COINS = 2
 
 COIN_DETAIL_FIELDS = {
