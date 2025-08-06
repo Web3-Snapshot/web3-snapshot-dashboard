@@ -108,8 +108,14 @@ stop() {
 build() {
     docker_command="ENVIRONMENT=$ENVIRONMENT docker compose -f docker-compose.$ENVIRONMENT.yml build"
 
-    if [ $_arg_build_service = "all" ]; then
+    if [ "$_arg_build_service" = "all" ]; then
         echo "Building all services"
+        if [ "$ENVIRONMENT" = "production" ]; then
+            echo "Production build: frontend will be omitted"
+            docker_command="$docker_command db redis backend"
+        else
+            docker_command="$docker_command frontend backend db redis"
+        fi
     else
         echo "Building service: $_arg_build_service"
         docker_command="$docker_command $_arg_build_service"
@@ -122,12 +128,7 @@ build() {
         docker_command="$docker_command --no-cache"
     fi
 
-    if [ "$ENVIRONMENT" = "production" ]; then
-        echo "Production build: frontend will be omitted"
-        /bin/sh -c "$docker_command db redis backend"
-    else
-        /bin/sh -c "$docker_command db redis backend frontend"
-    fi
+    /bin/sh -c "$docker_command"
 }
 
 deploy() {
@@ -192,7 +193,7 @@ start_cert_server() {
 }
 
 stop_cert_server() {
-    docker compose -f docker-compose.certbot.yml down
+    docker compose -f docker-compose.certbot.yml down --remove-orphans
 }
 
 get_certificate() {
@@ -201,7 +202,35 @@ get_certificate() {
 }
 
 renew_certificate() {
-    docker compose -f docker-compose.certbot.yml run --rm certbot renew --webroot --webroot-path /var/www/certbot/
+    local log_file="/home/deploy/web3-snapshot-dashboard/renew-certificate.log"
+    local output
+    local exit_code
+
+    # Determine the location of docker-compose.certbot.yml
+    local compose_file="${1:-${DOCKER_COMPOSE_CERTBOT_YML:-docker-compose.certbot.yml}}"
+
+    # Validate the compose file exists
+    if [ ! -f "$compose_file" ]; then
+        echo "Error: Docker Compose file not found: $compose_file" >&2
+        return 1
+    fi
+
+    # Run the docker command and capture output and exit code
+    output=$(docker compose -f "$compose_file" run --rm certbot renew --webroot --webroot-path /var/www/certbot/ --dry-run 2>&1)
+    exit_code=$?
+
+    # Log the output
+    echo "$output"
+    echo "$output" >>"$log_file"
+
+    # Handle errors
+    if [ $exit_code -ne 0 ]; then
+        echo "Error renewing certificate: $output" >&2
+        echo "Error renewing certificate: $output" >>"$log_file"
+        return 1
+    fi
+
+    return 0
 }
 
 install_backend() {
@@ -269,6 +298,7 @@ _arg_connect_service=
 _arg_debug=off
 _arg_build_service=all
 _arg_deploy=
+_arg_cache=off
 
 print_help() {
     printf '%s\n' "Manage the application via simple commands targeting the underlying docker setup."
