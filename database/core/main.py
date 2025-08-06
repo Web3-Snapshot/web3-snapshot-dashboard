@@ -38,7 +38,9 @@ DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
 SCHEMA_PATH = "./schema.sql"
 BASE_URL = environ.get("COINGECKO_API_URL")
 API_KEY = environ.get("COINGECKO_API_KEY")
-NUMBER_OF_SINGLE_COINS = 28
+# The number of single coins to fetch/process. Default is 28, which was chosen based on current application requirements.
+# This value can be overridden by setting the NUMBER_OF_SINGLE_COINS environment variable.
+NUMBER_OF_SINGLE_COINS = int(environ.get("NUMBER_OF_SINGLE_COINS", 28))
 
 # Headers for API requests
 HEADERS = {"x-cg-demo-api-key": API_KEY} if API_KEY else {}
