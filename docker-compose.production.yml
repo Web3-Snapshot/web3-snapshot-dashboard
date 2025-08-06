@@ -35,11 +35,11 @@ services:
 
   frontend:
     container_name: web3_frontend_prod
-    build:
-      context: ./frontend
+    # build:
+    #   context: ./frontend
     image: $AWS_ACCOUNT/$AWS_FRONTEND_REPOSITORY:latest
     ports:
-      - 80:80
+      # - 80:80
       - 443:443
     restart: always
     depends_on:
