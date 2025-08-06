@@ -1,5 +1,3 @@
-version: '3.7'
-
 services:
   db:
     container_name: web3_database_dev
@@ -11,6 +9,7 @@ services:
       - ENVIRONMENT=${ENVIRONMENT}
       - REDIS_URL=${REDIS_URL}
       - COINGECKO_API_URL=${COINGECKO_API_URL}
+      - COINGECKO_API_KEY=${COINGECKO_API_KEY}
     volumes:
       - database:/app/instance
       - ${PWD}/database:/app
@@ -94,6 +93,7 @@ services:
       - ENVIRONMENT=${ENVIRONMENT}
       - REDIS_URL=${REDIS_URL}
       - COINGECKO_API_URL=${COINGECKO_API_URL}
+      - COINGECKO_API_KEY=${COINGECKO_API_KEY}
     networks:
       - w3s_development-nw
 
