@@ -1,0 +1,53 @@
+@import '../colors.scss';
+@import '../breakpoints.scss';
+
+.footer {
+  margin-top: 3rem;
+  padding: 2rem 0 1rem 0;
+  border-top: 1px solid $grey3;
+  text-align: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: $grey5;
+}
+
+.credits {
+  margin: 0;
+}
+
+.source {
+  margin: 0;
+}
+
+.link {
+  color: $white;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.link:hover {
+  opacity: 0.7;
+}
+
+.logo {
+  height: 1.25rem;
+  width: auto;
+  vertical-align: middle;
+  margin-right: 0.25rem;
+}
+
+@media #{media-query(xs)}, #{media-query(ss)} {
+  .footer {
+    margin-top: 2rem;
+    padding: 1.5rem 0 1rem 0;
+  }
+  
+  .content {
+    font-size: 0.8rem;
+  }
+}
