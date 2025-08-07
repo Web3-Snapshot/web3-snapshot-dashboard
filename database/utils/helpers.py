@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import List, Union, Any, Dict, List
+from typing import List, Union, Any, Dict
 
 PRICES_PROPS = [
     "id",
