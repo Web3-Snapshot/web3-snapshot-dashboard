@@ -38,7 +38,9 @@ DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
 SCHEMA_PATH = "./schema.sql"
 BASE_URL = environ.get("COINGECKO_API_URL")
 API_KEY = environ.get("COINGECKO_API_KEY")
-NUMBER_OF_SINGLE_COINS = 28
+# Determines the requests we will make per minute in order update single coin data.
+# Under the current rate limits, we can only update 1 single coin per minute.
+NUMBER_OF_SINGLE_COINS = 1
 
 # Headers for API requests
 HEADERS = {"x-cg-demo-api-key": API_KEY} if API_KEY else {}
@@ -271,6 +273,7 @@ def fetch_and_cache():
         # Make requests to the first couple of ids
         for coin_id in rotating_ids[:NUMBER_OF_SINGLE_COINS]:
             coin_response = get_single_coin(coin_id)
+            print(f"\nRetrieved single coin ID: {coin_response.json().get('id')}\n")
 
             if coin_response.status_code != 200:
                 raise DataFetcherException(
