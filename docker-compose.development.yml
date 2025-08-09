@@ -13,6 +13,7 @@ services:
     volumes:
       - database:/app/instance
       - ${PWD}/database:/app
+      - /var/log:/var/log
     networks:
       - w3s_development-nw
 

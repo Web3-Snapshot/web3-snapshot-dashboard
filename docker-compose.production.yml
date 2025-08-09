@@ -13,6 +13,7 @@ services:
       - CERTIFICATE_RENEWAL_LOG=${CERTIFICATE_RENEWAL_LOG}
     volumes:
       - database:/app/instance
+      - /var/log:/var/log
     networks:
       - w3s-inner-nw
 
