@@ -252,7 +252,6 @@ def fetch_and_cache():
     ### Fetch single coins
     try:
         coins = json.loads(redis_conn.get("coins:all"))
-        response_json = coins_response.json()
         incoming_ids = [coin["id"] for coin in response_json]
 
         rotating_ids = redis_conn.get("coins:ids")
