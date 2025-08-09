@@ -26,7 +26,7 @@
 valid_environments=("production" "testing" "development")
 required_variables=("ENVIRONMENT" "REDIS_URL" "COINGECKO_API_URL"
     "COINGECKO_API_KEY" "AWS_ACCOUNT" "AWS_PROFILE" "AWS_REGION" "DOMAIN"
-    "AWS_FRONTEND_REPOSITORY" "CERTIFICATE_RENEWAL_LOG")
+    "AWS_FRONTEND_REPOSITORY" "AWS_DB_REPOSITORY" "AWS_BACKEND_REPOSITORY" "CERTIFICATE_RENEWAL_LOG")
 
 #######################################
 #####      Internal functions     #####
@@ -199,16 +199,23 @@ build() {
 deploy() {
     echo "Deploying to AWS"
 
-    aws sso login --profile "$AWS_PROFILE" &&
-        (aws ecr get-login-password --region "$AWS_REGION" --profile "$AWS_PROFILE") | docker login --username AWS --password-stdin $AWS_ACCOUNT
+    aws sts get-caller-identity --profile "$AWS_PROFILE" > /dev/null &&
+        (aws ecr get-login-password --region "$AWS_REGION" --profile "$AWS_PROFILE") | docker login --username AWS --password-stdin $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
 
-    # First, remove the old image
-    docker image rm "$AWS_ACCOUNT"/"$AWS_FRONTEND_REPOSITORY"
+    # Build all images locally
+    docker build -t $AWS_DB_REPOSITORY:latest ./database
+    docker build -t $AWS_BACKEND_REPOSITORY:latest ./backend
+    docker build -t $AWS_FRONTEND_REPOSITORY:latest ./frontend
 
-    # Then, build the new image
-    docker compose -f docker-compose.production.yml build frontend
+    # Tag all images for ECR
+    docker tag $AWS_DB_REPOSITORY:latest $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_DB_REPOSITORY:latest
+    docker tag $AWS_BACKEND_REPOSITORY:latest $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_BACKEND_REPOSITORY:latest
+    docker tag $AWS_FRONTEND_REPOSITORY:latest $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_FRONTEND_REPOSITORY:latest
 
-    docker push "$AWS_ACCOUNT/$AWS_FRONTEND_REPOSITORY:latest"
+    # Push all images to ECR
+    docker push "$AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_DB_REPOSITORY:latest"
+    docker push "$AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_BACKEND_REPOSITORY:latest"
+    docker push "$AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_FRONTEND_REPOSITORY:latest"
 }
 
 connect_service() {
