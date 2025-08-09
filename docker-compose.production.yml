@@ -14,6 +14,7 @@ services:
     volumes:
       - database:/app/instance
       - /var/log:/var/log
+      - ${PWD}/scripts:/scripts:ro
     networks:
       - w3s-inner-nw
 
