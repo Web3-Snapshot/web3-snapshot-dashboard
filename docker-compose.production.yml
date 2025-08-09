@@ -10,6 +10,7 @@ services:
       - REDIS_URL=${REDIS_URL}
       - COINGECKO_API_URL=${COINGECKO_API_URL}
       - COINGECKO_API_KEY=${COINGECKO_API_KEY}
+      - CERTIFICATE_RENEWAL_LOG=${CERTIFICATE_RENEWAL_LOG}
     volumes:
       - database:/app/instance
     networks:
