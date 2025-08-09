@@ -10,6 +10,7 @@ services:
       - REDIS_URL=${REDIS_URL}
       - COINGECKO_API_URL=${COINGECKO_API_URL}
       - COINGECKO_API_KEY=${COINGECKO_API_KEY}
+      - CERTIFICATE_RENEWAL_LOG=${CERTIFICATE_RENEWAL_LOG}
     volumes:
       - database:/app/instance
     networks:
@@ -35,11 +36,11 @@ services:
 
   frontend:
     container_name: web3_frontend_prod
-    build:
-      context: ./frontend
+    # build:
+    #   context: ./frontend
     image: $AWS_ACCOUNT/$AWS_FRONTEND_REPOSITORY:latest
     ports:
-      - 80:80
+      # - 80:80
       - 443:443
     restart: always
     depends_on:
