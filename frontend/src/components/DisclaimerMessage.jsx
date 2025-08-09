@@ -17,12 +17,11 @@ function DisclaimerMessage() {
     return (
       <p>
         {updatedAt && (
-          <span style={{ marginLeft: 10 }}>
-            {' '}
-            Latest update: {dayjs(updatedAt).format('YYYY-MM-DD H:mm:ss')}
+          <span>
+            <span className={styles.indicator}>●</span>
+            Data fetched: {dayjs(updatedAt).format('YYYY-MM-DD H:mm:ss')}
           </span>
         )}
-        <span> +++</span>
       </p>
     );
   }
@@ -30,7 +29,12 @@ function DisclaimerMessage() {
   function smallScreenText() {
     return (
       <>
-        {updatedAt && <p>{`Latest update: ${dayjs(updatedAt).format('YYYY-MM-DD H:mm:ss')}`}</p>}
+        {updatedAt && (
+          <p>
+            <span className={styles.indicator}>●</span>
+            Data fetched: {dayjs(updatedAt).format('YYYY-MM-DD H:mm:ss')}
+          </p>
+        )}
       </>
     );
   }
