@@ -27,30 +27,23 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and push images
+      - name: Build and push multi-platform images
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           AWS_ACCOUNT: ${{ secrets.AWS_ACCOUNT_ID }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
-          # Build images
-          docker build -t w3s-database:latest ./database
-          docker build -t w3s-backend:latest ./backend
-          docker build -t w3s-frontend:latest ./frontend
-
-          # Tag for ECR
-          docker tag w3s-database:latest $ECR_REGISTRY/w3s-database:latest
-          docker tag w3s-backend:latest $ECR_REGISTRY/w3s-backend:latest
-          docker tag w3s-frontend:latest $ECR_REGISTRY/w3s-frontend:latest
-
-          # Push to ECR
-          docker push $ECR_REGISTRY/w3s-database:latest
-          docker push $ECR_REGISTRY/w3s-backend:latest
-          docker push $ECR_REGISTRY/w3s-frontend:latest
+          # Build and push multi-platform images
+          docker buildx build --platform linux/amd64,linux/arm64 -t $ECR_REGISTRY/w3s-database:latest ./database --push
+          docker buildx build --platform linux/amd64,linux/arm64 -t $ECR_REGISTRY/w3s-backend:latest ./backend --push
+          docker buildx build --platform linux/amd64,linux/arm64 -t $ECR_REGISTRY/w3s-frontend:latest ./frontend --push
 
       - name: Update SSM Parameters
         run: |
