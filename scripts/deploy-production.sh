@@ -82,7 +82,7 @@ check_dependencies() {
     fi
 }
 
-DEPLOYMENT_DIR="/usr/src/web3-snapshot"
+DEPLOYMENT_DIR="$HOME/web3-snapshot"
 S3_BUCKET="w3s-deployment-configs-us-east-1"
 
 # Define required SSM parameters
