@@ -78,4 +78,4 @@ renew_certificate() {
     return 0
 }
 
-renew_certificate 
+renew_certificate

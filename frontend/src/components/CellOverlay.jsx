@@ -25,7 +25,8 @@ function Overlay({ width, className }) {
       className={`${className} ${styles.overlay}`}
       style={{
         width: `${width}%`,
-      }}></div>
+      }}
+    ></div>
   );
 }
 

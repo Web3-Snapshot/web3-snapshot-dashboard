@@ -132,10 +132,10 @@ _validate_option_arg() {
     local option_name="$1"
     local remaining_args="$2"
     local next_arg="$3"
-    
+
     # Check if there are enough arguments remaining
     test "$remaining_args" -lt 2 && die "Missing value for the optional argument '$option_name'." 1
-    
+
     # Check if the next argument starts with - (indicating it's another option)
     [[ "$next_arg" == -* ]] && die "Missing value for the optional argument '$option_name'." 1
 }
@@ -145,7 +145,7 @@ _validate_option_arg() {
 ######################################
 check_db() {
     echo "Checking if database exists..."
-    
+
     # Direct approach: list files and grep for database file
     if docker compose -f docker-compose."$ENVIRONMENT".yml run --rm backend ls /app/instance/ | grep -q "$ENVIRONMENT.db"; then
         echo "Database found"

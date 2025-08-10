@@ -49,7 +49,8 @@ function CoinInfoModal({ coinId, onClose }) {
           className={styles.dialogRoot}
           onClick={(evt) => {
             evt.stopPropagation();
-          }}>
+          }}
+        >
           <CgClose className={styles.closeIcon} onClick={handleBackdropClick}></CgClose>
           {coin ? (
             <>
@@ -69,7 +70,8 @@ function CoinInfoModal({ coinId, onClose }) {
                       renderView={(props) => <div {...props} className="scrollbarView" />}
                       autoHeight
                       autoHeightMin={modalDimensions.minHeight}
-                      autoHeightMax={modalDimensions.maxHeight}>
+                      autoHeightMax={modalDimensions.maxHeight}
+                    >
                       <div className={styles.coinDescription}>
                         <Markup content={removeTags(coin.description)}></Markup>
                       </div>
