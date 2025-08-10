@@ -237,6 +237,13 @@ else
     fi
 fi
 
+# Load environment variables for Docker Compose
+if [[ "$DRY_RUN" == "false" ]]; then
+    set -o allexport
+    source .env.production
+    set +o allexport
+fi
+
 # Pull latest images and restart
 echo "Pulling latest images and restarting services..."
 execute docker compose -f docker-compose.production.yml pull
