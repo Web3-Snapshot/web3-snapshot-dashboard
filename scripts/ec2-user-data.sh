@@ -45,17 +45,18 @@ unzip awscliv2.zip
 ./aws/install
 rm -rf aws awscliv2.zip
 
-# Create deployment directory
-mkdir -p /opt/web3-snapshot/scripts
-chown -R ubuntu:ubuntu /opt/web3-snapshot
+# Create deployment directory in ubuntu user's home
+DEPLOYMENT_DIR="/home/ubuntu/web3-snapshot"
+mkdir -p $DEPLOYMENT_DIR/scripts
+chown -R ubuntu:ubuntu $DEPLOYMENT_DIR
 
 # Download deployment script from S3
 echo "Downloading deployment script..."
-aws s3 cp s3://w3s-deployment-configs-us-east-1/scripts/deploy-production.sh /opt/web3-snapshot/scripts/ --region us-east-1
+aws s3 cp s3://w3s-deployment-configs-us-east-1/scripts/deploy-production.sh $DEPLOYMENT_DIR/scripts/ --region us-east-1
 
 # Make script executable
-chmod +x /opt/web3-snapshot/scripts/deploy-production.sh
-chown ubuntu:ubuntu /opt/web3-snapshot/scripts/deploy-production.sh
+chmod +x $DEPLOYMENT_DIR/scripts/deploy-production.sh
+chown ubuntu:ubuntu $DEPLOYMENT_DIR/scripts/deploy-production.sh
 
 # Verify installations
 echo "Verifying installations..."
@@ -67,5 +68,5 @@ echo "User Data script completed at $(date)"
 echo ""
 echo "=== NEXT STEPS ==="
 echo "1. SSH into the server: ssh ubuntu@<server-ip>"
-echo "2. Run deployment: /opt/web3-snapshot/scripts/deploy-production.sh"
+echo "2. Run deployment: ~/web3-snapshot/scripts/deploy-production.sh"
 echo "3. Server is ready for production!"
