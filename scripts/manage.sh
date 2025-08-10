@@ -196,28 +196,6 @@ build() {
     /bin/sh -c "$docker_command"
 }
 
-deploy() {
-    echo "Deploying to AWS"
-
-    aws sts get-caller-identity --profile "$AWS_PROFILE" > /dev/null &&
-        (aws ecr get-login-password --region "$AWS_REGION" --profile "$AWS_PROFILE") | docker login --username AWS --password-stdin $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com
-
-    # Build all images locally
-    docker build -t $AWS_DB_REPOSITORY:latest ./database
-    docker build -t $AWS_BACKEND_REPOSITORY:latest ./backend
-    docker build -t $AWS_FRONTEND_REPOSITORY:latest ./frontend
-
-    # Tag all images for ECR
-    docker tag $AWS_DB_REPOSITORY:latest $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_DB_REPOSITORY:latest
-    docker tag $AWS_BACKEND_REPOSITORY:latest $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_BACKEND_REPOSITORY:latest
-    docker tag $AWS_FRONTEND_REPOSITORY:latest $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_FRONTEND_REPOSITORY:latest
-
-    # Push all images to ECR
-    docker push "$AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_DB_REPOSITORY:latest"
-    docker push "$AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_BACKEND_REPOSITORY:latest"
-    docker push "$AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_FRONTEND_REPOSITORY:latest"
-}
-
 connect_service() {
     if [[ "$_arg_connect_service" == 'redis' ]]; then
         ENVIRONMENT=${ENVIRONMENT} \
@@ -273,55 +251,6 @@ init_db() {
     _exec_dc init_vars docker compose -f docker-compose."$ENVIRONMENT".yml run --rm db /bin/sh -c "python /app/core/init_db.py"
 }
 
-start_cert_server() {
-    docker compose -f docker-compose.certbot.yml down &&
-        docker compose -f docker-compose.certbot.yml up -d nginx80
-}
-
-stop_cert_server() {
-    docker compose -f docker-compose.certbot.yml down --remove-orphans
-}
-
-get_certificate() {
-    docker compose -f docker-compose.certbot.yml run --rm certbot certonly --webroot \
-        --webroot-path /var/www/certbot/ -d "${DOMAIN}" -d "${DOMAIN}" -v
-}
-
-# Renew SSL certificate using certbot
-# Uses the dry_run_flag variable set in the preparation phase to determine if this is a test run
-renew_certificate() {
-    local log_file="$CERTIFICATE_RENEWAL_LOG"
-    local output
-    local exit_code
-
-    # Determine the location of docker-compose.certbot.yml
-    local compose_file="${1:-${DOCKER_COMPOSE_CERTBOT_YML:-docker-compose.certbot.yml}}"
-
-    # Validate the compose file exists
-    if [ ! -f "$compose_file" ]; then
-        echo "Error: Docker Compose file not found: $compose_file" >&2
-        return 1
-    fi
-
-    # Run the docker command and capture output and exit code
-    # The dry_run_flag variable is set in the preparation phase
-    output=$(docker compose -f "$compose_file" run --rm certbot renew --webroot --webroot-path /var/www/certbot/ $dry_run_flag 2>&1)
-    exit_code=$?
-
-    # Log the output
-    echo "$output"
-    echo "$output" >>"$log_file"
-
-    # Handle errors
-    if [ $exit_code -ne 0 ]; then
-        echo "Error renewing certificate: $output" >&2
-        echo "Error renewing certificate: $output" >>"$log_file"
-        return 1
-    fi
-
-    return 0
-}
-
 install_backend() {
     if [[ -z "$_arg_install_backend" ]]; then
         echo "Error: No package to install."
@@ -344,17 +273,12 @@ install_backend() {
 # ARG_OPTIONAL_ACTION([stop],[],[Stop the server],[stop])
 # ARG_OPTIONAL_ACTION([print-vars],[],[Print variables],[print_vars])
 # ARG_OPTIONAL_SINGLE([build],[],[Build with docker compose])
-# ARG_OPTIONAL_SINGLE([deploy],[],[Deploy application to server])
 # ARG_OPTIONAL_BOOLEAN([debug],[],[Start up the debugging server and attach],[off])
 # ARG_OPTIONAL_BOOLEAN([dry-run],[],[Run certificate renewal in dry-run mode],[off])
 # ARG_OPTIONAL_ACTION([tests],[],[Run pytests],[tests])
 # ARG_OPTIONAL_ACTION([ps],[],[Print running containers],[ps])
 # ARG_OPTIONAL_ACTION([logs],[],[Tail out logs],[logs])
 # ARG_OPTIONAL_ACTION([isession],[],[Start an interactive session],[isession])
-# ARG_OPTIONAL_ACTION([start-cert-server],[],[Start the certbot server on port 80],[start-cert-server])
-# ARG_OPTIONAL_ACTION([stop-cert-server],[],[Stop the certbot server],[stop-cert-server])
-# ARG_OPTIONAL_ACTION([get-certificate],[],[Get a certbot certificate],[get-certificate])
-# ARG_OPTIONAL_ACTION([renew-certificate],[],[Renew certificate],[renew-certificate])
 # ARG_OPTIONAL_SINGLE([connect-service],[],[Connect to a service],[connect-service])
 # ARG_OPTIONAL_SINGLE([install-backend],[],[Install backend package])
 #
@@ -389,7 +313,6 @@ print_help() {
     printf '\t%s\n' "--stop: Stop the server"
     printf '\t%s\n' "--print-vars: Print variables"
     printf '\t%s\n' "--build: Build with docker compose (no default)"
-    printf '\t%s\n' "--deploy: Deploy application to remote server (no default)"
     printf '\t%s\n' "--debug, --no-debug: Start up the debugging server and attach (off by default)"
     printf '\t%s\n' "--dry-run, --no-dry-run: Run certificate renewal in dry-run mode (off by default)"
     printf '\t%s\n' "--init-db: Initialize the database"
@@ -397,10 +320,6 @@ print_help() {
     printf '\t%s\n' "--ps: Print running containers"
     printf '\t%s\n' "--logs: Tail out logs"
     printf '\t%s\n' "--isession: Start an interactive session"
-    printf '\t%s\n' "--start-cert-server: Start the certbot server on port 80"
-    printf '\t%s\n' "--stop-cert-server: Stop the certbot server"
-    printf '\t%s\n' "--get-certificate: Get a certbot certificate"
-    printf '\t%s\n' "--renew-certificate: Renew certificate"
     printf '\t%s\n' "--connect-service: Connect to a service (default: 'connect-service')"
     printf '\t%s\n' "--install-backend: Install backend package (no default)"
     printf '\t%s\n' "-h, --help: Prints help"
@@ -431,16 +350,6 @@ parse_commandline() {
         --build=*)
             _arg_build_service="${_key##--build=}"
             command="build"
-            ;;
-        --deploy)
-            _validate_option_arg "$_key" $# "$2"
-            _arg_deploy="$2"
-            command="deploy"
-            shift
-            ;;
-        --deploy=*)
-            _arg_deploy="${_key##--deploy=}"
-            command="deploy"
             ;;
         --no-debug | --debug)
             _arg_debug="on"
@@ -477,18 +386,6 @@ parse_commandline() {
             ;;
         --init-db)
             command="init_db"
-            ;;
-        --start-cert-server)
-            command="start_cert_server"
-            ;;
-        --stop-cert-server)
-            command="stop_cert_server"
-            ;;
-        --get-certificate)
-            command="get_certificate"
-            ;;
-        --renew-certificate)
-            command="renew_certificate"
             ;;
         --install-backend)
             _validate_option_arg "$_key" $# "$2"
@@ -561,14 +458,6 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         build
         exit 0
         ;;
-    "deploy")
-        if [ -z "$_arg_deploy" ]; then
-            echo "Error: Target container environment is not set."
-            exit 1
-        fi
-        deploy
-        exit 0
-        ;;
     "tests")
         tests
         exit 0
@@ -595,25 +484,6 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         ;;
     "init_db")
         init_db
-        exit 0
-        ;;
-    "start_cert_server")
-        start_cert_server
-        exit 0
-        ;;
-    "stop_cert_server")
-        stop_cert_server
-        exit 0
-        ;;
-    "get_certificate")
-        get_certificate
-        exit 0
-        ;;
-    "renew_certificate")
-        if [ "$_arg_dry_run" = "on" ]; then
-            dry_run_flag="--dry-run"
-        fi
-        renew_certificate
         exit 0
         ;;
     "install_backend")
