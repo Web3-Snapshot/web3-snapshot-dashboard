@@ -10,25 +10,25 @@ on:
 
 jobs:
   lint-all:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Run linter
-        uses: pre-commit/action@v2.0.3
+        uses: pre-commit/action@v3.0.0
         with:
           extra_args: --all-files
 
   backend-test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       ENVIRONMENT: development
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
