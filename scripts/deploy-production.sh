@@ -82,7 +82,7 @@ check_dependencies() {
     fi
 }
 
-DEPLOYMENT_DIR="/opt/web3-snapshot"
+DEPLOYMENT_DIR="/usr/src/web3-snapshot"
 S3_BUCKET="w3s-deployment-configs-us-east-1"
 
 # Define required SSM parameters
@@ -93,13 +93,16 @@ declare -A required_ssm_params=(
     ["AWS_ACCOUNT"]="/w3s/production/aws-account"
     ["AWS_REGION"]="/w3s/production/aws-region"
     ["DOMAIN"]="/w3s/production/domain"
+    ["EMAIL"]="/w3s/production/email"
 )
 
 # Define required S3 files
 declare -A required_s3_files=(
     ["docker-compose.production.yml"]="production/docker-compose.production.yml"
+    ["docker-compose.certbot.yml"]="production/docker-compose.certbot.yml"
     ["database/schema.sql"]="production/schema.sql"
     ["backend/.env"]="production/backend.env"
+    ["scripts/renew-certificate.sh"]="scripts/renew-certificate.sh"
 )
 
 # Static environment variables
@@ -133,6 +136,11 @@ for local_file in "${!required_s3_files[@]}"; do
     echo "Downloading $local_file from s3://$S3_BUCKET/$s3_path"
     execute aws s3 cp "s3://$S3_BUCKET/$s3_path" "./$local_file"
 done
+
+# Make certificate script executable
+if [[ "$DRY_RUN" == "false" ]]; then
+    chmod +x scripts/renew-certificate.sh
+fi
 
 # Generate backend secret key and process template
 echo "Processing backend environment template..."
@@ -194,6 +202,39 @@ else
     AWS_ACCOUNT_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-account" --query 'Parameter.Value' --output text --region us-east-1)
     AWS_REGION_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-region" --query 'Parameter.Value' --output text --region us-east-1)
     aws ecr get-login-password --region "$AWS_REGION_VALUE" | docker login --username AWS --password-stdin "$AWS_ACCOUNT_VALUE.dkr.ecr.$AWS_REGION_VALUE.amazonaws.com"
+fi
+
+# Generate SSL certificates if they don't exist
+echo "Checking SSL certificates..."
+if [[ "$DRY_RUN" == "true" ]]; then
+    echo "[DRY RUN] Would check for SSL certificates and generate if needed"
+else
+    # Check if certificates exist
+    if ! docker volume ls | grep -q "web3-snapshot_certbot_conf"; then
+        echo "SSL certificates not found. Generating initial certificates..."
+        # Create .env file for certbot (it expects this)
+        if [ -f ".env.production" ]; then
+            cp .env.production .env
+        fi
+
+        # Generate initial certificates using certbot setup
+        echo "Starting temporary nginx for certificate generation..."
+        docker compose -f docker-compose.certbot.yml up -d nginx80
+
+        # Wait a moment for nginx to start
+        sleep 5
+
+        # Generate certificate using EMAIL and DOMAIN from environment
+        echo "Generating SSL certificate for $DOMAIN..."
+        docker compose -f docker-compose.certbot.yml run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ --email "$EMAIL" --agree-tos --no-eff-email -d "$DOMAIN"
+
+        # Stop temporary nginx
+        docker compose -f docker-compose.certbot.yml down
+
+        echo "SSL certificates generated successfully."
+    else
+        echo "SSL certificates already exist."
+    fi
 fi
 
 # Pull latest images and restart
