@@ -15,8 +15,6 @@ services:
       - /var/log:/var/log
     networks:
       - w3s-inner-nw
-    mem_limit: 100m
-    memswap_limit: 100m
 
   backend:
     container_name: web3_backend_prod
@@ -33,16 +31,11 @@ services:
     networks:
       - w3s-inner-nw
       - w3s-nw
-    mem_limit: 150m
-    memswap_limit: 150m
 
   frontend:
     container_name: web3_frontend_prod
-    # build:
-    #   context: ./frontend
     image: $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_FRONTEND_REPOSITORY:latest
     ports:
-      # - 80:80
       - 443:443
     restart: always
     depends_on:
@@ -54,31 +47,6 @@ services:
       - certbot_conf:/etc/nginx/ssl
     networks:
       - w3s-nw
-    mem_limit: 100m
-    memswap_limit: 100m
-
-  # isession:
-  #   container_name: web3_isession_production
-  #   stdin_open: true
-  #   tty: true
-  #   command: ipython
-  #   build:
-  #     context: .
-  #     dockerfile: ./isession/Dockerfile
-  #   volumes:
-  #     - ${PWD}/backend/server:/app/server
-  #     - ${PWD}/backend/utils:/app/utils
-  #     - ${PWD}/database/schema.sql:/app/schema.sql
-  #     - ${PWD}/database:/app/database
-  #     - ${PWD}/isession/.ipython:/app/.ipython
-  #     - /app/.ipython/profile_default/pid
-  #     - /app/.ipython/profile_default/security
-  #     - database:/app/instance
-  #   environment:
-  #     - IPYTHONDIR=/app/.ipython
-  #     - ENVIRONMENT=${ENVIRONMENT}
-  #   networks:
-  #     - w3s-nw
 
   redis:
     container_name: web3_redis_prod
@@ -90,8 +58,6 @@ services:
       - 6379
     networks:
       - w3s-inner-nw
-    mem_limit: 50m
-    memswap_limit: 50m
 
 volumes:
   database:
