@@ -68,3 +68,4 @@ jobs:
           aws s3 cp docker-compose.production.yml s3://w3s-deployment-configs/production/docker-compose.production.yml
           aws s3 cp database/schema.sql s3://w3s-deployment-configs/production/schema.sql
           aws s3 cp backend/.env_TEMPLATE s3://w3s-deployment-configs/production/backend.env
+          aws s3 cp scripts/deploy-production.sh s3://w3s-deployment-configs/scripts/deploy-production.sh

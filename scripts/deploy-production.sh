@@ -19,6 +19,69 @@ execute() {
     fi
 }
 
+# Check and install required dependencies
+check_dependencies() {
+    echo "Checking required dependencies..."
+
+    # Check AWS CLI
+    if ! command -v aws &> /dev/null; then
+        echo "AWS CLI not found. Installing..."
+        if [[ "$DRY_RUN" == "true" ]]; then
+            echo "[DRY RUN] Would install unzip and AWS CLI"
+        else
+            # Install unzip if missing
+            if ! command -v unzip &> /dev/null; then
+                echo "Installing unzip..."
+                sudo apt-get update -qq
+                sudo apt-get install -y unzip
+            fi
+
+            # Detect architecture and install AWS CLI v2
+            ARCH=$(uname -m)
+            if [[ "$ARCH" == "x86_64" ]]; then
+                AWS_CLI_URL="https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+            elif [[ "$ARCH" == "aarch64" ]]; then
+                AWS_CLI_URL="https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip"
+            else
+                echo "Error: Unsupported architecture: $ARCH"
+                exit 1
+            fi
+
+            echo "Installing AWS CLI for architecture: $ARCH"
+            curl "$AWS_CLI_URL" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+            rm -rf aws awscliv2.zip
+            echo "AWS CLI installed successfully"
+        fi
+    else
+        echo "AWS CLI found: $(aws --version)"
+    fi
+
+    # Check Docker and run bootstrap if missing
+    if ! command -v docker &> /dev/null || ! docker compose version &> /dev/null 2>&1; then
+        echo "Docker or Docker Compose not found. Running bootstrap script..."
+        if [[ "$DRY_RUN" == "true" ]]; then
+            echo "[DRY RUN] Would run bootstrap script"
+        else
+            # Get script directory
+            SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+            if [[ -f "$SCRIPT_DIR/bootstrap-server.sh" ]]; then
+                "$SCRIPT_DIR/bootstrap-server.sh"
+                echo "Bootstrap completed. Please log out and back in, then re-run this script."
+                exit 0
+            else
+                echo "Error: Bootstrap script not found at $SCRIPT_DIR/bootstrap-server.sh"
+                echo "Please install Docker and Docker Compose manually."
+                exit 1
+            fi
+        fi
+    else
+        echo "Docker found: $(docker --version)"
+        echo "Docker Compose found: $(docker compose version)"
+    fi
+}
+
 DEPLOYMENT_DIR="/opt/web3-snapshot"
 S3_BUCKET="w3s-deployment-configs"
 
@@ -50,6 +113,9 @@ declare -A static_env_vars=(
 )
 
 echo "Starting deployment..."
+
+# Check dependencies first
+check_dependencies
 
 # Create deployment directory
 if [[ "$DRY_RUN" == "true" ]]; then
@@ -98,14 +164,14 @@ for var_name in "${!required_ssm_params[@]}"; do
             echo "[DRY RUN] Would get parameter: $ssm_path (with decryption)"
             value="<ENCRYPTED_VALUE>"
         else
-            value=$(aws ssm get-parameter --name "$ssm_path" --with-decryption --query 'Parameter.Value' --output text)
+            value=$(aws ssm get-parameter --name "$ssm_path" --with-decryption --query 'Parameter.Value' --output text --region eu-central-1)
         fi
     else
         if [[ "$DRY_RUN" == "true" ]]; then
             echo "[DRY RUN] Would get parameter: $ssm_path"
             value="<SSM_VALUE>"
         else
-            value=$(aws ssm get-parameter --name "$ssm_path" --query 'Parameter.Value' --output text)
+            value=$(aws ssm get-parameter --name "$ssm_path" --query 'Parameter.Value' --output text --region eu-central-1)
         fi
     fi
     env_content+="$var_name=$value\n"
@@ -125,8 +191,8 @@ if [[ "$DRY_RUN" == "true" ]]; then
     echo "[DRY RUN] Would get AWS region from SSM: /w3s/production/aws-region"
     echo "[DRY RUN] Would login to ECR: <ACCOUNT>.dkr.ecr.<REGION>.amazonaws.com"
 else
-    AWS_ACCOUNT_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-account" --query 'Parameter.Value' --output text)
-    AWS_REGION_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-region" --query 'Parameter.Value' --output text)
+    AWS_ACCOUNT_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-account" --query 'Parameter.Value' --output text --region eu-central-1)
+    AWS_REGION_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-region" --query 'Parameter.Value' --output text --region eu-central-1)
     aws ecr get-login-password --region "$AWS_REGION_VALUE" | docker login --username AWS --password-stdin "$AWS_ACCOUNT_VALUE.dkr.ecr.$AWS_REGION_VALUE.amazonaws.com"
 fi
 
