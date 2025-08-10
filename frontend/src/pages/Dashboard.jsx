@@ -19,7 +19,6 @@ function Dashboard() {
     const sse = new EventSource('/api/coin-stream');
 
     function handleStream(evt) {
-      console.log('evt.data', evt.data);
       const res = JSON.parse(evt.data);
       setPricesRows(res.prices);
       setTokenomicsRows(res.tokenomics);

@@ -30,7 +30,8 @@ function App() {
           // body.offsetHeight,
           body.scrollHeight
         );
-        console.log('windowTopMessage.current', windowTopMessage.current);
+        // For debugging purposes if needed
+        // console.log('windowTopMessage.current', windowTopMessage.current);
         window.top.postMessage(windowTopMessage.current, '*');
       }, 500);
     }
