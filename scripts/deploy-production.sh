@@ -1,6 +1,26 @@
 #!/bin/bash
 set -e
 
+# Get AWS region from environment or instance metadata
+get_aws_region() {
+    if [[ -n "${AWS_DEFAULT_REGION:-}" ]]; then
+        echo "$AWS_DEFAULT_REGION"
+        return 0
+    fi
+
+    if command -v curl >/dev/null 2>&1; then
+        local region
+        region=$(curl -s --max-time 5 http://169.254.169.254/latest/meta-data/placement/region 2>/dev/null)
+        if [[ -n "$region" ]]; then
+            echo "$region"
+            return 0
+        fi
+    fi
+
+    echo "Error: Unable to determine AWS region. Set AWS_DEFAULT_REGION environment variable." >&2
+    exit 1
+}
+
 # Parse arguments
 DRY_RUN=false
 if [[ "$1" == "--dry-run" ]]; then
@@ -118,6 +138,10 @@ declare -A static_env_vars=(
 
 echo "Starting deployment..."
 
+# Get AWS region
+AWS_REGION=$(get_aws_region)
+echo "Using AWS region: $AWS_REGION"
+
 # Check dependencies first
 check_dependencies
 
@@ -173,14 +197,14 @@ for var_name in "${!required_ssm_params[@]}"; do
             echo "[DRY RUN] Would get parameter: $ssm_path (with decryption)"
             value="<ENCRYPTED_VALUE>"
         else
-            value=$(aws ssm get-parameter --name "$ssm_path" --with-decryption --query 'Parameter.Value' --output text --region us-east-1)
+            value=$(aws ssm get-parameter --name "$ssm_path" --with-decryption --query 'Parameter.Value' --output text --region "$AWS_REGION")
         fi
     else
         if [[ "$DRY_RUN" == "true" ]]; then
             echo "[DRY RUN] Would get parameter: $ssm_path"
             value="<SSM_VALUE>"
         else
-            value=$(aws ssm get-parameter --name "$ssm_path" --query 'Parameter.Value' --output text --region us-east-1)
+            value=$(aws ssm get-parameter --name "$ssm_path" --query 'Parameter.Value' --output text --region "$AWS_REGION")
         fi
     fi
     env_content+="$var_name=$value\n"
@@ -200,8 +224,8 @@ if [[ "$DRY_RUN" == "true" ]]; then
     echo "[DRY RUN] Would get AWS region from SSM: /w3s/production/aws-region"
     echo "[DRY RUN] Would login to ECR: <ACCOUNT>.dkr.ecr.<REGION>.amazonaws.com"
 else
-    AWS_ACCOUNT_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-account" --query 'Parameter.Value' --output text --region us-east-1)
-    AWS_REGION_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-region" --query 'Parameter.Value' --output text --region us-east-1)
+    AWS_ACCOUNT_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-account" --query 'Parameter.Value' --output text --region "$AWS_REGION")
+    AWS_REGION_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-region" --query 'Parameter.Value' --output text --region "$AWS_REGION")
     aws ecr get-login-password --region "$AWS_REGION_VALUE" | docker login --username AWS --password-stdin "$AWS_ACCOUNT_VALUE.dkr.ecr.$AWS_REGION_VALUE.amazonaws.com"
 fi
 

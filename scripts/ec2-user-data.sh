@@ -4,6 +4,26 @@ set -e
 # EC2 User Data Script for Web3 Snapshot Dashboard
 # This script bootstraps a fresh Ubuntu EC2 instance and downloads the deployment script
 
+# Get AWS region from environment or instance metadata
+get_aws_region() {
+    if [[ -n "${AWS_DEFAULT_REGION:-}" ]]; then
+        echo "$AWS_DEFAULT_REGION"
+        return 0
+    fi
+
+    if command -v curl >/dev/null 2>&1; then
+        local region
+        region=$(curl -s --max-time 5 http://169.254.169.254/latest/meta-data/placement/region 2>/dev/null)
+        if [[ -n "$region" ]]; then
+            echo "$region"
+            return 0
+        fi
+    fi
+
+    echo "Error: Unable to determine AWS region. Set AWS_DEFAULT_REGION environment variable." >&2
+    exit 1
+}
+
 # Log everything to a file for debugging
 exec > >(tee /var/log/user-data.log) 2>&1
 echo "Starting EC2 User Data script at $(date)"
@@ -50,9 +70,11 @@ DEPLOYMENT_DIR="/home/ubuntu/web3-snapshot"
 mkdir -p $DEPLOYMENT_DIR/scripts
 chown -R ubuntu:ubuntu $DEPLOYMENT_DIR
 
-# Download deployment script from S3
+# Get AWS region and download deployment script from S3
+AWS_REGION=$(get_aws_region)
+echo "Using AWS region: $AWS_REGION"
 echo "Downloading deployment script..."
-aws s3 cp s3://w3s-deployment-configs-us-east-1/scripts/deploy-production.sh $DEPLOYMENT_DIR/scripts/ --region us-east-1
+aws s3 cp s3://w3s-deployment-configs-us-east-1/scripts/deploy-production.sh $DEPLOYMENT_DIR/scripts/ --region "$AWS_REGION"
 
 # Make script executable
 chmod +x $DEPLOYMENT_DIR/scripts/deploy-production.sh
