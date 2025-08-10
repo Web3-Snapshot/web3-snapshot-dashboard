@@ -70,11 +70,13 @@ DEPLOYMENT_DIR="/home/ubuntu/web3-snapshot"
 mkdir -p $DEPLOYMENT_DIR/scripts
 chown -R ubuntu:ubuntu $DEPLOYMENT_DIR
 
-# Get AWS region and download deployment script from S3
+# Get AWS region and S3 bucket, then download deployment script
 AWS_REGION=$(get_aws_region)
 echo "Using AWS region: $AWS_REGION"
+S3_BUCKET=$(aws ssm get-parameter --name "/w3s/production/s3-deployment-bucket" --query 'Parameter.Value' --output text --region "$AWS_REGION")
+echo "Using S3 bucket: $S3_BUCKET"
 echo "Downloading deployment script..."
-aws s3 cp s3://w3s-deployment-configs-us-east-1/scripts/deploy-production.sh $DEPLOYMENT_DIR/scripts/ --region "$AWS_REGION"
+aws s3 cp s3://$S3_BUCKET/scripts/deploy-production.sh $DEPLOYMENT_DIR/scripts/ --region "$AWS_REGION"
 
 # Make script executable
 chmod +x $DEPLOYMENT_DIR/scripts/deploy-production.sh

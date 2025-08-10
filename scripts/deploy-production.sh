@@ -103,7 +103,6 @@ check_dependencies() {
 }
 
 DEPLOYMENT_DIR="$HOME/web3-snapshot"
-S3_BUCKET="w3s-deployment-configs-us-east-1"
 
 # Define required SSM parameters
 declare -A required_ssm_params=(
@@ -114,6 +113,7 @@ declare -A required_ssm_params=(
     ["AWS_REGION"]="/w3s/production/aws-region"
     ["DOMAIN"]="/w3s/production/domain"
     ["EMAIL"]="/w3s/production/email"
+    ["S3_DEPLOYMENT_BUCKET"]="/w3s/production/s3-deployment-bucket"
 )
 
 # Define required S3 files
@@ -144,6 +144,15 @@ echo "Using AWS region: $AWS_REGION"
 
 # Check dependencies first
 check_dependencies
+
+# Get S3 bucket name from SSM
+if [[ "$DRY_RUN" == "true" ]]; then
+    echo "[DRY RUN] Would get S3 bucket from SSM: /w3s/production/s3-deployment-bucket"
+    S3_BUCKET="<S3_BUCKET_NAME>"
+else
+    S3_BUCKET=$(aws ssm get-parameter --name "/w3s/production/s3-deployment-bucket" --query 'Parameter.Value' --output text --region "$AWS_REGION")
+fi
+echo "Using S3 bucket: $S3_BUCKET"
 
 # Create deployment directory
 if [[ "$DRY_RUN" == "true" ]]; then

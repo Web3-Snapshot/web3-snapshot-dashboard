@@ -55,14 +55,15 @@ jobs:
           aws ssm put-parameter --name "/w3s/production/aws-region" --value "${{ secrets.AWS_REGION }}" --type "String" --overwrite
           aws ssm put-parameter --name "/w3s/production/domain" --value "web3snapshot.loxosceles.me" --type "String" --overwrite
           aws ssm put-parameter --name "/w3s/production/email" --value "${{ secrets.CERTIFICATE_EMAIL }}" --type "String" --overwrite
+          aws ssm put-parameter --name "/w3s/production/s3-deployment-bucket" --value "${{ secrets.S3_DEPLOYMENT_BUCKET }}" --type "String" --overwrite
 
       - name: Upload configuration files to S3
         run: |
           # Upload files to S3 deployment bucket
-          aws s3 cp docker-compose.production.yml s3://w3s-deployment-configs-us-east-1/production/docker-compose.production.yml
-          aws s3 cp docker-compose.certbot.yml s3://w3s-deployment-configs-us-east-1/production/docker-compose.certbot.yml
-          aws s3 cp database/schema.sql s3://w3s-deployment-configs-us-east-1/production/schema.sql
-          aws s3 cp backend/.env_TEMPLATE s3://w3s-deployment-configs-us-east-1/production/backend.env
-          aws s3 cp scripts/deploy-production.sh s3://w3s-deployment-configs-us-east-1/scripts/deploy-production.sh
-          aws s3 cp scripts/renew-certificate.sh s3://w3s-deployment-configs-us-east-1/scripts/renew-certificate.sh
-          aws s3 cp nginx/default.conf s3://w3s-deployment-configs-us-east-1/production/nginx-default.conf
+          aws s3 cp docker-compose.production.yml s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/production/docker-compose.production.yml
+          aws s3 cp docker-compose.certbot.yml s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/production/docker-compose.certbot.yml
+          aws s3 cp database/schema.sql s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/production/schema.sql
+          aws s3 cp backend/.env_TEMPLATE s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/production/backend.env
+          aws s3 cp scripts/deploy-production.sh s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/scripts/deploy-production.sh
+          aws s3 cp scripts/renew-certificate.sh s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/scripts/renew-certificate.sh
+          aws s3 cp nginx/default.conf s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/production/nginx-default.conf
