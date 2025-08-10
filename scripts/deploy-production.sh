@@ -103,6 +103,7 @@ declare -A required_s3_files=(
     ["database/schema.sql"]="production/schema.sql"
     ["backend/.env"]="production/backend.env"
     ["scripts/renew-certificate.sh"]="scripts/renew-certificate.sh"
+    ["nginx/default.conf"]="production/nginx-default.conf"
 )
 
 # Static environment variables

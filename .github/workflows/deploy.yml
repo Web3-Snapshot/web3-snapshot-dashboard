@@ -65,3 +65,4 @@ jobs:
           aws s3 cp backend/.env_TEMPLATE s3://w3s-deployment-configs-us-east-1/production/backend.env
           aws s3 cp scripts/deploy-production.sh s3://w3s-deployment-configs-us-east-1/scripts/deploy-production.sh
           aws s3 cp scripts/renew-certificate.sh s3://w3s-deployment-configs-us-east-1/scripts/renew-certificate.sh
+          aws s3 cp nginx/default.conf s3://w3s-deployment-configs-us-east-1/production/nginx-default.conf
