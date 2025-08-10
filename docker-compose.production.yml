@@ -13,7 +13,6 @@ services:
     volumes:
       - database:/app/instance
       - /var/log:/var/log
-      - ${PWD}/scripts:/scripts:ro
     networks:
       - w3s-inner-nw
 
@@ -26,7 +25,6 @@ services:
     env_file: ./backend/.env
     volumes:
       - database:/app/instance
-      - ${PWD}/database/schema.sql:/app/schema.sql
     restart: always
     depends_on:
       - db

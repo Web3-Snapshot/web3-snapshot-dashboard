@@ -51,3 +51,20 @@ jobs:
           docker push $ECR_REGISTRY/w3s-database:latest
           docker push $ECR_REGISTRY/w3s-backend:latest
           docker push $ECR_REGISTRY/w3s-frontend:latest
+
+      - name: Update SSM Parameters
+        run: |
+          # Store individual environment variables in SSM
+          aws ssm put-parameter --name "/w3s/production/redis-url" --value "redis://redis:6379/0" --type "String" --overwrite
+          aws ssm put-parameter --name "/w3s/production/coingecko-api-url" --value "${{ secrets.COINGECKO_API_URL }}" --type "String" --overwrite
+          aws ssm put-parameter --name "/w3s/production/coingecko-api-key" --value "${{ secrets.COINGECKO_API_KEY }}" --type "SecureString" --overwrite
+          aws ssm put-parameter --name "/w3s/production/aws-account" --value "${{ secrets.AWS_ACCOUNT_ID }}" --type "String" --overwrite
+          aws ssm put-parameter --name "/w3s/production/aws-region" --value "${{ secrets.AWS_REGION }}" --type "String" --overwrite
+          aws ssm put-parameter --name "/w3s/production/domain" --value "web3snapshot.loxosceles.me" --type "String" --overwrite
+
+      - name: Upload configuration files to S3
+        run: |
+          # Upload files to S3 deployment bucket
+          aws s3 cp docker-compose.production.yml s3://w3s-deployment-configs/production/docker-compose.production.yml
+          aws s3 cp database/schema.sql s3://w3s-deployment-configs/production/schema.sql
+          aws s3 cp backend/.env_TEMPLATE s3://w3s-deployment-configs/production/backend.env
