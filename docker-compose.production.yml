@@ -15,6 +15,8 @@ services:
       - /var/log:/var/log
     networks:
       - w3s-inner-nw
+    mem_limit: 100m
+    memswap_limit: 100m
 
   backend:
     container_name: web3_backend_prod
@@ -31,6 +33,8 @@ services:
     networks:
       - w3s-inner-nw
       - w3s-nw
+    mem_limit: 150m
+    memswap_limit: 150m
 
   frontend:
     container_name: web3_frontend_prod
@@ -50,6 +54,8 @@ services:
       - certbot_conf:/etc/nginx/ssl
     networks:
       - w3s-nw
+    mem_limit: 100m
+    memswap_limit: 100m
 
   # isession:
   #   container_name: web3_isession_production
@@ -84,6 +90,8 @@ services:
       - 6379
     networks:
       - w3s-inner-nw
+    mem_limit: 50m
+    memswap_limit: 50m
 
 volumes:
   database:
