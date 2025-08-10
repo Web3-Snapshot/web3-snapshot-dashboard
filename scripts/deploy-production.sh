@@ -83,7 +83,7 @@ check_dependencies() {
 }
 
 DEPLOYMENT_DIR="/opt/web3-snapshot"
-S3_BUCKET="w3s-deployment-configs"
+S3_BUCKET="w3s-deployment-configs-us-east-1"
 
 # Define required SSM parameters
 declare -A required_ssm_params=(
@@ -164,14 +164,14 @@ for var_name in "${!required_ssm_params[@]}"; do
             echo "[DRY RUN] Would get parameter: $ssm_path (with decryption)"
             value="<ENCRYPTED_VALUE>"
         else
-            value=$(aws ssm get-parameter --name "$ssm_path" --with-decryption --query 'Parameter.Value' --output text --region eu-central-1)
+            value=$(aws ssm get-parameter --name "$ssm_path" --with-decryption --query 'Parameter.Value' --output text --region us-east-1)
         fi
     else
         if [[ "$DRY_RUN" == "true" ]]; then
             echo "[DRY RUN] Would get parameter: $ssm_path"
             value="<SSM_VALUE>"
         else
-            value=$(aws ssm get-parameter --name "$ssm_path" --query 'Parameter.Value' --output text --region eu-central-1)
+            value=$(aws ssm get-parameter --name "$ssm_path" --query 'Parameter.Value' --output text --region us-east-1)
         fi
     fi
     env_content+="$var_name=$value\n"
@@ -191,8 +191,8 @@ if [[ "$DRY_RUN" == "true" ]]; then
     echo "[DRY RUN] Would get AWS region from SSM: /w3s/production/aws-region"
     echo "[DRY RUN] Would login to ECR: <ACCOUNT>.dkr.ecr.<REGION>.amazonaws.com"
 else
-    AWS_ACCOUNT_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-account" --query 'Parameter.Value' --output text --region eu-central-1)
-    AWS_REGION_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-region" --query 'Parameter.Value' --output text --region eu-central-1)
+    AWS_ACCOUNT_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-account" --query 'Parameter.Value' --output text --region us-east-1)
+    AWS_REGION_VALUE=$(aws ssm get-parameter --name "/w3s/production/aws-region" --query 'Parameter.Value' --output text --region us-east-1)
     aws ecr get-login-password --region "$AWS_REGION_VALUE" | docker login --username AWS --password-stdin "$AWS_ACCOUNT_VALUE.dkr.ecr.$AWS_REGION_VALUE.amazonaws.com"
 fi
 

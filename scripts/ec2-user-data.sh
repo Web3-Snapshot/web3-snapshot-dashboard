@@ -51,7 +51,7 @@ chown -R ubuntu:ubuntu /opt/web3-snapshot
 
 # Download deployment script from S3
 echo "Downloading deployment script..."
-aws s3 cp s3://w3s-deployment-configs/scripts/deploy-production.sh /opt/web3-snapshot/scripts/ --region eu-central-1
+aws s3 cp s3://w3s-deployment-configs-us-east-1/scripts/deploy-production.sh /opt/web3-snapshot/scripts/ --region us-east-1
 
 # Make script executable
 chmod +x /opt/web3-snapshot/scripts/deploy-production.sh
