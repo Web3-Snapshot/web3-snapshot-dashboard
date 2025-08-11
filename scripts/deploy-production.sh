@@ -39,66 +39,43 @@ execute() {
     fi
 }
 
-# Check and install required dependencies
+# Check required dependencies
 check_dependencies() {
     echo "Checking required dependencies..."
 
+    local missing_deps=false
+
     # Check AWS CLI
     if ! command -v aws &> /dev/null; then
-        echo "AWS CLI not found. Installing..."
-        if [[ "$DRY_RUN" == "true" ]]; then
-            echo "[DRY RUN] Would install unzip and AWS CLI"
-        else
-            # Install unzip if missing
-            if ! command -v unzip &> /dev/null; then
-                echo "Installing unzip..."
-                sudo apt-get update -qq
-                sudo apt-get install -y unzip
-            fi
-
-            # Detect architecture and install AWS CLI v2
-            ARCH=$(uname -m)
-            if [[ "$ARCH" == "x86_64" ]]; then
-                AWS_CLI_URL="https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
-            elif [[ "$ARCH" == "aarch64" ]]; then
-                AWS_CLI_URL="https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip"
-            else
-                echo "Error: Unsupported architecture: $ARCH"
-                exit 1
-            fi
-
-            echo "Installing AWS CLI for architecture: $ARCH"
-            curl "$AWS_CLI_URL" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
-            rm -rf aws awscliv2.zip
-            echo "AWS CLI installed successfully"
-        fi
+        echo "❌ AWS CLI not found"
+        missing_deps=true
     else
-        echo "AWS CLI found: $(aws --version)"
+        echo "✅ AWS CLI found: $(aws --version)"
     fi
 
-    # Check Docker and run bootstrap if missing
-    if ! command -v docker &> /dev/null || ! docker compose version &> /dev/null 2>&1; then
-        echo "Docker or Docker Compose not found. Running bootstrap script..."
-        if [[ "$DRY_RUN" == "true" ]]; then
-            echo "[DRY RUN] Would run bootstrap script"
-        else
-            # Get script directory
-            SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-            if [[ -f "$SCRIPT_DIR/bootstrap-server.sh" ]]; then
-                "$SCRIPT_DIR/bootstrap-server.sh"
-                echo "Bootstrap completed. Please log out and back in, then re-run this script."
-                exit 0
-            else
-                echo "Error: Bootstrap script not found at $SCRIPT_DIR/bootstrap-server.sh"
-                echo "Please install Docker and Docker Compose manually."
-                exit 1
-            fi
-        fi
+    # Check Docker
+    if ! command -v docker &> /dev/null; then
+        echo "❌ Docker not found"
+        missing_deps=true
     else
-        echo "Docker found: $(docker --version)"
-        echo "Docker Compose found: $(docker compose version)"
+        echo "✅ Docker found: $(docker --version)"
+    fi
+
+    # Check Docker Compose
+    if ! docker compose version &> /dev/null 2>&1; then
+        echo "❌ Docker Compose not found"
+        missing_deps=true
+    else
+        echo "✅ Docker Compose found: $(docker compose version)"
+    fi
+
+    if [[ "$missing_deps" == "true" ]]; then
+        echo ""
+        echo "Missing dependencies detected. Please run the bootstrap script first:"
+        echo "  $SCRIPTS_DIR/bootstrap-server.sh"
+        echo ""
+        echo "After bootstrap completes, log out and back in, then re-run this deployment script."
+        exit 1
     fi
 }
 
@@ -189,13 +166,15 @@ for local_file in "${!required_s3_files[@]}"; do
     execute aws s3 cp "s3://$S3_BUCKET/$s3_path" "$local_file" --region "$AWS_REGION"
 done
 
-# Download certificate management script
-echo "Downloading certificate management script..."
+# Download scripts
+echo "Downloading scripts..."
 if [[ "$DRY_RUN" == "true" ]]; then
     echo "[DRY RUN] Would download manage-certificate.sh to $SCRIPTS_DIR"
+    echo "[DRY RUN] Would download bootstrap-server.sh to $SCRIPTS_DIR"
 else
     aws s3 cp "s3://$S3_BUCKET/scripts/manage-certificate.sh" "$SCRIPTS_DIR/manage-certificate.sh" --region "$AWS_REGION"
-    chmod 755 "$SCRIPTS_DIR/manage-certificate.sh"
+    aws s3 cp "s3://$S3_BUCKET/scripts/bootstrap-server.sh" "$SCRIPTS_DIR/bootstrap-server.sh" --region "$AWS_REGION"
+    chmod 755 "$SCRIPTS_DIR/manage-certificate.sh" "$SCRIPTS_DIR/bootstrap-server.sh"
 fi
 
 # Generate backend secret key and process template
