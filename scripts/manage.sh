@@ -160,7 +160,7 @@ start() {
     echo "Starting containers in $ENVIRONMENT environment"
     # shellcheck disable=SC2034
     local -a start_vars=("ENVIRONMENT" "DEBUG")
-    check_db && _exec_dc start_vars docker compose -f docker-compose."$ENVIRONMENT".yml up -d frontend backend db redis
+    _exec_dc start_vars docker compose -f docker-compose."$ENVIRONMENT".yml up -d frontend backend data_fetcher redis
 }
 
 stop() {
@@ -177,9 +177,9 @@ build() {
         echo "Building all services"
         if [ "$ENVIRONMENT" = "production" ]; then
             echo "Production build: frontend will be omitted"
-            docker_command="$docker_command db redis backend"
+            docker_command="$docker_command data_fetcher redis backend"
         else
-            docker_command="$docker_command frontend backend db redis"
+            docker_command="$docker_command frontend backend data_fetcher redis"
         fi
     else
         echo "Building service: $_arg_build_service"
@@ -232,7 +232,7 @@ tests() {
     # shellcheck disable=SC2034
     local -a test_vars=("ENVIRONMENT" "DEBUG" "REDIS_URL")
     start && _exec_dc test_vars docker compose -f docker-compose."$ENVIRONMENT".yml run --rm backend pytest tests -vvv &&
-        _exec_dc test_vars docker compose -f docker-compose."$ENVIRONMENT".yml run --rm db pytest tests -vvv
+        _exec_dc test_vars docker compose -f docker-compose."$ENVIRONMENT".yml run --rm data_fetcher pytest tests -vvv
 }
 
 isession() {

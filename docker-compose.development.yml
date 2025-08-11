@@ -1,10 +1,10 @@
 services:
-  db:
-    container_name: web3_database_dev
+  data_fetcher:
+    container_name: web3_data_fetcher_dev
     init: true
     restart: always
     build:
-      context: ./database
+      context: ./data_fetcher
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - REDIS_URL=${REDIS_URL}
@@ -12,7 +12,7 @@ services:
       - COINGECKO_API_KEY=${COINGECKO_API_KEY}
     volumes:
       - database:/app/instance
-      - ${PWD}/database:/app
+      - ${PWD}/data_fetcher:/app
       - /var/log:/var/log
     networks:
       - w3s_development-nw
@@ -32,12 +32,11 @@ services:
     volumes:
       - database:/app/instance
       - ${PWD}/backend:/app
-      - ${PWD}/database/schema.sql:/app/schema.sql
-      - ${PWD}/database/utils:/app/database_utils
+
     restart: always
     command: flask --app "server:create_app(config_env='server.config.development')" run --no-debugger --reload --host=0.0.0.0 --port=5000
     depends_on:
-      - db
+      - data_fetcher
     networks:
       - w3s_development-nw
 
@@ -82,9 +81,8 @@ services:
     volumes:
       - ${PWD}/backend/server:/app/server
       - ${PWD}/backend/utils:/app/utils
-      - ${PWD}/database/schema.sql:/app/schema.sql
-      - ${PWD}/database/core:/app/database/core
-      - ${PWD}/database/utils:/app/database/utils
+      - ${PWD}/data_fetcher/core:/app/data_fetcher/core
+      - ${PWD}/data_fetcher/utils:/app/data_fetcher/utils
       - ${PWD}/isession/.ipython:/app/.ipython
       - /app/.ipython/profile_default/pid
       - /app/.ipython/profile_default/security
