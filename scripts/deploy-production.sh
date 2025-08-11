@@ -102,7 +102,10 @@ check_dependencies() {
     fi
 }
 
-DEPLOYMENT_DIR="$HOME/web3-snapshot"
+# Directory configuration
+APP_DIR="$HOME/web3-snapshot"
+SCRIPTS_DIR="/opt/web3-snapshot/scripts"
+CURRENT_USER=$(whoami)
 
 # Define required SSM parameters
 declare -A required_ssm_params=(
@@ -116,12 +119,11 @@ declare -A required_ssm_params=(
     ["S3_DEPLOYMENT_BUCKET"]="/w3s/production/s3-deployment-bucket"
 )
 
-# Define required S3 files
+# Define required S3 files for app directory
 declare -A required_s3_files=(
     ["docker-compose.production.yml"]="production/docker-compose.production.yml"
     ["docker-compose.certbot.yml"]="production/docker-compose.certbot.yml"
     ["backend/.env"]="production/backend.env"
-    ["scripts/renew-certificate.sh"]="scripts/renew-certificate.sh"
     ["nginx/default.conf"]="production/nginx-default.conf"
 )
 
@@ -152,16 +154,27 @@ else
 fi
 echo "Using S3 bucket: $S3_BUCKET"
 
-# Create deployment directory
+# Setup deploy group and permissions
 if [[ "$DRY_RUN" == "true" ]]; then
-    echo "[DRY RUN] Would create directories: $DEPLOYMENT_DIR/{backend,data_fetcher,scripts}"
-    echo "[DRY RUN] Would change to directory: $DEPLOYMENT_DIR"
+    echo "[DRY RUN] Would create deploy group and add user $CURRENT_USER"
+    echo "[DRY RUN] Would create system scripts directory: $SCRIPTS_DIR"
+    echo "[DRY RUN] Would create app directory: $APP_DIR"
 else
-    mkdir -p $DEPLOYMENT_DIR/{backend,data_fetcher,scripts}
-    cd $DEPLOYMENT_DIR
+    # Create deploy group and add current user
+    sudo groupadd -f deploy
+    sudo usermod -a -G deploy $CURRENT_USER
+
+    # Create system scripts directory with proper permissions
+    sudo mkdir -p $SCRIPTS_DIR
+    sudo chown -R root:deploy /opt/web3-snapshot
+    sudo chmod 755 /opt/web3-snapshot $SCRIPTS_DIR
+
+    # Create app directory
+    mkdir -p $APP_DIR/{backend,data_fetcher}
+    cd $APP_DIR
 fi
 
-# Download files from S3
+# Download configuration files to app directory
 echo "Downloading configuration files..."
 for local_file in "${!required_s3_files[@]}"; do
     s3_path="${required_s3_files[$local_file]}"
@@ -169,9 +182,14 @@ for local_file in "${!required_s3_files[@]}"; do
     execute aws s3 cp "s3://$S3_BUCKET/$s3_path" "./$local_file"
 done
 
-# Make certificate script executable by all users
-if [[ "$DRY_RUN" == "false" ]]; then
-    chmod 755 scripts/renew-certificate.sh
+# Download certificate script to system directory
+echo "Downloading certificate script to system directory..."
+if [[ "$DRY_RUN" == "true" ]]; then
+    echo "[DRY RUN] Would download renew-certificate.sh to $SCRIPTS_DIR"
+else
+    sudo aws s3 cp "s3://$S3_BUCKET/scripts/renew-certificate.sh" "$SCRIPTS_DIR/renew-certificate.sh" --region "$AWS_REGION"
+    sudo chmod 755 "$SCRIPTS_DIR/renew-certificate.sh"
+    sudo chown root:deploy "$SCRIPTS_DIR/renew-certificate.sh"
 fi
 
 # Generate backend secret key and process template
@@ -245,7 +263,7 @@ else
 /opt/web3-snapshot/scripts/renew-certificate.sh
 
 # Check certificate status
-docker compose -f docker-compose.certbot.yml run --rm certbot certificates
+docker compose -f docker-compose.certbot.yml run -T --rm certbot certificates
 \`\`\`
 
 ### Container Management
@@ -275,6 +293,28 @@ docker compose -f docker-compose.production.yml up -d
 - Environment: \`.env.production\`
 - Domain: \`$(grep DOMAIN .env.production 2>/dev/null | cut -d= -f2 || echo "<not set>")\`
 - Region: \`$(grep AWS_REGION .env.production 2>/dev/null | cut -d= -f2 || echo "<not set>")\`
+
+### Docker Cleanup
+\`\`\`bash
+# Remove unused containers, networks, images
+docker system prune -f
+
+# Remove unused volumes (be careful!)
+docker volume prune -f
+
+# Remove all stopped containers
+docker container prune -f
+\`\`\`
+
+### Quick Deployment from S3
+\`\`\`bash
+# Pull and run deployment script directly from S3
+aws s3 cp s3://w3s-deployment-configs-us-east-1/scripts/deploy-production.sh - --region us-east-1 | bash
+\`\`\`
+
+### File Locations
+- App configs: \`~/web3-snapshot/\`
+- System scripts: \`/opt/web3-snapshot/scripts/\`
 EOF
 fi
 
@@ -312,7 +352,7 @@ else
 
         # Generate certificate using EMAIL and DOMAIN from environment
         echo "Generating SSL certificate for $DOMAIN..."
-        docker compose -f docker-compose.certbot.yml run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ --email "$EMAIL" --agree-tos --no-eff-email -d "$DOMAIN"
+        docker compose -f docker-compose.certbot.yml run -T --rm certbot certonly --webroot --webroot-path /var/www/certbot/ --email "$EMAIL" --agree-tos --no-eff-email -d "$DOMAIN"
 
         # Stop temporary nginx
         docker compose -f docker-compose.certbot.yml down
