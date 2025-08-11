@@ -65,5 +65,5 @@ jobs:
 
           aws s3 cp backend/.env_TEMPLATE s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/production/backend.env
           aws s3 cp scripts/deploy-production.sh s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/scripts/deploy-production.sh
-          aws s3 cp scripts/renew-certificate.sh s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/scripts/renew-certificate.sh
+          aws s3 cp scripts/manage-certificate.sh s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/scripts/manage-certificate.sh
           aws s3 cp nginx/default.conf s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/production/nginx-default.conf

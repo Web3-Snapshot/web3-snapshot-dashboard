@@ -14,9 +14,6 @@
 #   logs - Shows the logs of the application
 #   isession - Starts an interactive session
 #   connect-service - Connects to a service
-#   start-cert-server - Starts the certbot server on port 80
-#   get-certificate - Gets a certificate
-#   renew-certificate - Renews a certificate
 #   help - Shows the help menu
 
 #######################################
@@ -290,7 +287,7 @@ _arg_cache=off
 
 print_help() {
     printf '%s\n' "Manage the application via simple commands targeting the underlying docker setup."
-    printf 'Usage: %s [--start] [--stop] [--print-vars] [--build] [--deploy] [--build-backend] [--(no-)debug] [--(no-)dry-run] [--tests] [--ps] [--logs] [--issession] [--start-cert-server] [--stop-cert-server] [--get-certificate] [--renew-certificate] [--connect-service <arg>] [--install-backend <arg>] [-h|--help]\n' "$0"
+    printf 'Usage: %s [--start] [--stop] [--print-vars] [--build] [--deploy] [--build-backend] [--(no-)debug] [--(no-)dry-run] [--tests] [--ps] [--logs] [--issession] [--connect-service <arg>] [--install-backend <arg>] [-h|--help]\n' "$0"
     printf '\t%s\n' "--start: Start the server"
     printf '\t%s\n' "--stop: Stop the server"
     printf '\t%s\n' "--print-vars: Print variables"
