@@ -1,22 +1,25 @@
 #!/bin/bash
 set -e
 
-# Configuration
-DEPLOYMENT_DIR="$HOME/web3-snapshot"
-COMPOSE_FILE_CERTBOT="docker-compose.certbot.yml"
-COMPOSE_FILE_APP="docker-compose.production.yml"
+# Path configuration - all paths defined at top
+APP_DIR="/opt/web3-snapshot"
+COMPOSE_DIR="$APP_DIR/compose"
+CONFIG_DIR="$APP_DIR/config"
+COMPOSE_FILE_CERTBOT="$COMPOSE_DIR/docker-compose.certbot.yml"
+COMPOSE_FILE_APP="$COMPOSE_DIR/docker-compose.production.yml"
+ENV_FILE="$CONFIG_DIR/.env.production"
 LOG_FILE="/var/log/certificate-renewal.log"
 
-# Change to deployment directory
-cd "$DEPLOYMENT_DIR" || {
-    echo "Error: Failed to change to directory: $DEPLOYMENT_DIR" >&2
+# Change to compose directory
+cd "$COMPOSE_DIR" || {
+    echo "Error: Failed to change to directory: $COMPOSE_DIR" >&2
     exit 1
 }
 
 # Load environment variables (includes DOMAIN and EMAIL from SSM)
-if [ -f ".env.production" ]; then
+if [ -f "$ENV_FILE" ]; then
     set -o allexport
-    source ".env.production"
+    source "$ENV_FILE"
     set +o allexport
 fi
 
@@ -33,7 +36,7 @@ fi
 
 # Check if certificates exist
 check_certificates() {
-    docker compose -f "$COMPOSE_FILE_CERTBOT" -f "$COMPOSE_FILE_APP" run --rm certbot certificates | grep -q "$DOMAIN"
+    docker compose -f "$COMPOSE_FILE_CERTBOT" -f "$COMPOSE_FILE_APP" run -T --rm certbot certificates | grep -q "$DOMAIN"
 }
 
 # Generate initial certificates
@@ -43,7 +46,7 @@ generate_certificates() {
     docker compose -f "$COMPOSE_FILE_CERTBOT" up -d nginx80
     sleep 5
 
-    docker compose -f "$COMPOSE_FILE_CERTBOT" -f "$COMPOSE_FILE_APP" run --rm certbot certonly \
+    docker compose -f "$COMPOSE_FILE_CERTBOT" -f "$COMPOSE_FILE_APP" run -T --rm certbot certonly \
         --webroot --webroot-path /var/www/certbot/ \
         --email "$EMAIL" --agree-tos --no-eff-email \
         -d "$DOMAIN"
@@ -57,7 +60,7 @@ renew_certificates() {
 
     docker compose -f "$COMPOSE_FILE_CERTBOT" up -d nginx80
 
-    docker compose -f "$COMPOSE_FILE_CERTBOT" -f "$COMPOSE_FILE_APP" run --rm certbot renew \
+    docker compose -f "$COMPOSE_FILE_CERTBOT" -f "$COMPOSE_FILE_APP" run -T --rm certbot renew \
         --webroot --webroot-path /var/www/certbot/
 
     docker compose -f "$COMPOSE_FILE_CERTBOT" stop nginx80

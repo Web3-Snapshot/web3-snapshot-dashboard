@@ -102,9 +102,17 @@ check_dependencies() {
     fi
 }
 
-# Directory configuration
-APP_DIR="$HOME/web3-snapshot"
-SCRIPTS_DIR="/opt/web3-snapshot/scripts"
+# Path configuration
+APP_DIR="/opt/web3-snapshot"
+COMPOSE_DIR="$APP_DIR/compose"
+CONFIG_DIR="$APP_DIR/config"
+SCRIPTS_DIR="$APP_DIR/scripts"
+COMPOSE_FILE_PROD="$COMPOSE_DIR/docker-compose.production.yml"
+COMPOSE_FILE_CERTBOT="$COMPOSE_DIR/docker-compose.certbot.yml"
+ENV_FILE="$CONFIG_DIR/.env.production"
+BACKEND_ENV_FILE="$CONFIG_DIR/backend/.env"
+NGINX_CONF_FILE="$COMPOSE_DIR/nginx/default.conf"
+README_FILE="$APP_DIR/README.md"
 CURRENT_USER=$(whoami)
 
 # Define required SSM parameters
@@ -119,12 +127,12 @@ declare -A required_ssm_params=(
     ["S3_DEPLOYMENT_BUCKET"]="/w3s/production/s3-deployment-bucket"
 )
 
-# Define required S3 files for app directory
+# Define required S3 files (relative to APP_DIR)
 declare -A required_s3_files=(
-    ["docker-compose.production.yml"]="production/docker-compose.production.yml"
-    ["docker-compose.certbot.yml"]="production/docker-compose.certbot.yml"
-    ["backend/.env"]="production/backend.env"
-    ["nginx/default.conf"]="production/nginx-default.conf"
+    ["$COMPOSE_FILE_PROD"]="production/docker-compose.production.yml"
+    ["$COMPOSE_FILE_CERTBOT"]="production/docker-compose.certbot.yml"
+    ["$BACKEND_ENV_FILE"]="production/backend.env"
+    ["$NGINX_CONF_FILE"]="production/nginx-default.conf"
 )
 
 # Static environment variables
@@ -157,51 +165,50 @@ echo "Using S3 bucket: $S3_BUCKET"
 # Setup deploy group and permissions
 if [[ "$DRY_RUN" == "true" ]]; then
     echo "[DRY RUN] Would create deploy group and add user $CURRENT_USER"
-    echo "[DRY RUN] Would create system scripts directory: $SCRIPTS_DIR"
     echo "[DRY RUN] Would create app directory: $APP_DIR"
 else
     # Create deploy group and add current user
     sudo groupadd -f deploy
     sudo usermod -a -G deploy $CURRENT_USER
 
-    # Create system scripts directory with proper permissions
-    sudo mkdir -p $SCRIPTS_DIR
-    sudo chown -R root:deploy /opt/web3-snapshot
-    sudo chmod 755 /opt/web3-snapshot $SCRIPTS_DIR
+    # Create app directory structure with proper permissions
+    sudo mkdir -p $CONFIG_DIR/backend $COMPOSE_DIR/nginx $SCRIPTS_DIR
+    sudo chown -R root:deploy $APP_DIR
+    sudo chmod 755 $APP_DIR $CONFIG_DIR $COMPOSE_DIR $SCRIPTS_DIR
 
-    # Create app directory
-    mkdir -p $APP_DIR/{backend,data_fetcher}
     cd $APP_DIR
 fi
 
-# Download configuration files to app directory
+# Download configuration files
 echo "Downloading configuration files..."
 for local_file in "${!required_s3_files[@]}"; do
     s3_path="${required_s3_files[$local_file]}"
     echo "Downloading $local_file from s3://$S3_BUCKET/$s3_path"
-    execute aws s3 cp "s3://$S3_BUCKET/$s3_path" "./$local_file"
+    execute sudo aws s3 cp "s3://$S3_BUCKET/$s3_path" "./$local_file" --region "$AWS_REGION"
 done
 
-# Download certificate script to system directory
-echo "Downloading certificate script to system directory..."
+# Download certificate management script
+echo "Downloading certificate management script..."
 if [[ "$DRY_RUN" == "true" ]]; then
-    echo "[DRY RUN] Would download renew-certificate.sh to $SCRIPTS_DIR"
+    echo "[DRY RUN] Would download manage-certificate.sh to $SCRIPTS_DIR"
 else
-    sudo aws s3 cp "s3://$S3_BUCKET/scripts/renew-certificate.sh" "$SCRIPTS_DIR/renew-certificate.sh" --region "$AWS_REGION"
-    sudo chmod 755 "$SCRIPTS_DIR/renew-certificate.sh"
-    sudo chown root:deploy "$SCRIPTS_DIR/renew-certificate.sh"
+    sudo aws s3 cp "s3://$S3_BUCKET/scripts/manage-certificate.sh" "$SCRIPTS_DIR/manage-certificate.sh" --region "$AWS_REGION"
+    sudo chmod 755 "$SCRIPTS_DIR/manage-certificate.sh"
+    sudo chown root:deploy "$SCRIPTS_DIR/manage-certificate.sh"
 fi
 
 # Generate backend secret key and process template
 echo "Processing backend environment template..."
 if [[ "$DRY_RUN" == "true" ]]; then
     echo "[DRY RUN] Would generate random secret key for backend"
-    echo "[DRY RUN] Would process backend/.env template"
+    echo "[DRY RUN] Would process $BACKEND_ENV_FILE template"
 else
     # Generate a random secret key
     BACKEND_SECRET_KEY=$(openssl rand -hex 32)
     # Process the template
-    sed "s/{{BACKEND_SECRET_KEY}}/$BACKEND_SECRET_KEY/g" backend/.env > backend/.env.tmp && mv backend/.env.tmp backend/.env
+    sudo sed "s/{{BACKEND_SECRET_KEY}}/$BACKEND_SECRET_KEY/g" "$BACKEND_ENV_FILE" > /tmp/backend.env.tmp
+    sudo mv /tmp/backend.env.tmp "$BACKEND_ENV_FILE"
+    sudo chown root:deploy "$BACKEND_ENV_FILE"
 fi
 
 # Generate .env.production from SSM parameters
@@ -236,14 +243,15 @@ for var_name in "${!required_ssm_params[@]}"; do
 done
 
 if [[ "$DRY_RUN" == "true" ]]; then
-    echo "[DRY RUN] Would create .env.production with content:"
+    echo "[DRY RUN] Would create $ENV_FILE with content:"
     echo -e "$env_content"
-    echo "[DRY RUN] Would create server README.md"
+    echo "[DRY RUN] Would create server $README_FILE"
 else
-    echo -e "$env_content" > .env.production
+    echo -e "$env_content" | sudo tee "$ENV_FILE" > /dev/null
+    sudo chown root:deploy "$ENV_FILE"
 
     # Create server README with deployment info
-    cat > README.md << EOF
+    sudo tee "$README_FILE" > /dev/null << EOF
 # Web3 Snapshot Dashboard - Server
 
 ## Quick Commands
@@ -259,15 +267,18 @@ else
 
 ### SSL Certificates
 \`\`\`bash
-# Renew certificates
-/opt/web3-snapshot/scripts/renew-certificate.sh
+# Manage certificates (create/renew)
+$SCRIPTS_DIR/manage-certificate.sh
 
-# Check certificate status
-docker compose -f docker-compose.certbot.yml run -T --rm certbot certificates
+# Check certificate status (from compose directory)
+cd $COMPOSE_DIR && docker compose -f docker-compose.certbot.yml run -T --rm certbot certificates
 \`\`\`
 
 ### Container Management
 \`\`\`bash
+# Change to compose directory first
+cd $COMPOSE_DIR
+
 # Check container status
 docker compose -f docker-compose.production.yml ps
 
@@ -290,9 +301,9 @@ docker compose -f docker-compose.production.yml up -d
 - Application logs: \`docker compose -f docker-compose.production.yml logs\`
 
 ### Configuration
-- Environment: \`.env.production\`
-- Domain: \`$(grep DOMAIN .env.production 2>/dev/null | cut -d= -f2 || echo "<not set>")\`
-- Region: \`$(grep AWS_REGION .env.production 2>/dev/null | cut -d= -f2 || echo "<not set>")\`
+- Environment: \`$ENV_FILE\`
+- Domain: \`$(grep DOMAIN $ENV_FILE 2>/dev/null | cut -d= -f2 || echo "<not set>")\`
+- Region: \`$(grep AWS_REGION $ENV_FILE 2>/dev/null | cut -d= -f2 || echo "<not set>")\`
 
 ### Docker Cleanup
 \`\`\`bash
@@ -313,8 +324,10 @@ aws s3 cp s3://w3s-deployment-configs-us-east-1/scripts/deploy-production.sh - -
 \`\`\`
 
 ### File Locations
-- App configs: \`~/web3-snapshot/\`
-- System scripts: \`/opt/web3-snapshot/scripts/\`
+- Base directory: \`$APP_DIR/\`
+- Configuration: \`$CONFIG_DIR/\`
+- Docker compose: \`$COMPOSE_DIR/\`
+- Scripts: \`$SCRIPTS_DIR/\`
 EOF
 fi
 
@@ -339,12 +352,13 @@ else
     if ! docker volume ls | grep -q "web3-snapshot_certbot_conf"; then
         echo "SSL certificates not found. Generating initial certificates..."
         # Create .env file for certbot (it expects this)
-        if [ -f ".env.production" ]; then
-            cp .env.production .env
+        if [ -f "$ENV_FILE" ]; then
+            sudo cp "$ENV_FILE" "$COMPOSE_DIR/.env"
         fi
 
         # Generate initial certificates using certbot setup
         echo "Starting temporary nginx for certificate generation..."
+        cd "$COMPOSE_DIR"
         docker compose -f docker-compose.certbot.yml up -d nginx80
 
         # Wait a moment for nginx to start
@@ -356,6 +370,7 @@ else
 
         # Stop temporary nginx
         docker compose -f docker-compose.certbot.yml down
+        cd "$APP_DIR"
 
         echo "SSL certificates generated successfully."
     else
@@ -366,8 +381,9 @@ fi
 # Load environment variables for Docker Compose
 if [[ "$DRY_RUN" == "false" ]]; then
     set -o allexport
-    source .env.production
+    source "$ENV_FILE"
     set +o allexport
+    cd "$COMPOSE_DIR"
 fi
 
 # Pull latest images and restart
