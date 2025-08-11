@@ -41,7 +41,7 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
           # Build and push multi-platform images
-          docker buildx build --platform linux/amd64,linux/arm64 -t $ECR_REGISTRY/w3s-database:latest ./database --push
+          docker buildx build --platform linux/amd64,linux/arm64 -t $ECR_REGISTRY/w3s-data-fetcher:latest ./data_fetcher --push
           docker buildx build --platform linux/amd64,linux/arm64 -t $ECR_REGISTRY/w3s-backend:latest ./backend --push
           docker buildx build --platform linux/amd64,linux/arm64 -t $ECR_REGISTRY/w3s-frontend:latest ./frontend --push
 
@@ -62,7 +62,7 @@ jobs:
           # Upload files to S3 deployment bucket
           aws s3 cp docker-compose.production.yml s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/production/docker-compose.production.yml
           aws s3 cp docker-compose.certbot.yml s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/production/docker-compose.certbot.yml
-          aws s3 cp database/schema.sql s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/production/schema.sql
+
           aws s3 cp backend/.env_TEMPLATE s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/production/backend.env
           aws s3 cp scripts/deploy-production.sh s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/scripts/deploy-production.sh
           aws s3 cp scripts/renew-certificate.sh s3://${{ secrets.S3_DEPLOYMENT_BUCKET }}/scripts/renew-certificate.sh

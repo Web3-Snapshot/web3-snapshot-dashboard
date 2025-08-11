@@ -220,7 +220,7 @@ All dependencies are handled automatically by Docker:
 │   ├── server/        # API routes and Redis connections
 │   ├── tests/         # Backend tests
 │   └── Dockerfile.dev # Development container
-├── database/          # Data fetcher service (CoinGecko → Redis)
+├── data_fetcher/      # Data fetcher service (CoinGecko → Redis)
 │   ├── core/          # API fetching and Redis storage logic
 │   ├── tests/         # Data fetcher tests
 │   └── crontab        # 6-minute scheduled data fetching

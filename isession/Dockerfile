@@ -10,7 +10,7 @@ RUN pipenv install --deploy --system --skip-lock
 
 RUN rm -rf /app/Pipfile*
 
-COPY ./database/Pipfile /app/
+COPY ./data_fetcher/Pipfile /app/
 
 RUN pipenv install --deploy --system --skip-lock
 
