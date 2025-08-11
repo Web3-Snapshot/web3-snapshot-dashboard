@@ -13,6 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: development
+      REDIS_URL: redis://localhost:6379
+      COINGECKO_API_URL: https://api.coingecko.com/api/v3
+      COINGECKO_API_KEY: test_key
+      DEBUG: false
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
@@ -21,9 +25,6 @@ jobs:
 
       - name: Install dependencies
         run: ./scripts/manage --build development
-
-      - name: Initialize database
-        run: ./scripts/manage --init-db
 
       - name: Run pytest
         run: ./scripts/manage --tests

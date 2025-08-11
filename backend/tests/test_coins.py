@@ -1,21 +1,15 @@
 import json
-from asyncio import sleep
-from contextlib import contextmanager
 from datetime import datetime, timezone
-from functools import partial
-from unittest import mock
+from unittest.mock import Mock
 
 import pytest
-from database_utils.helpers import (
+from server.routes.coins import event_stream
+
+from data_fetcher.utils.helpers import (
     compute_extra_columns,
-    generate_object_diff,
     normalize_coins,
     process_percentages,
 )
-from fakeredis import FakeStrictRedis
-from rq import Queue
-from rq.job import Job
-from server.routes.coins import event_stream
 
 UPDATED_AT = datetime(2022, 1, 1, 0, 0, 0, tzinfo=timezone.utc).isoformat()
 
@@ -45,7 +39,6 @@ INSERT_FIELDS = [
     "atl",
     "atl_change_percentage",
     "atl_date",
-    # "roi",
     "last_updated",
     "price_change_percentage_1h_in_currency",
     "price_change_percentage_24h_in_currency",
@@ -56,18 +49,6 @@ INSERT_FIELDS = [
     "price_change_percentage_1y_in_currency",
     "updated_at",
 ]
-
-
-@contextmanager
-def mock_events():
-    with mock.patch(
-        "server.routes.coins.event_stream",
-        partial(
-            event_stream,
-            single=True,
-        ),
-    ):
-        yield
 
 
 def seed_coin(conn, app):
@@ -128,7 +109,7 @@ def seed_coin(conn, app):
     app.redis_conn.set("coins:updated_at", UPDATED_AT)
 
 
-def test_get_coins(client, db_connection, app):
+def test_get_coins(client, app):
     """Test case for the 'get_coins' endpoint.
 
     This test verifies that the 'get_coins' endpoint returns the expected JSON response.
@@ -141,7 +122,7 @@ def test_get_coins(client, db_connection, app):
     Returns:
         None
     """
-    seed_coin(db_connection, app)
+    seed_coin(None, app)
 
     response = client.get("/api/coins")
 
@@ -191,40 +172,37 @@ def test_get_coins(client, db_connection, app):
     assert response.json["updated_at"] == str(UPDATED_AT)
 
 
-# FIXME: This test is not working yet. We need to find a way to run the event stream in
-# the background.
-@pytest.mark.skip
-def test_get_coins_stream(client, app):
-    "Test the coin event stream."
+def test_sse_event_stream_function(app):
+    """Test the event_stream function directly to verify data flow.
 
-    async def send_pubsub():
-        pub_payload = {
-            "data": {
-                "changed": 1,
-                "updated_at": UPDATED_AT,
-            },
-            "errors": [],
-        }
+    Uses the 'single=True' parameter which was designed specifically for testing.
+    This prevents the infinite loop that would hang the test suite while still
+    verifying that the complete SSE data flow works correctly.
+    """
 
-        while True:
-            await sleep(0.1)
-            print("publishing")
+    # Seed data first
+    seed_coin(None, app)
 
-            app.redis_conn.publish("coins", json.dumps(pub_payload))
+    # Create mock pubsub to simulate Redis message
+    mock_pubsub = Mock()
+    mock_pubsub.get_message.side_effect = [
+        None,  # Initial subscription message (cleared by event_stream)
+        {"type": "message", "data": "test"},  # Actual message triggers data yield
+        None,  # Would be next timeout, but single=True breaks the loop
+    ]
 
-    queue = Queue(is_async=False, connection=app.redis_conn)
-    job = queue.enqueue(
-        send_pubsub,
-    )
-    assert job
+    # Test the event stream generator with single=True for testing
+    # This yields exactly one SSE message then exits instead of looping forever
+    stream_gen = event_stream(app.redis_conn, mock_pubsub, single=True)
+    event_data = next(stream_gen)
 
-    with mock_events():
-        response = client.get(
-            "/api/coin-stream", headers={"Accept": "text/event-stream"}
-        )
+    # Verify the SSE format and data
+    assert event_data.startswith("data: ")
+    json_data = json.loads(event_data[6:])  # Remove "data: " prefix
 
-    assert response.status_code == 200
-    # assert response.content_type == "text/event-stream"
-    # assert response.headers["Cache-Control"] == "no-cache"
-    # assert response.headers["Connection"] == "keep-alive"
-    # assert response.headers["X-Accel-Buffering"] == "no"
+    # Verify the data structure matches what we seeded
+    assert "prices" in json_data
+    assert "tokenomics" in json_data
+    assert "order" in json_data
+    assert json_data["order"] == ["test_id"]
+    assert json_data["updated_at"] == UPDATED_AT

@@ -109,7 +109,7 @@ For local development setup, container architecture, and debugging tools, see th
 
 ```
 ├── backend/           # Flask API server
-├── database/          # Data fetcher service (CoinGecko API)
+├── data_fetcher/      # Data fetcher service (CoinGecko API → Redis)
 ├── frontend/          # React application
 ├── nginx/             # Nginx config for SSL challenges
 ├── scripts/           # Deployment and management scripts

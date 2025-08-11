@@ -1,6 +1,6 @@
 services:
-  db:
-    container_name: web3_database_prod
+  data_fetcher:
+    container_name: web3_data_fetcher_prod
     init: true
     restart: always
     image: $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_DB_REPOSITORY:latest
@@ -27,7 +27,7 @@ services:
       - database:/app/instance
     restart: always
     depends_on:
-      - db
+      - data_fetcher
     networks:
       - w3s-inner-nw
       - w3s-nw

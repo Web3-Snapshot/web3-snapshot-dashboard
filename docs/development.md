@@ -13,10 +13,7 @@ cd web3-snapshot-dashboard
 cp .env.development_TEMPLATE .env.development
 # Edit .env.development and add your CoinGecko API key
 
-# Initialize database
-manage --init-db
 
-# Start development environment
 manage --start
 
 # Access application
@@ -32,7 +29,7 @@ The application consists of five main containers in development:
 
 - **frontend**: React development server with hot reload
 - **backend**: Flask API server serving data from Redis
-- **db**: Data fetcher service that retrieves data from CoinGecko API
+- **data_fetcher**: Data fetcher service that retrieves data from CoinGecko API
 - **redis**: Data store for all crypto market data
 
 ### Development Tools
@@ -149,15 +146,7 @@ manage --ps
 manage --logs
 ```
 
-### Database Operations
 
-```bash
-# Initialize database with schema and initial data
-manage --init-db
-
-# Check if database exists and is accessible
-manage --check-db
-```
 
 ### Testing and Quality
 
@@ -176,7 +165,7 @@ manage --build backend --no-cache  # Build without using cache
 ```bash
 # Connect to service containers for debugging
 manage --connect-service backend  # Drops into backend container shell
-manage --connect-service db       # Drops into database container shell
+manage --connect-service data_fetcher  # Drops into data_fetcher container shell
 manage --connect-service redis    # Drops into redis-cli prompt
 
 # Interactive Python session with pre-loaded connections
