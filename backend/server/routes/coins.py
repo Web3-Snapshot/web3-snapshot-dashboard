@@ -60,7 +60,10 @@ def event_stream(redis_conn, pubsub, single=False):
     Sends keepalive messages every 30 seconds to prevent connection timeout.
 
     Args:
+        redis_conn: Redis connection instance.
         pubsub: (Redis.pubsub): A Redis pubsub connection.
+        single (bool): If True, yields only one message then exits the loop.
+                      Used for testing to prevent infinite streaming that would hang tests.
 
     Yields:
         str: A JSON string representing the latest coin data or keepalive message.
@@ -98,8 +101,9 @@ def event_stream(redis_conn, pubsub, single=False):
         }
 
         if single:
-            single = False
+            # Testing mode: yield one message and break to prevent infinite loop
             yield "data: %s\n\n" % json.dumps(payload)
+            break
 
         yield "data: %s\n\n" % json.dumps(payload)
 
