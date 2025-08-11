@@ -169,9 +169,9 @@ for local_file in "${!required_s3_files[@]}"; do
     execute aws s3 cp "s3://$S3_BUCKET/$s3_path" "./$local_file"
 done
 
-# Make certificate script executable
+# Make certificate script executable by all users
 if [[ "$DRY_RUN" == "false" ]]; then
-    chmod +x scripts/renew-certificate.sh
+    chmod 755 scripts/renew-certificate.sh
 fi
 
 # Generate backend secret key and process template
@@ -220,8 +220,62 @@ done
 if [[ "$DRY_RUN" == "true" ]]; then
     echo "[DRY RUN] Would create .env.production with content:"
     echo -e "$env_content"
+    echo "[DRY RUN] Would create server README.md"
 else
     echo -e "$env_content" > .env.production
+
+    # Create server README with deployment info
+    cat > README.md << EOF
+# Web3 Snapshot Dashboard - Server
+
+## Quick Commands
+
+### Deployment
+\`\`\`bash
+# Re-deploy application
+/opt/web3-snapshot/scripts/deploy-production.sh
+
+# Deploy with dry-run
+/opt/web3-snapshot/scripts/deploy-production.sh --dry-run
+\`\`\`
+
+### SSL Certificates
+\`\`\`bash
+# Renew certificates
+/opt/web3-snapshot/scripts/renew-certificate.sh
+
+# Check certificate status
+docker compose -f docker-compose.certbot.yml run --rm certbot certificates
+\`\`\`
+
+### Container Management
+\`\`\`bash
+# Check container status
+docker compose -f docker-compose.production.yml ps
+
+# View logs
+docker compose -f docker-compose.production.yml logs
+
+# Restart services
+docker compose -f docker-compose.production.yml restart
+
+# Stop services
+docker compose -f docker-compose.production.yml down
+
+# Start services
+docker compose -f docker-compose.production.yml up -d
+\`\`\`
+
+### Logs
+- Certificate renewal: \`/var/log/certificate-renewal.log\`
+- Data fetching: \`/var/log/web3snapshot-fetch.log\`
+- Application logs: \`docker compose -f docker-compose.production.yml logs\`
+
+### Configuration
+- Environment: \`.env.production\`
+- Domain: \`$(grep DOMAIN .env.production 2>/dev/null | cut -d= -f2 || echo "<not set>")\`
+- Region: \`$(grep AWS_REGION .env.production 2>/dev/null | cut -d= -f2 || echo "<not set>")\`
+EOF
 fi
 
 # Login to ECR

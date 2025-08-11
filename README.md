@@ -60,12 +60,17 @@ S3_DEPLOYMENT_BUCKET
 
    ```bash
    ssh ubuntu@<server-ip>
-   ~/web3-snapshot/scripts/deploy-production.sh
+   /opt/web3-snapshot/scripts/deploy-production.sh
+   ```
+
+   **Alternative - Pull deployment script from S3:**
+   ```bash
+   aws s3 cp s3://w3s-deployment-configs-us-east-1/scripts/deploy-production.sh - --region us-east-1 | bash
    ```
 
 3. **Generate SSL Certificates**:
    ```bash
-   ~/web3-snapshot/scripts/renew-certificate.sh
+   /opt/web3-snapshot/scripts/renew-certificate.sh
    ```
 
 ### Automated Deployment Pipeline
@@ -88,14 +93,14 @@ Merge to `main` branch (via PR) triggers:
 ### Certificate Renewal
 
 - Automated renewal via cron job (twice daily)
-- Script: `~/web3-snapshot/scripts/renew-certificate.sh`
+- Script: `/opt/web3-snapshot/scripts/renew-certificate.sh`
 - Logs: `/var/log/certificate-renewal.log`
 
 ### Manual Certificate Operations
 
 ```bash
 # Generate new certificates
-~/web3-snapshot/scripts/renew-certificate.sh
+/opt/web3-snapshot/scripts/renew-certificate.sh
 
 # Check certificate status
 docker compose -f docker-compose.certbot.yml run --rm certbot certificates
@@ -144,7 +149,7 @@ For local development setup, container architecture, and debugging tools, see th
 docker logs web3_frontend_prod
 
 # Regenerate certificates
-~/web3-snapshot/scripts/renew-certificate.sh
+/opt/web3-snapshot/scripts/renew-certificate.sh
 ```
 
 **Container Issues**:

@@ -65,10 +65,12 @@ unzip awscliv2.zip
 ./aws/install
 rm -rf aws awscliv2.zip
 
-# Create deployment directory in ubuntu user's home
-DEPLOYMENT_DIR="/home/ubuntu/web3-snapshot"
-mkdir -p $DEPLOYMENT_DIR/scripts
-chown -R ubuntu:ubuntu $DEPLOYMENT_DIR
+# Create system scripts directory with proper permissions
+SCRIPTS_DIR="/opt/web3-snapshot/scripts"
+mkdir -p $SCRIPTS_DIR
+chown -R root:ubuntu /opt/web3-snapshot
+chmod 755 /opt/web3-snapshot
+chmod 755 /opt/web3-snapshot/scripts
 
 # Get AWS region and S3 bucket, then download deployment script
 AWS_REGION=$(get_aws_region)
@@ -76,11 +78,11 @@ echo "Using AWS region: $AWS_REGION"
 S3_BUCKET=$(aws ssm get-parameter --name "/w3s/production/s3-deployment-bucket" --query 'Parameter.Value' --output text --region "$AWS_REGION")
 echo "Using S3 bucket: $S3_BUCKET"
 echo "Downloading deployment script..."
-aws s3 cp s3://$S3_BUCKET/scripts/deploy-production.sh $DEPLOYMENT_DIR/scripts/ --region "$AWS_REGION"
+aws s3 cp s3://$S3_BUCKET/scripts/deploy-production.sh $SCRIPTS_DIR/ --region "$AWS_REGION"
 
-# Make script executable
-chmod +x $DEPLOYMENT_DIR/scripts/deploy-production.sh
-chown ubuntu:ubuntu $DEPLOYMENT_DIR/scripts/deploy-production.sh
+# Make script executable by all users with proper ownership
+chmod 755 $SCRIPTS_DIR/deploy-production.sh
+chown root:ubuntu $SCRIPTS_DIR/deploy-production.sh
 
 # Verify installations
 echo "Verifying installations..."
@@ -92,5 +94,5 @@ echo "User Data script completed at $(date)"
 echo ""
 echo "=== NEXT STEPS ==="
 echo "1. SSH into the server: ssh ubuntu@<server-ip>"
-echo "2. Run deployment: ~/web3-snapshot/scripts/deploy-production.sh"
+echo "2. Run deployment: /opt/web3-snapshot/scripts/deploy-production.sh"
 echo "3. Server is ready for production!"
