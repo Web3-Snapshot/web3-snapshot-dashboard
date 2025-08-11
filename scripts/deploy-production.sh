@@ -102,7 +102,7 @@ check_dependencies() {
     fi
 }
 
-DEPLOYMENT_DIR="$HOME/web3-snapshot"
+DEPLOYMENT_DIR="/opt/web3-snapshot"
 
 # Define required SSM parameters
 declare -A required_ssm_params=(
@@ -169,9 +169,9 @@ for local_file in "${!required_s3_files[@]}"; do
     execute aws s3 cp "s3://$S3_BUCKET/$s3_path" "./$local_file"
 done
 
-# Make certificate script executable
+# Make certificate script executable by all users
 if [[ "$DRY_RUN" == "false" ]]; then
-    chmod +x scripts/renew-certificate.sh
+    chmod 755 scripts/renew-certificate.sh
 fi
 
 # Generate backend secret key and process template
