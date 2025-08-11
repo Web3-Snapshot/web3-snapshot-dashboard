@@ -1,0 +1,23 @@
+name: Lint
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - "main"
+      - "dev"
+
+jobs:
+  lint-all:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Run linter
+        uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: --all-files

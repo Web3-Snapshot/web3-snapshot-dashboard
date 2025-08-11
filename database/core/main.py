@@ -200,8 +200,10 @@ def fetch_and_cache():
         DataFetcherException: If the status code for fetching the single coin is not 200.
 
     """
-    print(f"\n=== FETCH STARTED: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')} ===")
-    
+    print(
+        f"\n=== FETCH STARTED: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')} ==="
+    )
+
     try:
         coins_response = get_coins(100)  # Get the top 100 coins
         response_json = coins_response.json()

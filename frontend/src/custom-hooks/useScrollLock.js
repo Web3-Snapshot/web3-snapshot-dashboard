@@ -2,7 +2,7 @@
  *  Credits to Luke Denton
  *  https://blog.logrocket.com/create-advanced-scroll-lock-react-hook/
  */
-import React, { useRef, useCallback, useLayoutEffect } from 'react';
+import { useRef, useCallback, useLayoutEffect } from 'react';
 
 function isiOS() {
   return (

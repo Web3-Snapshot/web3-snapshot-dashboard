@@ -66,16 +66,16 @@ def event_stream(redis_conn, pubsub, single=False):
         str: A JSON string representing the latest coin data or keepalive message.
     """
     pubsub.get_message(timeout=1)  # Clear any initial subscription message
-    
+
     while True:
         message = pubsub.get_message(timeout=30)  # 30 second timeout
-        
+
         if message is None:
             # Send keepalive comment to prevent connection timeout
             yield ": keepalive\n\n"
             continue
-            
-        if message['type'] != 'message':
+
+        if message["type"] != "message":
             continue
         print(message)
         coins = redis_conn.get("coins:all")

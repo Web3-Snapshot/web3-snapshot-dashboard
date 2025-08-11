@@ -1,4 +1,4 @@
 */6 * * * * cd /app && /usr/local/bin/python -m core.main >> /var/log/web3snapshot-fetch.log 2>&1
-0 2,14 * * * /scripts/renew-certificate.sh >> /var/log/certificate-renewal.log 2>&1
+0 2,14 * * * $HOME/web3-snapshot/scripts/renew-certificate.sh >> /var/log/certificate-renewal.log 2>&1
 0 0 * * * find /var/log -name "web3snapshot-fetch.log" -size +1M -exec truncate -s 0 {} \;
 0 0 */100 * * find /var/log -name "certificate-renewal.log" -exec truncate -s 0 {} \;

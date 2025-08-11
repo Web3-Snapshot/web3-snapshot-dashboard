@@ -120,7 +120,8 @@ const Coin = () => {
             <p
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(coin.description ? coin.description.en : ''),
-              }}></p>
+              }}
+            ></p>
           </div>
         </div>
       </div>
