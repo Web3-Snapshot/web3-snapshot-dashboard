@@ -1,8 +1,6 @@
 import json
-from time import sleep
 
 from flask import Blueprint, Response, current_app
-from server.db import get_db
 
 bp = Blueprint("tracking", __name__)
 
