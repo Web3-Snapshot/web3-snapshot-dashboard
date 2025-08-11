@@ -65,9 +65,12 @@ unzip awscliv2.zip
 ./aws/install
 rm -rf aws awscliv2.zip
 
-# Create system scripts directory
+# Create system scripts directory with proper permissions
 SCRIPTS_DIR="/opt/web3-snapshot/scripts"
 mkdir -p $SCRIPTS_DIR
+chown -R root:ubuntu /opt/web3-snapshot
+chmod 755 /opt/web3-snapshot
+chmod 755 /opt/web3-snapshot/scripts
 
 # Get AWS region and S3 bucket, then download deployment script
 AWS_REGION=$(get_aws_region)
@@ -77,9 +80,9 @@ echo "Using S3 bucket: $S3_BUCKET"
 echo "Downloading deployment script..."
 aws s3 cp s3://$S3_BUCKET/scripts/deploy-production.sh $SCRIPTS_DIR/ --region "$AWS_REGION"
 
-# Make script executable by all users
+# Make script executable by all users with proper ownership
 chmod 755 $SCRIPTS_DIR/deploy-production.sh
-chown ubuntu:ubuntu $SCRIPTS_DIR/deploy-production.sh
+chown root:ubuntu $SCRIPTS_DIR/deploy-production.sh
 
 # Verify installations
 echo "Verifying installations..."
