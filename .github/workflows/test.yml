@@ -22,8 +22,5 @@ jobs:
       - name: Install dependencies
         run: ./scripts/manage --build development
 
-      - name: Initialize database
-
-
       - name: Run pytest
         run: ./scripts/manage --tests
