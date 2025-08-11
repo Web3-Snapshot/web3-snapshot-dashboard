@@ -9,30 +9,31 @@ if [[ "$1" == "--dry-run" ]]; then
     echo
 fi
 
-# Execute function - runs command or shows it
-execute() {
-    if [[ "$DRY_RUN" == "true" ]]; then
-        echo "[DRY RUN] Would execute: $*"
-    else
-        echo "Executing: $*"
-        "$@"
-    fi
-}
+
 
 echo "Starting server bootstrap..."
 
 # Update system packages
 echo "Updating system packages..."
-execute sudo apt-get update
-execute sudo apt-get upgrade -y
+if [[ "$DRY_RUN" == "true" ]]; then
+    echo "[DRY RUN] Would update system packages"
+else
+    sudo apt-get update
+    sudo apt-get upgrade -y
+fi
 
 # Install essential packages
 echo "Installing essential packages..."
-execute sudo apt-get install -y curl unzip ca-certificates gnupg lsb-release
+if [[ "$DRY_RUN" == "true" ]]; then
+    echo "[DRY RUN] Would install essential packages"
+else
+    sudo apt-get install -y curl unzip ca-certificates gnupg lsb-release
+fi
 
 # Install Docker
-echo "Installing Docker..."
+echo "Checking Docker installation..."
 if ! command -v docker &> /dev/null; then
+    echo "Docker not found. Installing Docker..."
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would install Docker"
     else
@@ -52,13 +53,23 @@ if ! command -v docker &> /dev/null; then
 
         echo "Docker installed successfully"
     fi
+elif ! docker compose version &> /dev/null 2>&1; then
+    echo "Docker found but Docker Compose plugin missing. Installing Docker..."
+    if [[ "$DRY_RUN" == "true" ]]; then
+        echo "[DRY RUN] Would install Docker with Compose plugin"
+    else
+        sudo apt-get update
+        sudo apt-get install -y docker-compose-plugin
+        echo "Docker Compose plugin installed successfully"
+    fi
 else
     echo "Docker already installed: $(docker --version)"
 fi
 
 # Install AWS CLI
-echo "Installing AWS CLI..."
+echo "Checking AWS CLI installation..."
 if ! command -v aws &> /dev/null; then
+    echo "AWS CLI not found. Installing AWS CLI..."
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Would install AWS CLI"
     else
@@ -84,6 +95,15 @@ else
     echo "AWS CLI already installed: $(aws --version)"
 fi
 
+# Create deploy group and add current user
+echo "Setting up deploy group..."
+if [[ "$DRY_RUN" == "true" ]]; then
+    echo "[DRY RUN] Would create deploy group and add user"
+else
+    sudo groupadd -f deploy
+    sudo usermod -a -G deploy $USER
+fi
+
 # Verify installations
 echo "Verifying installations..."
 if [[ "$DRY_RUN" == "false" ]]; then
@@ -91,11 +111,17 @@ if [[ "$DRY_RUN" == "false" ]]; then
     echo "Docker Compose version: $(docker compose version)"
     echo "AWS CLI version: $(aws --version)"
 
-    # Test Docker without sudo (requires re-login to take effect)
+    # Test group memberships (requires re-login to take effect)
     if groups $USER | grep -q docker; then
-        echo "User $USER is in docker group"
+        echo "✅ User $USER is in docker group"
     else
-        echo "Warning: User $USER not in docker group yet. Please log out and back in."
+        echo "⚠️  User $USER not in docker group yet. Please log out and back in."
+    fi
+
+    if groups $USER | grep -q deploy; then
+        echo "✅ User $USER is in deploy group"
+    else
+        echo "⚠️  User $USER not in deploy group yet. Please log out and back in."
     fi
 fi
 
