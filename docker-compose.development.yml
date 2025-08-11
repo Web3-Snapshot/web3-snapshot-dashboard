@@ -11,7 +11,6 @@ services:
       - COINGECKO_API_URL=${COINGECKO_API_URL}
       - COINGECKO_API_KEY=${COINGECKO_API_KEY}
     volumes:
-      - database:/app/instance
       - ${PWD}/data_fetcher:/app
       - /var/log:/var/log
     networks:
@@ -30,7 +29,6 @@ services:
       - 5000:5000
       - 5678:5678
     volumes:
-      - database:/app/instance
       - ${PWD}/backend:/app
       - ${PWD}/data_fetcher:/app/data_fetcher
 
@@ -86,7 +84,7 @@ services:
       - ${PWD}/isession/.ipython:/app/.ipython
       - /app/.ipython/profile_default/pid
       - /app/.ipython/profile_default/security
-      - database:/app/instance
+
     environment:
       - IPYTHONDIR=/app/.ipython
       - ENVIRONMENT=${ENVIRONMENT}
@@ -97,7 +95,6 @@ services:
       - w3s_development-nw
 
 volumes:
-  database:
   cache:
 
 

@@ -120,7 +120,6 @@ declare -A required_ssm_params=(
 declare -A required_s3_files=(
     ["docker-compose.production.yml"]="production/docker-compose.production.yml"
     ["docker-compose.certbot.yml"]="production/docker-compose.certbot.yml"
-    ["database/schema.sql"]="production/schema.sql"
     ["backend/.env"]="production/backend.env"
     ["scripts/renew-certificate.sh"]="scripts/renew-certificate.sh"
     ["nginx/default.conf"]="production/nginx-default.conf"
@@ -130,9 +129,8 @@ declare -A required_s3_files=(
 declare -A static_env_vars=(
     ["ENVIRONMENT"]="production"
     ["CERTIFICATE_RENEWAL_LOG"]="/var/log/certificate_renewal.log"
-    ["AWS_PROFILE"]="default"
     ["AWS_FRONTEND_REPOSITORY"]="w3s-frontend"
-    ["AWS_DB_REPOSITORY"]="w3s-database"
+    ["AWS_DATA_FETCHER_REPOSITORY"]="w3s-data-fetcher"
     ["AWS_BACKEND_REPOSITORY"]="w3s-backend"
 )
 
@@ -156,10 +154,10 @@ echo "Using S3 bucket: $S3_BUCKET"
 
 # Create deployment directory
 if [[ "$DRY_RUN" == "true" ]]; then
-    echo "[DRY RUN] Would create directories: $DEPLOYMENT_DIR/{backend,database,scripts}"
+    echo "[DRY RUN] Would create directories: $DEPLOYMENT_DIR/{backend,data_fetcher,scripts}"
     echo "[DRY RUN] Would change to directory: $DEPLOYMENT_DIR"
 else
-    mkdir -p $DEPLOYMENT_DIR/{backend,database,scripts}
+    mkdir -p $DEPLOYMENT_DIR/{backend,data_fetcher,scripts}
     cd $DEPLOYMENT_DIR
 fi
 

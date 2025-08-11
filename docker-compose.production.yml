@@ -3,7 +3,7 @@ services:
     container_name: web3_data_fetcher_prod
     init: true
     restart: always
-    image: $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_DB_REPOSITORY:latest
+    image: $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_DATA_FETCHER_REPOSITORY:latest
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - REDIS_URL=${REDIS_URL}
@@ -11,7 +11,6 @@ services:
       - COINGECKO_API_KEY=${COINGECKO_API_KEY}
       - CERTIFICATE_RENEWAL_LOG=${CERTIFICATE_RENEWAL_LOG}
     volumes:
-      - database:/app/instance
       - /var/log:/var/log
     networks:
       - w3s-inner-nw
@@ -23,8 +22,7 @@ services:
       - FLASK_DEBUG=production
       - REDIS_URL=${REDIS_URL}
     env_file: ./backend/.env
-    volumes:
-      - database:/app/instance
+
     restart: always
     depends_on:
       - data_fetcher
@@ -60,7 +58,6 @@ services:
       - w3s-inner-nw
 
 volumes:
-  database:
   certbot_www:
   certbot_conf:
 
