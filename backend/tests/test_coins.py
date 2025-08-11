@@ -6,16 +6,14 @@ from functools import partial
 from unittest import mock
 
 import pytest
-from database_utils.helpers import (
+from rq import Queue
+from server.routes.coins import event_stream
+
+from data_fetcher.utils.helpers import (
     compute_extra_columns,
-    generate_object_diff,
     normalize_coins,
     process_percentages,
 )
-from fakeredis import FakeStrictRedis
-from rq import Queue
-from rq.job import Job
-from server.routes.coins import event_stream
 
 UPDATED_AT = datetime(2022, 1, 1, 0, 0, 0, tzinfo=timezone.utc).isoformat()
 
@@ -128,7 +126,7 @@ def seed_coin(conn, app):
     app.redis_conn.set("coins:updated_at", UPDATED_AT)
 
 
-def test_get_coins(client, db_connection, app):
+def test_get_coins(client, app):
     """Test case for the 'get_coins' endpoint.
 
     This test verifies that the 'get_coins' endpoint returns the expected JSON response.
@@ -141,7 +139,7 @@ def test_get_coins(client, db_connection, app):
     Returns:
         None
     """
-    seed_coin(db_connection, app)
+    seed_coin(None, app)
 
     response = client.get("/api/coins")
 
