@@ -5,13 +5,23 @@ A dashboard that shows recent trends on the crypto market using data from the Co
 ## Architecture
 
 ### Components
+
 - **Frontend**: React application with nginx serving HTTPS traffic
-- **Backend**: Flask API server providing crypto market data
-- **Database**: SQLite with automated data fetching via cron jobs
-- **Redis**: Caching layer for API responses
+- **Backend**: Flask API server providing crypto market data from Redis
+- **Data Fetcher**: Service that fetches data from CoinGecko API via cron jobs
+- **Redis**: Data store for all crypto market data
 - **SSL**: Automated Let's Encrypt certificate management
 
+### Data Flow
+
+- **External API**: CoinGecko API provides crypto market data
+- **Data Fetcher**: Fetches and processes data every 6 minutes, stores in Redis
+- **Redis Store**: Data storage with pub/sub for real-time updates
+- **Backend API**: Serves data from Redis to frontend
+- **Frontend**: Receives real-time updates via server-sent events
+
 ### Infrastructure
+
 - **Deployment**: AWS EC2 with Docker containers
 - **Images**: Multi-platform Docker images stored in AWS ECR
 - **Configuration**: AWS SSM Parameter Store for secrets
@@ -20,11 +30,13 @@ A dashboard that shows recent trends on the crypto market using data from the Co
 ## Deployment
 
 ### Prerequisites
+
 - AWS account with ECR repositories created
 - Domain name pointing to your EC2 instance
 - GitHub repository secrets configured
 
 ### GitHub Secrets Required
+
 ```
 AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY
@@ -39,11 +51,13 @@ S3_DEPLOYMENT_BUCKET
 ### Production Deployment
 
 1. **Launch EC2 Instance** with the user data script:
+
    ```bash
    # Use scripts/ec2-user-data.sh as user data
    ```
 
 2. **Deploy Application**:
+
    ```bash
    ssh ubuntu@<server-ip>
    ~/web3-snapshot/scripts/deploy-production.sh
@@ -56,7 +70,8 @@ S3_DEPLOYMENT_BUCKET
 
 ### Automated Deployment Pipeline
 
-Push to `main` branch triggers:
+Merge to `main` branch (via PR) triggers:
+
 1. Multi-platform Docker image builds (AMD64/ARM64)
 2. Push images to AWS ECR
 3. Update SSM parameters
@@ -65,16 +80,19 @@ Push to `main` branch triggers:
 ## SSL Certificate Management
 
 ### Automatic Certificate Generation
+
 - Certificates are generated automatically during deployment
 - Uses Let's Encrypt with webroot validation
 - Certificates stored in Docker volumes
 
 ### Certificate Renewal
+
 - Automated renewal via cron job (twice daily)
 - Script: `~/web3-snapshot/scripts/renew-certificate.sh`
 - Logs: `/var/log/certificate-renewal.log`
 
 ### Manual Certificate Operations
+
 ```bash
 # Generate new certificates
 ~/web3-snapshot/scripts/renew-certificate.sh
@@ -85,30 +103,13 @@ docker compose -f docker-compose.certbot.yml run --rm certbot certificates
 
 ## Development
 
-### Local Development Setup
-```bash
-# Clone repository
-git clone <repository-url>
-cd web3-snapshot-dashboard
-
-# Start development environment
-docker compose -f docker-compose.development.yml up -d
-
-# Access application
-# Frontend: http://localhost:3000
-# Backend: http://localhost:5000
-```
-
-### Environment Configuration
-- Copy `.env.development_TEMPLATE` to `.env.development`
-- Configure CoinGecko API credentials
-- Update database and Redis URLs as needed
+For local development setup, container architecture, and debugging tools, see the [Development Guide](docs/development.md).
 
 ## File Structure
 
 ```
 ├── backend/           # Flask API server
-├── database/          # Data fetching and storage
+├── database/          # Data fetcher service (CoinGecko API)
 ├── frontend/          # React application
 ├── nginx/             # Nginx config for SSL challenges
 ├── scripts/           # Deployment and management scripts
@@ -119,21 +120,25 @@ docker compose -f docker-compose.development.yml up -d
 ## Scripts
 
 ### Deployment Scripts
+
 - `scripts/deploy-production.sh` - Main production deployment
 - `scripts/ec2-user-data.sh` - EC2 instance bootstrap
 - `scripts/bootstrap-server.sh` - Server setup (Docker, AWS CLI)
 
 ### Certificate Management
+
 - `scripts/renew-certificate.sh` - SSL certificate generation/renewal
 
 ### Development Tools
+
 - `scripts/manage.sh` - Development environment management
 
-## Troubleshooting
+## Server Troubleshooting
 
-### Common Issues
+### Common Production Issues
 
 **SSL Certificate Problems**:
+
 ```bash
 # Check certificate status
 docker logs web3_frontend_prod
@@ -143,6 +148,7 @@ docker logs web3_frontend_prod
 ```
 
 **Container Issues**:
+
 ```bash
 # Check container status
 docker compose -f docker-compose.production.yml ps
@@ -152,6 +158,7 @@ docker compose -f docker-compose.production.yml logs [service-name]
 ```
 
 **Environment Variable Issues**:
+
 ```bash
 # Verify environment variables
 cd ~/web3-snapshot
@@ -160,6 +167,7 @@ echo $AWS_REGION
 ```
 
 ### Log Locations
+
 - Application logs: `docker compose logs`
 - Certificate renewal: `/var/log/certificate-renewal.log`
 - Data fetching: `/var/log/web3snapshot-fetch.log`
@@ -168,7 +176,9 @@ echo $AWS_REGION
 ## Configuration
 
 ### SSM Parameters
+
 The application uses AWS SSM Parameter Store for configuration:
+
 - `/w3s/production/redis-url`
 - `/w3s/production/coingecko-api-url`
 - `/w3s/production/coingecko-api-key`
@@ -178,6 +188,7 @@ The application uses AWS SSM Parameter Store for configuration:
 - `/w3s/production/email`
 
 ### Docker Compose Files
+
 - `docker-compose.development.yml` - Local development
 - `docker-compose.production.yml` - Production deployment
 - `docker-compose.certbot.yml` - SSL certificate management
@@ -191,11 +202,8 @@ The application uses AWS SSM Parameter Store for configuration:
 
 ## Monitoring
 
-### Health Checks
-- Frontend: `https://yourdomain.com`
-- Backend API: `https://yourdomain.com/api/health`
+### Container Status (Server)
 
-### Container Status
 ```bash
 docker compose -f docker-compose.production.yml ps
 ```
@@ -209,4 +217,4 @@ docker compose -f docker-compose.production.yml ps
 
 ## License
 
-[Add your license information here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
