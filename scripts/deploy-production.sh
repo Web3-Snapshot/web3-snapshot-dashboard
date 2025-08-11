@@ -184,7 +184,7 @@ echo "Downloading configuration files..."
 for local_file in "${!required_s3_files[@]}"; do
     s3_path="${required_s3_files[$local_file]}"
     echo "Downloading $local_file from s3://$S3_BUCKET/$s3_path"
-    execute sudo aws s3 cp "s3://$S3_BUCKET/$s3_path" "./$local_file" --region "$AWS_REGION"
+    execute sudo aws s3 cp "s3://$S3_BUCKET/$s3_path" "$local_file" --region "$AWS_REGION"
 done
 
 # Download certificate management script
