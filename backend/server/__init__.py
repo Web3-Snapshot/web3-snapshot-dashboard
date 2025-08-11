@@ -3,7 +3,6 @@ from urllib.parse import quote, urlparse, urlunparse
 
 from flask import Flask
 from redis import from_url
-from rq import Queue
 
 
 class PrefixMiddleware(object):
@@ -65,10 +64,6 @@ def create_app(config_env="server.config.development"):
 
     app.config.from_object(config_env)
     print(app.config)
-
-    from .db import close_connection
-
-    app.teardown_appcontext(close_connection)
 
     from server.routes import coins
 

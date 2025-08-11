@@ -143,24 +143,11 @@ _validate_option_arg() {
 ######################################
 #####      Exposed functions     #####
 ######################################
-check_db() {
-    echo "Checking if database exists..."
-
-    # Direct approach: list files and grep for database file
-    if docker compose -f docker-compose."$ENVIRONMENT".yml run --rm backend ls /app/instance/ | grep -q "$ENVIRONMENT.db"; then
-        echo "Database found"
-        return 0
-    else
-        echo "Database not found. Run migrations first"
-        return 1
-    fi
-}
-
 start() {
     echo "Starting containers in $ENVIRONMENT environment"
     # shellcheck disable=SC2034
     local -a start_vars=("ENVIRONMENT" "DEBUG")
-    check_db && _exec_dc start_vars docker compose -f docker-compose."$ENVIRONMENT".yml up -d frontend backend db redis
+    _exec_dc start_vars docker compose -f docker-compose."$ENVIRONMENT".yml up -d frontend backend data_fetcher redis
 }
 
 stop() {
@@ -177,9 +164,9 @@ build() {
         echo "Building all services"
         if [ "$ENVIRONMENT" = "production" ]; then
             echo "Production build: frontend will be omitted"
-            docker_command="$docker_command db redis backend"
+            docker_command="$docker_command data_fetcher redis backend"
         else
-            docker_command="$docker_command frontend backend db redis"
+            docker_command="$docker_command frontend backend data_fetcher redis"
         fi
     else
         echo "Building service: $_arg_build_service"
@@ -232,7 +219,7 @@ tests() {
     # shellcheck disable=SC2034
     local -a test_vars=("ENVIRONMENT" "DEBUG" "REDIS_URL")
     start && _exec_dc test_vars docker compose -f docker-compose."$ENVIRONMENT".yml run --rm backend pytest tests -vvv &&
-        _exec_dc test_vars docker compose -f docker-compose."$ENVIRONMENT".yml run --rm db pytest tests -vvv
+        _exec_dc test_vars docker compose -f docker-compose."$ENVIRONMENT".yml run --rm data_fetcher pytest tests -vvv
 }
 
 isession() {
@@ -244,12 +231,7 @@ isession() {
         docker attach "(docker ps -aqf 'name=isession')"
 }
 
-init_db() {
-    # Needs full environment since it runs the db container
-    # shellcheck disable=SC2034
-    local -a init_vars=("ENVIRONMENT" "DEBUG" "REDIS_URL" "COINGECKO_API_URL" "COINGECKO_API_KEY" "CERTIFICATE_RENEWAL_LOG")
-    _exec_dc init_vars docker compose -f docker-compose."$ENVIRONMENT".yml run --rm db /bin/sh -c "python /app/core/init_db.py"
-}
+
 
 install_backend() {
     if [[ -z "$_arg_install_backend" ]]; then
@@ -315,7 +297,7 @@ print_help() {
     printf '\t%s\n' "--build: Build with docker compose (no default)"
     printf '\t%s\n' "--debug, --no-debug: Start up the debugging server and attach (off by default)"
     printf '\t%s\n' "--dry-run, --no-dry-run: Run certificate renewal in dry-run mode (off by default)"
-    printf '\t%s\n' "--init-db: Initialize the database"
+
     printf '\t%s\n' "--tests: Run pytests"
     printf '\t%s\n' "--ps: Print running containers"
     printf '\t%s\n' "--logs: Tail out logs"
@@ -368,9 +350,7 @@ parse_commandline() {
         --logs)
             command="logs"
             ;;
-        --check-db)
-            command="check_db"
-            ;;
+
         --isession)
             command="isession"
             ;;
@@ -384,9 +364,7 @@ parse_commandline() {
             _arg_connect_service="${_key##--connect-service=}"
             command="connect_service"
             ;;
-        --init-db)
-            command="init_db"
-            ;;
+
         --install-backend)
             _validate_option_arg "$_key" $# "$2"
             _arg_install_backend="$2"
@@ -470,10 +448,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         logs
         exit 0
         ;;
-    "check_db")
-        check_db
-        exit 0
-        ;;
+
     "isession")
         isession
         exit 0
@@ -482,10 +457,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         connect_service
         exit 0
         ;;
-    "init_db")
-        init_db
-        exit 0
-        ;;
+
     "install_backend")
         install_backend
         exit 0
