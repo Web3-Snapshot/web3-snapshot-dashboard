@@ -102,7 +102,7 @@ check_dependencies() {
     fi
 }
 
-DEPLOYMENT_DIR="/opt/web3-snapshot"
+DEPLOYMENT_DIR="$HOME/web3-snapshot"
 
 # Define required SSM parameters
 declare -A required_ssm_params=(

@@ -2,7 +2,7 @@
 set -e
 
 # Configuration
-DEPLOYMENT_DIR="/opt/web3-snapshot"
+DEPLOYMENT_DIR="$HOME/web3-snapshot"
 COMPOSE_FILE_CERTBOT="docker-compose.certbot.yml"
 COMPOSE_FILE_APP="docker-compose.production.yml"
 LOG_FILE="/var/log/certificate-renewal.log"

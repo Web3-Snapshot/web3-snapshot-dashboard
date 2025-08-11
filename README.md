@@ -166,7 +166,7 @@ docker compose -f docker-compose.production.yml logs [service-name]
 
 ```bash
 # Verify environment variables
-cd /opt/web3-snapshot
+cd ~/web3-snapshot
 source .env.production
 echo $AWS_REGION
 ```
