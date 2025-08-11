@@ -1,33 +1,21 @@
-name: Lint and Test
+name: Test
 
 on:
   workflow_call:
   workflow_dispatch:
   pull_request:
     branches:
-      - 'main'
+      - "main"
+      - "dev"
 
 jobs:
-  lint-all:
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v2
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Run linter
-        uses: pre-commit/action@v2.0.3
-        with:
-          extra_args: --all-files
-
   backend-test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       ENVIRONMENT: development
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 

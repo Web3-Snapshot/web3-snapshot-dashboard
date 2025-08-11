@@ -4,7 +4,6 @@ import utc from 'dayjs/plugin/utc';
 import { useBreakpoints } from 'react-breakpoints-hook';
 import { BREAKPOINTS } from '../constants';
 import { usePricesStore } from './Prices/state';
-import { APP_VERSION } from '../shared/constants';
 
 dayjs.extend(utc);
 
@@ -17,16 +16,12 @@ function DisclaimerMessage() {
   function largeScreenText() {
     return (
       <p>
-        <span style={{ marginRight: 10 }}>
-          +++ <strong>Under Development: v{APP_VERSION}</strong>
-        </span>
         {updatedAt && (
-          <span style={{ marginLeft: 10 }}>
-            {' '}
-            Lastest update: {dayjs(updatedAt).format('YYYY-MM-DD H:mm:ss')}
+          <span>
+            <span className={styles.indicator}>●</span>
+            Data fetched: {dayjs(updatedAt).format('YYYY-MM-DD H:mm:ss')}
           </span>
         )}
-        <span> +++</span>
       </p>
     );
   }
@@ -34,10 +29,12 @@ function DisclaimerMessage() {
   function smallScreenText() {
     return (
       <>
-        <p>
-          <strong>+++ Under Development: v{APP_VERSION} +++</strong>
-        </p>
-        {updatedAt && <p>{`Latest update: ${dayjs(updatedAt).format('YYYY-MM-DD H:mm:ss')}`}</p>}
+        {updatedAt && (
+          <p>
+            <span className={styles.indicator}>●</span>
+            Data fetched: {dayjs(updatedAt).format('YYYY-MM-DD H:mm:ss')}
+          </p>
+        )}
       </>
     );
   }

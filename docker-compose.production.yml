@@ -1,32 +1,30 @@
-version: '3.7'
-
 services:
   db:
     container_name: web3_database_prod
     init: true
     restart: always
-    build:
-      context: ./database
+    image: $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_DB_REPOSITORY:latest
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
       - REDIS_URL=${REDIS_URL}
-      - COIN_API_URL=${COIN_API_URL}
+      - COINGECKO_API_URL=${COINGECKO_API_URL}
+      - COINGECKO_API_KEY=${COINGECKO_API_KEY}
+      - CERTIFICATE_RENEWAL_LOG=${CERTIFICATE_RENEWAL_LOG}
     volumes:
       - database:/app/instance
+      - /var/log:/var/log
     networks:
       - w3s-inner-nw
 
   backend:
     container_name: web3_backend_prod
-    build:
-      context: ./backend
+    image: $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_BACKEND_REPOSITORY:latest
     environment:
       - FLASK_DEBUG=production
       - REDIS_URL=${REDIS_URL}
     env_file: ./backend/.env
     volumes:
       - database:/app/instance
-      - ${PWD}/database/schema.sql:/app/schema.sql
     restart: always
     depends_on:
       - db
@@ -36,11 +34,8 @@ services:
 
   frontend:
     container_name: web3_frontend_prod
-    build:
-      context: ./frontend
-    image: $AWS_ACCOUNT/$AWS_FRONTEND_REPOSITORY:latest
+    image: $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_FRONTEND_REPOSITORY:latest
     ports:
-      - 80:80
       - 443:443
     restart: always
     depends_on:
@@ -50,29 +45,6 @@ services:
     volumes:
       - certbot_www:/var/www/certbot/:ro
       - certbot_conf:/etc/nginx/ssl
-    networks:
-      - w3s-nw
-
-  isession:
-    container_name: web3_isession_production
-    stdin_open: true
-    tty: true
-    command: ipython
-    build:
-      context: .
-      dockerfile: ./isession/Dockerfile
-    volumes:
-      - ${PWD}/backend/server:/app/server
-      - ${PWD}/backend/utils:/app/utils
-      - ${PWD}/database/schema.sql:/app/schema.sql
-      - ${PWD}/database:/app/database
-      - ${PWD}/isession/.ipython:/app/.ipython
-      - /app/.ipython/profile_default/pid
-      - /app/.ipython/profile_default/security
-      - database:/app/instance
-    environment:
-      - IPYTHONDIR=/app/.ipython
-      - ENVIRONMENT=${ENVIRONMENT}
     networks:
       - w3s-nw
 
@@ -91,7 +63,6 @@ volumes:
   database:
   certbot_www:
   certbot_conf:
-
 
 networks:
   w3s-nw:

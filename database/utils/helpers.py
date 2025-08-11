@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import List, Union
+from typing import Any, Dict, List, Union
 
 PRICES_PROPS = [
     "id",
@@ -53,13 +53,11 @@ def calculate_relative_percentage(key, original_value, d):
         return 0
 
     if original_value >= 0:
-        return round(((original_value) / d[key]["positive"]) * 100)
+        divisor = d[key]["positive"] if d[key]["positive"] != 0 else 1
+        return round(((original_value) / divisor) * 100)
 
-    return round((abs(original_value) / d[key]["negative"]) * 100)
-
-
-from copy import deepcopy
-from typing import Any, Dict, List
+    divisor = d[key]["negative"] if d[key]["negative"] != 0 else 1
+    return round((abs(original_value) / divisor) * 100)
 
 
 def process_percentages(

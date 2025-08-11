@@ -40,4 +40,6 @@ README_old.md
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
-cron.log
+
+# Amazon Q rules
+/.amazonq/

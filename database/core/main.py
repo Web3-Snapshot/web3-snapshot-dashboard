@@ -20,7 +20,6 @@ Note: The module relies on external dependencies such as requests, cache, and ut
 """
 
 import json
-import pprint
 import traceback
 from datetime import datetime, timezone
 from os import environ
@@ -37,8 +36,15 @@ from utils.helpers import (
 
 DB_PATH = f"./instance/{environ.get('ENVIRONMENT')}.db"
 SCHEMA_PATH = "./schema.sql"
-BASE_URL = environ.get("COIN_API_URL")
-NUMBER_OF_SINGLE_COINS = 2
+BASE_URL = environ.get("COINGECKO_API_URL")
+API_KEY = environ.get("COINGECKO_API_KEY")
+# Defines the number of requests which we can make to the API for single coins.
+# Currently, the API allows for 10_000 reqs/month. We have to make two requests
+# for an update (all coins and a single coin).
+NUMBER_OF_SINGLE_COINS = 1
+
+# Headers for API requests
+HEADERS = {"x-cg-demo-api-key": API_KEY} if API_KEY else {}
 
 COIN_DETAIL_FIELDS = {
     "id": "id",
@@ -111,7 +117,7 @@ def get_single_coin(coin_id):
     Returns:
         requests.Response: The response object containing the coin information.
     """
-    return requests.get(f"{BASE_URL}/coins/{coin_id}")
+    return requests.get(f"{BASE_URL}/coins/{coin_id}", headers=HEADERS)
 
 
 def get_coins(pages=100):
@@ -132,7 +138,7 @@ def get_coins(pages=100):
         "vs_currency": "usd",
         "order": "market_cap_desc",
     }
-    return requests.get(f"{BASE_URL}/coins/markets", params=payload)
+    return requests.get(f"{BASE_URL}/coins/markets", params=payload, headers=HEADERS)
 
 
 def preprocess_data(coins):
@@ -194,11 +200,17 @@ def fetch_and_cache():
         DataFetcherException: If the status code for fetching the single coin is not 200.
 
     """
+    print(
+        f"\n=== FETCH STARTED: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')} ==="
+    )
+
     try:
         coins_response = get_coins(100)  # Get the top 100 coins
+        response_json = coins_response.json()
+        print(f"Fetched {len(response_json)} coins from API")
 
         # Calculate MC/FDV which is the ratio MC/FDV
-        coins = preprocess_data(coins_response.json())
+        coins = preprocess_data(response_json)
         normalized_coins, order = normalize_coins(coins)
 
         previous_data = redis_conn.get("coins:all")
@@ -211,10 +223,7 @@ def fetch_and_cache():
             diff = normalized_coins
 
         diff_length = diff.get("prices") and len(diff["prices"]) or 0
-        print("**************************************")
         print(f"Diff: {diff_length} rows changed")
-        # print(f"Diff: {pprint.pprint(diff)}")
-        print("**************************************")
 
         if diff_length > 0:
             updated_at = datetime.now(timezone.utc).isoformat()
@@ -223,8 +232,12 @@ def fetch_and_cache():
             redis_conn.set("coins:order", json.dumps(order))
             redis_conn.set("coins:updated_at", updated_at)
 
-            print("order:", order)
-            print("updated_at:", updated_at)
+            # Show first 10 and last 5 coins in order
+            if len(order) > 15:
+                order_preview = order[:10] + ["..."] + order[-5:]
+            else:
+                order_preview = order
+            print(f"Updated cache with {len(order)} coins: {order_preview}")
             pub_payload = {
                 "data": {
                     "changed": diff_length,
@@ -235,16 +248,13 @@ def fetch_and_cache():
             redis_conn.publish("coins", json.dumps(pub_payload))
 
     except Exception as err:  # pylint: disable=broad-except
-        print("Something went wrong inside the main function while fetching all coins")
-        print(err)
+        print(f"ERROR fetching all coins: {err}")
         print(traceback.format_exc())
 
     ### Fetch single coins
     try:
         coins = json.loads(redis_conn.get("coins:all"))
-        # {prices: {bitcoin: {id: 1, name: "Bitcoin", ...}}, tokenomics:
-        # {bitcoin: {id: 1, ...}, order: [bitcoin, ...], updated_at: ...}
-        incoming_ids = [coin["id"] for coin in coins_response.json()]
+        incoming_ids = [coin["id"] for coin in response_json]
 
         rotating_ids = redis_conn.get("coins:ids")
         if rotating_ids is None:
@@ -256,8 +266,8 @@ def fetch_and_cache():
 
         # Generate the diff and return the removed and new ids
         removed_ids, new_ids = generate_list_diff(rotating_ids, incoming_ids)
-        print(f"Removed ids: {removed_ids}")
-        print(f"New ids: {new_ids}")
+        if removed_ids or new_ids:
+            print(f"ID changes - Removed: {len(removed_ids)}, New: {len(new_ids)}")
 
         # First remove the obsolete ids
         rotating_ids = [id for id in rotating_ids if id not in removed_ids]
@@ -283,14 +293,11 @@ def fetch_and_cache():
             rotating_ids[NUMBER_OF_SINGLE_COINS:]
             + rotating_ids[:NUMBER_OF_SINGLE_COINS]
         )
-        print(f"rotating_ids before save: {rotating_ids}")
         redis_conn.set("coins:ids", json.dumps(rotating_ids))
+        print(f"Processed {NUMBER_OF_SINGLE_COINS} single coin(s)")
 
     except Exception as err:  # pylint: disable=broad-except
-        print(
-            "Something went wrong inside the main function while fetching single coins"
-        )
-        print(err)
+        print(f"ERROR fetching single coins: {err}")
         print(traceback.format_exc())
 
 

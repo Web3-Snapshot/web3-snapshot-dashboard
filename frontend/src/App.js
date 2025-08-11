@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Prices from './components/Prices';
 import Tokenomics from './components/Tokenomics';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Dashboard from './pages/Dashboard';
 import { useIsIframe } from './custom-hooks/useIsIframe';
 
@@ -29,7 +30,8 @@ function App() {
           // body.offsetHeight,
           body.scrollHeight
         );
-        console.log('windowTopMessage.current', windowTopMessage.current);
+        // For debugging purposes if needed
+        // console.log('windowTopMessage.current', windowTopMessage.current);
         window.top.postMessage(windowTopMessage.current, '*');
       }, 500);
     }
@@ -55,6 +57,7 @@ function App() {
         </Route>
         <Route path="*" element={<></>} />
       </Routes>
+      {!isIframe && <Footer />}
     </>
   );
 }

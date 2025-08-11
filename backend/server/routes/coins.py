@@ -57,23 +57,35 @@ def get_coins():
 def event_stream(redis_conn, pubsub, single=False):
     """Event stream function that listens to a Redis pubsub channel for updates on coin data.
     When a message is received, it retrieves the latest coin data from Redis and yields it.
+    Sends keepalive messages every 30 seconds to prevent connection timeout.
 
     Args:
         pubsub: (Redis.pubsub): A Redis pubsub connection.
 
     Yields:
-        str: A JSON string representing the latest coin data.
+        str: A JSON string representing the latest coin data or keepalive message.
     """
-    for message in pubsub.listen():
+    pubsub.get_message(timeout=1)  # Clear any initial subscription message
+
+    while True:
+        message = pubsub.get_message(timeout=30)  # 30 second timeout
+
+        if message is None:
+            # Send keepalive comment to prevent connection timeout
+            yield ": keepalive\n\n"
+            continue
+
+        if message["type"] != "message":
+            continue
         print(message)
         coins = redis_conn.get("coins:all")
         if coins is None:
-            return {"error": "No coins found"}, 404
+            continue
         coins = json.loads(coins)
 
         order = redis_conn.get("coins:order")
         if order is None:
-            return {"error": "No sort order found"}, 404
+            continue
         order = json.loads(order)
 
         updated_at = redis_conn.get("coins:updated_at")
@@ -89,7 +101,7 @@ def event_stream(redis_conn, pubsub, single=False):
             single = False
             yield "data: %s\n\n" % json.dumps(payload)
 
-        yield "data:  %s\n\n" % json.dumps(payload)
+        yield "data: %s\n\n" % json.dumps(payload)
 
 
 @bp.route("/coin-stream", methods=["GET"])
