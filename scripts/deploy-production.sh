@@ -174,8 +174,10 @@ else
     # Create app directory structure with proper permissions
     sudo mkdir -p $CONFIG_DIR/backend $COMPOSE_DIR/nginx $SCRIPTS_DIR
     sudo chown -R root:deploy $APP_DIR
-    sudo chmod 755 $APP_DIR $CONFIG_DIR $COMPOSE_DIR $SCRIPTS_DIR
+    sudo chmod 775 $APP_DIR $CONFIG_DIR $COMPOSE_DIR $SCRIPTS_DIR
 
+    # Activate deploy group membership for current session
+    exec sg deploy "$0 $*"
     cd $APP_DIR
 fi
 
@@ -184,7 +186,7 @@ echo "Downloading configuration files..."
 for local_file in "${!required_s3_files[@]}"; do
     s3_path="${required_s3_files[$local_file]}"
     echo "Downloading $local_file from s3://$S3_BUCKET/$s3_path"
-    execute sudo aws s3 cp "s3://$S3_BUCKET/$s3_path" "$local_file" --region "$AWS_REGION"
+    execute aws s3 cp "s3://$S3_BUCKET/$s3_path" "$local_file" --region "$AWS_REGION"
 done
 
 # Download certificate management script
@@ -192,9 +194,8 @@ echo "Downloading certificate management script..."
 if [[ "$DRY_RUN" == "true" ]]; then
     echo "[DRY RUN] Would download manage-certificate.sh to $SCRIPTS_DIR"
 else
-    sudo aws s3 cp "s3://$S3_BUCKET/scripts/manage-certificate.sh" "$SCRIPTS_DIR/manage-certificate.sh" --region "$AWS_REGION"
-    sudo chmod 755 "$SCRIPTS_DIR/manage-certificate.sh"
-    sudo chown root:deploy "$SCRIPTS_DIR/manage-certificate.sh"
+    aws s3 cp "s3://$S3_BUCKET/scripts/manage-certificate.sh" "$SCRIPTS_DIR/manage-certificate.sh" --region "$AWS_REGION"
+    chmod 755 "$SCRIPTS_DIR/manage-certificate.sh"
 fi
 
 # Generate backend secret key and process template
@@ -206,9 +207,8 @@ else
     # Generate a random secret key
     BACKEND_SECRET_KEY=$(openssl rand -hex 32)
     # Process the template
-    sudo sed "s/{{BACKEND_SECRET_KEY}}/$BACKEND_SECRET_KEY/g" "$BACKEND_ENV_FILE" > /tmp/backend.env.tmp
-    sudo mv /tmp/backend.env.tmp "$BACKEND_ENV_FILE"
-    sudo chown root:deploy "$BACKEND_ENV_FILE"
+    sed "s/{{BACKEND_SECRET_KEY}}/$BACKEND_SECRET_KEY/g" "$BACKEND_ENV_FILE" > /tmp/backend.env.tmp
+    mv /tmp/backend.env.tmp "$BACKEND_ENV_FILE"
 fi
 
 # Generate .env.production from SSM parameters
@@ -247,11 +247,10 @@ if [[ "$DRY_RUN" == "true" ]]; then
     echo -e "$env_content"
     echo "[DRY RUN] Would create server $README_FILE"
 else
-    echo -e "$env_content" | sudo tee "$ENV_FILE" > /dev/null
-    sudo chown root:deploy "$ENV_FILE"
+    echo -e "$env_content" > "$ENV_FILE"
 
     # Create server README with deployment info
-    sudo tee "$README_FILE" > /dev/null << EOF
+    tee "$README_FILE" > /dev/null << EOF
 # Web3 Snapshot Dashboard - Server
 
 ## Quick Commands
@@ -353,7 +352,7 @@ else
         echo "SSL certificates not found. Generating initial certificates..."
         # Create .env file for certbot (it expects this)
         if [ -f "$ENV_FILE" ]; then
-            sudo cp "$ENV_FILE" "$COMPOSE_DIR/.env"
+            cp "$ENV_FILE" "$COMPOSE_DIR/.env"
         fi
 
         # Generate initial certificates using certbot setup
