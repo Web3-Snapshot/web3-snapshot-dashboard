@@ -41,6 +41,7 @@ declare -A static_env_vars=(
     ["AWS_FRONTEND_REPOSITORY"]="w3s-frontend"
     ["AWS_DATA_FETCHER_REPOSITORY"]="w3s-data-fetcher"
     ["AWS_BACKEND_REPOSITORY"]="w3s-backend"
+    ["FLASK_ENV"]="production"
 )
 
 # Generic parameter validation and assignment helper
@@ -282,15 +283,32 @@ generate_environment_files() {
         fi
         env_content+="$var_name=$value\n"
 
-        # Set variables for later functions in dry run mode
-        if [[ "$DRY_RUN" == "true" ]]; then
-            if [[ "$var_name" == "DOMAIN" ]]; then
-                export DOMAIN="$value"
-            elif [[ "$var_name" == "EMAIL" ]]; then
-                export EMAIL="$value"
-            fi
+        # Add computed Docker image names
+        if [[ "$var_name" == "AWS_ACCOUNT" ]]; then
+            aws_account_value="$value"
+        elif [[ "$var_name" == "AWS_REGION" ]]; then
+            aws_region_value="$value"
         fi
     done
+
+    # Add Docker image environment variables
+    if [[ -n "$aws_account_value" && -n "$aws_region_value" ]]; then
+        env_content+="DOCKER_IMAGE_DATA_FETCHER=$aws_account_value.dkr.ecr.$aws_region_value.amazonaws.com/w3s-data-fetcher:latest\n"
+        env_content+="DOCKER_IMAGE_BACKEND=$aws_account_value.dkr.ecr.$aws_region_value.amazonaws.com/w3s-backend:latest\n"
+        env_content+="DOCKER_IMAGE_FRONTEND=$aws_account_value.dkr.ecr.$aws_region_value.amazonaws.com/w3s-frontend:latest\n"
+    fi
+
+    # Set variables for dry run mode
+    if [[ "$DRY_RUN" == "true" ]]; then
+        # Extract DOMAIN and EMAIL from SSM for dry run
+        for var_name in "${!required_ssm_params[@]}"; do
+            if [[ "$var_name" == "DOMAIN" || "$var_name" == "EMAIL" ]]; then
+                ssm_path="${required_ssm_params[$var_name]}"
+                value=$(aws ssm get-parameter --name "$ssm_path" --query 'Parameter.Value' --output text --region "$aws_region")
+                export $var_name="$value"
+            fi
+        done
+    fi
 
     if [[ "$DRY_RUN" == "true" ]]; then
         echo "[DRY RUN] Environment file content would be:"
@@ -353,11 +371,6 @@ deploy_containers() {
         if [ -f "$ENV_FILE" ]; then
             cp "$ENV_FILE" "$COMPOSE_DIR/.env"
         fi
-
-        # Debug: Show current AWS_REGION value
-        echo "DEBUG: Current AWS_REGION value: '$AWS_REGION'"
-        echo "DEBUG: Environment variables for docker-compose:"
-        grep AWS_ "$ENV_FILE" || true
 
         docker compose -f "$compose_file_prod" pull
         docker compose -f "$compose_file_prod" down
