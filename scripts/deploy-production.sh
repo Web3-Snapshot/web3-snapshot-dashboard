@@ -305,7 +305,7 @@ generate_environment_files() {
             if [[ "$var_name" == "DOMAIN" || "$var_name" == "EMAIL" ]]; then
                 ssm_path="${required_ssm_params[$var_name]}"
                 value=$(aws ssm get-parameter --name "$ssm_path" --query 'Parameter.Value' --output text --region "$aws_region")
-                export $var_name="$value"
+                declare -g "$var_name"="$value"
             fi
         done
     fi
@@ -345,7 +345,7 @@ setup_ssl_certificates() {
 
     echo "Managing SSL certificates for $domain..."
     if [[ "$DRY_RUN" == "true" ]]; then
-        echo "[DRY RUN] Would manage SSL certificates"
+        echo "[DRY RUN] Would manage SSL certificates for domain: $domain, email: $email"
     else
         docker compose -f "$compose_file_certbot" up -d nginx80
         sleep 5
