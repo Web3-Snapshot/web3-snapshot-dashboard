@@ -5,13 +5,9 @@ services:
     container_name: web3_data_fetcher_prod
     init: true
     restart: always
-    image: $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_DATA_FETCHER_REPOSITORY:latest
-    environment:
-      - ENVIRONMENT=${ENVIRONMENT}
-      - REDIS_URL=${REDIS_URL}
-      - COINGECKO_API_URL=${COINGECKO_API_URL}
-      - COINGECKO_API_KEY=${COINGECKO_API_KEY}
-      - CERTIFICATE_RENEWAL_LOG=${CERTIFICATE_RENEWAL_LOG}
+    image: ${DOCKER_IMAGE_DATA_FETCHER}
+    # Path configured by deployment script on server
+    env_file: /opt/web3-snapshot/config/.env.production
     volumes:
       - /var/log:/var/log
     networks:
@@ -19,13 +15,11 @@ services:
 
   backend:
     container_name: web3_backend_prod
-    image: $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_BACKEND_REPOSITORY:latest
-    environment:
-      - FLASK_DEBUG=production
-      - REDIS_URL=${REDIS_URL}
-    # Path configured by deployment script on server
-    env_file: /opt/web3-snapshot/config/backend/.env
-
+    image: ${DOCKER_IMAGE_BACKEND}
+    # Paths configured by deployment script on server
+    env_file:
+      - /opt/web3-snapshot/config/.env.production
+      - /opt/web3-snapshot/config/backend/.env
     restart: always
     depends_on:
       - data_fetcher
@@ -35,7 +29,9 @@ services:
 
   frontend:
     container_name: web3_frontend_prod
-    image: $AWS_ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com/$AWS_FRONTEND_REPOSITORY:latest
+    image: ${DOCKER_IMAGE_FRONTEND}
+    # Path configured by deployment script on server
+    env_file: /opt/web3-snapshot/config/.env.production
     ports:
       - 443:443
     restart: always
