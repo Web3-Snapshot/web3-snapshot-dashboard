@@ -56,6 +56,26 @@ services:
     networks:
       - w3s-inner-nw
 
+  certificate_renewal:
+    container_name: web3_certificate_renewal_prod
+    image: alpine:latest
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/web3-snapshot/scripts:/opt/web3-snapshot/scripts:ro
+      - /opt/web3-snapshot/compose:/opt/web3-snapshot/compose:ro
+      - /opt/web3-snapshot/config:/opt/web3-snapshot/config:ro
+      - /var/log:/var/log
+      - certbot_conf:/etc/letsencrypt
+    command: |
+      sh -c "
+      apk add --no-cache docker-cli docker-compose cronie &&
+      (echo '0 2,14 * * * sh /opt/web3-snapshot/scripts/manage-certificate.sh >> /var/log/certificate-renewal.log 2>&1'; echo '0 0 */100 * * find /var/log -name "certificate-renewal.log" -exec truncate -s 0 {} \;') | crontab - &&
+      crond -f
+      "
+    networks:
+      - w3s-nw
+
 volumes:
   certbot_www:
   certbot_conf:
