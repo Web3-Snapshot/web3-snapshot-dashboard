@@ -23,7 +23,8 @@ services:
     environment:
       - FLASK_DEBUG=production
       - REDIS_URL=${REDIS_URL}
-    env_file: ./backend/.env
+    # Path configured by deployment script on server
+    env_file: /opt/web3-snapshot/config/backend/.env
 
     restart: always
     depends_on:
