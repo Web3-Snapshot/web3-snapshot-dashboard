@@ -1,3 +1,5 @@
+name: web3-snapshot
+
 services:
   certbot:
     image: certbot/certbot:latest
@@ -13,9 +15,10 @@ services:
     ports:
       - 80:80
     volumes:
-      - ${PWD}/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      # Path configured by deployment script on server
+      - /opt/web3-snapshot/compose/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - certbot_www:/var/www/certbot/:ro
-      - certbot_conf:/etc/nginx/ssl/:ro
+      - certbot_conf:/etc/letsencrypt/:ro
     networks:
       - w3s-nw
 
