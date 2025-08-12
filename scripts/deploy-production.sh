@@ -43,6 +43,24 @@ declare -A static_env_vars=(
     ["AWS_BACKEND_REPOSITORY"]="w3s-backend"
 )
 
+# Generic parameter validation and assignment helper
+validate_and_assign_params() {
+    local -n params_ref=$1
+    local actual_count=$2
+    local function_name="${FUNCNAME[2]}"
+
+    [[ $actual_count -eq ${#params_ref[@]} ]] || { echo "Error: $function_name() requires exactly ${#params_ref[@]} parameters: ${params_ref[*]}" >&2; exit 1; }
+
+    for i in "${!params_ref[@]}"; do
+        eval "${params_ref[$i]}=\"\${$((i+3))}\""
+    done
+
+    for param in "${params_ref[@]}"; do
+        [[ -n "${!param}" ]] || { echo "Error: $function_name() missing $param (got: '${!param}')" >&2; exit 1; }
+    done
+}
+
+
 # Get AWS region from environment or instance metadata
 get_aws_region() {
     if [[ -n "${AWS_DEFAULT_REGION:-}" ]]; then
@@ -65,36 +83,18 @@ get_aws_region() {
 
 # Set deployment assets bucket from SSM Parameter Store
 set_deployment_assets_bucket() {
-    local aws_region="$1"
-    local ssm_param_path="$2"
+    local params=(aws_region ssm_param_path)
+    validate_and_assign_params params $# "$@"
 
-    if [[ -z "$aws_region" ]]; then
-        echo "Error: set_deployment_assets_bucket() requires aws_region parameter" >&2
-        exit 1
-    fi
-    if [[ -z "$ssm_param_path" ]]; then
-        echo "Error: set_deployment_assets_bucket() requires ssm_param_path parameter" >&2
-        exit 1
-    fi
-
-    if [[ "$DRY_RUN" == "true" ]]; then
-        echo "[DRY RUN] Would get deployment assets bucket from SSM: $ssm_param_path in region: $aws_region"
-        echo "<DEPLOYMENT_ASSETS_BUCKET>"
-    else
-        aws ssm get-parameter --name "$ssm_param_path" --query 'Parameter.Value' --output text --region "$aws_region"
-    fi
+    aws ssm get-parameter --name "$ssm_param_path" --query 'Parameter.Value' --output text --region "$aws_region"
 }
 
 
 
 # Setup directories and permissions
 setup_directories() {
-    local current_user="$1"
-
-    if [[ -z "$current_user" ]]; then
-        echo "Error: setup_directories() requires current_user parameter" >&2
-        exit 1
-    fi
+    local params=(current_user)
+    validate_and_assign_params params $# "$@"
 
     echo "Setting up directories and permissions..."
     if [[ "$DRY_RUN" == "true" ]]; then
@@ -119,17 +119,8 @@ setup_directories() {
 
 # Download configuration files from S3
 download_configuration_files() {
-    local deployment_assets_bucket="$1"
-    local aws_region="$2"
-
-    if [[ -z "$deployment_assets_bucket" ]]; then
-        echo "Error: download_configuration_files() requires deployment_assets_bucket parameter" >&2
-        exit 1
-    fi
-    if [[ -z "$aws_region" ]]; then
-        echo "Error: download_configuration_files() requires aws_region parameter" >&2
-        exit 1
-    fi
+    local params=(deployment_assets_bucket aws_region)
+    validate_and_assign_params params $# "$@"
 
     echo "Downloading configuration files..."
     for local_file in "${!required_s3_files[@]}"; do
@@ -145,22 +136,8 @@ download_configuration_files() {
 
 # Download scripts from S3
 download_scripts() {
-    local deployment_assets_bucket="$1"
-    local aws_region="$2"
-    local scripts_dir="$3"
-
-    if [[ -z "$deployment_assets_bucket" ]]; then
-        echo "Error: download_scripts() requires deployment_assets_bucket parameter" >&2
-        exit 1
-    fi
-    if [[ -z "$aws_region" ]]; then
-        echo "Error: download_scripts() requires aws_region parameter" >&2
-        exit 1
-    fi
-    if [[ -z "$scripts_dir" ]]; then
-        echo "Error: download_scripts() requires scripts_dir parameter" >&2
-        exit 1
-    fi
+    local params=(deployment_assets_bucket aws_region scripts_dir)
+    validate_and_assign_params params $# "$@"
 
     echo "Downloading scripts..."
     if [[ "$DRY_RUN" == "true" ]]; then
@@ -175,12 +152,8 @@ download_scripts() {
 
 # Create symlinks for easy script access
 create_script_symlinks() {
-    local scripts_dir="$1"
-
-    if [[ -z "$scripts_dir" ]]; then
-        echo "Error: create_script_symlinks() requires scripts_dir parameter" >&2
-        exit 1
-    fi
+    local params=(scripts_dir)
+    validate_and_assign_params params $# "$@"
 
     echo "Creating script symlinks..."
     if [[ "$DRY_RUN" == "true" ]]; then
@@ -275,22 +248,8 @@ EOF
 
 # Generate environment files
 generate_environment_files() {
-    local backend_env_file="$1"
-    local env_file="$2"
-    local aws_region="$3"
-
-    if [[ -z "$backend_env_file" ]]; then
-        echo "Error: generate_environment_files() requires backend_env_file parameter" >&2
-        exit 1
-    fi
-    if [[ -z "$env_file" ]]; then
-        echo "Error: generate_environment_files() requires env_file parameter" >&2
-        exit 1
-    fi
-    if [[ -z "$aws_region" ]]; then
-        echo "Error: generate_environment_files() requires aws_region parameter" >&2
-        exit 1
-    fi
+    local params=(backend_env_file env_file aws_region)
+    validate_and_assign_params params $# "$@"
 
     echo "Generating environment files..."
 
@@ -317,25 +276,24 @@ generate_environment_files() {
     for var_name in "${!required_ssm_params[@]}"; do
         ssm_path="${required_ssm_params[$var_name]}"
         if [[ "$var_name" == "COINGECKO_API_KEY" ]]; then
-            if [[ "$DRY_RUN" == "true" ]]; then
-                echo "[DRY RUN] Would get parameter: $ssm_path (with decryption)"
-                value="<ENCRYPTED_VALUE>"
-            else
-                value=$(aws ssm get-parameter --name "$ssm_path" --with-decryption --query 'Parameter.Value' --output text --region "$aws_region")
-            fi
+            value=$(aws ssm get-parameter --name "$ssm_path" --with-decryption --query 'Parameter.Value' --output text --region "$aws_region")
         else
-            if [[ "$DRY_RUN" == "true" ]]; then
-                echo "[DRY RUN] Would get parameter: $ssm_path"
-                value="<SSM_VALUE>"
-            else
-                value=$(aws ssm get-parameter --name "$ssm_path" --query 'Parameter.Value' --output text --region "$aws_region")
-            fi
+            value=$(aws ssm get-parameter --name "$ssm_path" --query 'Parameter.Value' --output text --region "$aws_region")
         fi
         env_content+="$var_name=$value\n"
+
+        # Set variables for later functions in dry run mode
+        if [[ "$DRY_RUN" == "true" ]]; then
+            if [[ "$var_name" == "DOMAIN" ]]; then
+                export DOMAIN="$value"
+            elif [[ "$var_name" == "EMAIL" ]]; then
+                export EMAIL="$value"
+            fi
+        fi
     done
 
     if [[ "$DRY_RUN" == "true" ]]; then
-        echo "[DRY RUN] Would create $env_file with content:"
+        echo "[DRY RUN] Environment file content would be:"
         echo -e "$env_content"
         echo "[DRY RUN] Would create server $README_FILE"
     else
@@ -347,14 +305,10 @@ generate_environment_files() {
 
 # Login to ECR
 login_to_ecr() {
-    local aws_region="$1"
+    local params=(aws_region)
+    validate_and_assign_params params $# "$@"
     local aws_account_param="${required_ssm_params[AWS_ACCOUNT]}"
     local aws_region_param="${required_ssm_params[AWS_REGION]}"
-
-    if [[ -z "$aws_region" ]]; then
-        echo "Error: login_to_ecr() requires aws_region parameter" >&2
-        exit 1
-    fi
 
     echo "Logging into ECR..."
     if [[ "$DRY_RUN" == "true" ]]; then
@@ -368,63 +322,26 @@ login_to_ecr() {
 
 # Setup SSL certificates
 setup_ssl_certificates() {
-    local compose_file_certbot="$1"
-    local domain="$2"
-    local email="$3"
-    local env_file="$4"
-    local compose_dir="$5"
+    local params=(compose_file_certbot domain email env_file compose_dir)
+    validate_and_assign_params params $# "$@"
 
-    if [[ -z "$compose_file_certbot" ]]; then
-        echo "Error: setup_ssl_certificates() requires compose_file_certbot parameter" >&2
-        exit 1
-    fi
-    if [[ -z "$domain" ]]; then
-        echo "Error: setup_ssl_certificates() requires domain parameter" >&2
-        exit 1
-    fi
-    if [[ -z "$email" ]]; then
-        echo "Error: setup_ssl_certificates() requires email parameter" >&2
-        exit 1
-    fi
-    if [[ -z "$env_file" ]]; then
-        echo "Error: setup_ssl_certificates() requires env_file parameter" >&2
-        exit 1
-    fi
-    if [[ -z "$compose_dir" ]]; then
-        echo "Error: setup_ssl_certificates() requires compose_dir parameter" >&2
-        exit 1
-    fi
-
-    echo "Checking SSL certificates..."
+    echo "Managing SSL certificates for $domain..."
     if [[ "$DRY_RUN" == "true" ]]; then
-        echo "[DRY RUN] Would check for SSL certificates and generate if needed"
+        echo "[DRY RUN] Would manage SSL certificates"
     else
-        if ! docker compose -f "$compose_file_certbot" run --rm --no-deps certbot test -f "/etc/letsencrypt/live/$domain/fullchain.pem"; then
-            echo "SSL certificates not found. Generating initial certificates..."
-            if [ -f "$env_file" ]; then
-                cp "$env_file" "$compose_dir/.env"
-            fi
-            echo "Starting temporary nginx for certificate generation..."
-            docker compose -f "$compose_file_certbot" up -d nginx80
-            sleep 5
-            echo "Generating SSL certificate for $domain..."
-            docker compose -f "$compose_file_certbot" run -T --rm certbot certonly --webroot --webroot-path /var/www/certbot/ --email "$email" --agree-tos --no-eff-email -d "$domain"
-            docker compose -f "$compose_file_certbot" down
-            echo "SSL certificates generated successfully."
-        else
-            echo "SSL certificates already exist."
-        fi
+        docker compose -f "$compose_file_certbot" up -d nginx80
+        sleep 5
+        echo "Running certbot for $domain..."
+        docker compose -f "$compose_file_certbot" run -T --rm certbot certonly --webroot --webroot-path /var/www/certbot/ --email "$email" --agree-tos --no-eff-email --keep-until-expiring -d "$domain"
+        docker compose -f "$compose_file_certbot" down
+        echo "SSL certificate management completed."
     fi
 }
 
 # Deploy containers
 deploy_containers() {
-    local compose_file_prod="$1"
-
-    if [[ -z "$compose_file_prod" ]]; then
-        echo "Error: deploy_containers() requires compose_file_prod parameter" >&2
-        exit 1
-    fi
+    local params=(compose_file_prod)
+    validate_and_assign_params params $# "$@"
 
     echo "Pulling latest images and restarting services..."
     if [[ "$DRY_RUN" == "true" ]]; then
@@ -432,6 +349,16 @@ deploy_containers() {
         echo "[DRY RUN] Would stop containers"
         echo "[DRY RUN] Would start containers"
     else
+        # Copy environment file to compose directory for docker-compose
+        if [ -f "$ENV_FILE" ]; then
+            cp "$ENV_FILE" "$COMPOSE_DIR/.env"
+        fi
+
+        # Debug: Show current AWS_REGION value
+        echo "DEBUG: Current AWS_REGION value: '$AWS_REGION'"
+        echo "DEBUG: Environment variables for docker-compose:"
+        grep AWS_ "$ENV_FILE" || true
+
         docker compose -f "$compose_file_prod" pull
         docker compose -f "$compose_file_prod" down
         docker compose -f "$compose_file_prod" up -d
@@ -552,15 +479,9 @@ create_script_symlinks "$SCRIPTS_DIR"
 # Sets: DOMAIN, EMAIL, and all other environment variables (via source in non-dry-run)
 # Generates: Server README.md with deployment commands and configuration
 generate_environment_files "$BACKEND_ENV_FILE" "$ENV_FILE" "$AWS_REGION"
-echo "Set environment variables (by sourcing $ENV_FILE):"
-if [[ "$DRY_RUN" == "true" ]]; then
-    echo "[DRY RUN] Would display environment file contents"
-else
-    if [[ -f "$ENV_FILE" ]]; then
-        cat "$ENV_FILE"
-    else
-        echo "Warning: Environment file $ENV_FILE not found"
-    fi
+echo "Environment variables that would be set:"
+if [[ "$DRY_RUN" != "true" && -f "$ENV_FILE" ]]; then
+    cat "$ENV_FILE"
 fi
 
 # ============================================================================
@@ -585,3 +506,8 @@ setup_ssl_certificates "$COMPOSE_FILE_CERTBOT" "$DOMAIN" "$EMAIL" "$ENV_FILE" "$
 deploy_containers "$COMPOSE_FILE_PROD"
 
 echo "Deployment completed successfully!"
+
+# Cleanup dry run variables
+if [[ "$DRY_RUN" == "true" ]]; then
+    unset DOMAIN EMAIL
+fi
